@@ -1,0 +1,29 @@
+spring:
+ profiles:
+   active: local
+ jpa:
+   hibernate:
+     ddl-auto: create-drop
+   show-sql: true
+ thymeleaf:
+   cache: false
+   check-template: true
+   check-template-location: true
+   enabled: true
+   encoding: UTF-8
+   prefix: classpath:/templates/
+   suffix: .html
+ datasource:
+   driver-class-name: org.h2.Driver
+   url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+   username: sa
+   password: sa
+   initialization-mode: always
+ h2:
+   console:
+     enabled: true
+ rabbitmq:
+   host: localhost
+   port: 5672
+   username: guest
+   password: guest
