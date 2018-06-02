@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Channels</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.0/css/bootstrap.min.css}"/>
+    <script th:src="@{/webjars/sockjs-client/1.0.2/sockjs.js}"></script>
+    <script th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/4.1.0/js/bootstrap.min.js}"></script>
+    <script type="text/javascript">
+        var sock = null;
+
+        $(document).ready(function () {
+            sock = new SockJS('/sock');
+
+            sock.onopen = function () {
+                console.log("connected");
+            };
+
+            sock.onmessage = function (e) {
+                var data = JSON.parse(e.data);
+                var channelId = data.channelId;
+                if($("#"+channelId).css('display') != 'none'){
+                    showMessage(data);
+                }
+            };
+
+            sock.onclose = function () {
+                console.log('disconnected');
+            };
+
+            $("#chatInput_1").keypress(function(e) {
+
+                if (e.keyCode == 13){
+                    sendMsg(1);
+
+                }
+            });
+
+            $("#chatInput_2").keypress(function(e) {
+
+                if (e.keyCode == 13){
+                    sendMsg(2);
+
+                }
+            });
+
+            $("#chatInput_3").keypress(function(e) {
+
+                if (e.keyCode == 13){
+                    sendMsg(3);
+
+                }
+            });
+
+            $("#chatInput_4").keypress(function(e) {
+
+                if (e.keyCode == 13){
+                    sendMsg(4);
+
+                }
+            });
+        });
+
+        function enter(channelId) {
+            if($("#"+channelId).css('display') == 'none'){
+                $.ajax({
+                    url: '/api/channels/'+channelId,
+                    method: 'get',
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (data) {
+                        if(data != null){
+                            for(var i=0;i<data.length;i++){
+                                showMessage(data[i]);
+                            }
+                        }
+                    }
+                });
+
+                $("#"+channelId).show();
+            }
+        }
+
+        function sendMsg(channelId) {
+            //sock.send(JSON.stringify({'channelId' : channelId, 'text' : $("#chatInput_"+channelId).val()}));
+
+            var JSONObject= {
+                "channelId" : channelId,
+                "text" : $("#chatInput_"+channelId).val()
+            };
+            var jsonData = JSON.stringify( JSONObject );
+
+            $.ajax({
+                url: '/api/channels/'+channelId+'/messages',
+                method: 'post',
+                data: jsonData,
+                dataType: "json",
+                contentType: "application/json",
+                success: function (data) {
+                    // showMessage(data);
+                }
+            });
+
+            $("#chatInput_"+channelId).val("");
+        }
+
+        function disconnect() {
+            sock.close();
+        }
+
+        function showMessage(data) {
+            $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+
+            var textArea = $('#messages_'+data.channelId);
+            textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
+        }
+
+    </script>
+</head>
+<body>
+<div>
+    <div style="margin: 30px">
+        <button type="button" class="btn btn-dark btn-sm" onclick="location.href='/logout'">로그아웃</button>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div style="padding-bottom: 10px">
+                    <button type="button" class="btn btn-success" onclick="enter('1')">1번 채널 입장</button>
+                </div>
+                <div id="1" style="display: none">
+                    <div>
+                        <div>
+                            <textarea cols="40" rows="20" id="messages_1" readonly></textarea>
+                        </div>
+                        <div>
+                            <input type="text" size="30" id="chatInput_1"/>
+                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(1)">전송</button>
+                        </div>
+                        <!--<div>
+                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div style="padding-bottom: 10px">
+                    <button type="button" class="btn btn-success" onclick="enter('2')">2번 채널 입장</button>
+                </div>
+                <div id="2" style="display: none">
+                    <div>
+                        <div>
+                            <textarea cols="40" rows="20" id="messages_2" readonly></textarea>
+                        </div>
+                        <div>
+                            <input type="text" size="30" id="chatInput_2"/>
+                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(2)">전송</button>
+                        </div>
+                        <!--<div>
+                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div style="padding-bottom: 10px">
+                    <button type="button" class="btn btn-success" onclick="enter('3')">3번 채널 입장</button>
+                </div>
+                <div id="3" style="display: none">
+                    <div>
+                        <div>
+                            <textarea cols="40" rows="20" id="messages_3" readonly></textarea>
+                        </div>
+                        <div>
+                            <input type="text" size="30" id="chatInput_3"/>
+                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(3)">전송</button>
+                        </div>
+                        <!--<div>
+                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div style="padding-bottom: 10px">
+                   <button type="button" class="btn btn-success" onclick="enter('4')">4번 채널 입장</button>
+                </div>
+                <div id="4" style="display: none">
+                    <div>
+                        <div>
+                            <textarea cols="40" rows="20" id="messages_4" readonly></textarea>
+                        </div>
+                        <div>
+                            <input type="text" size="30" id="chatInput_4"/>
+                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(4)">전송</button>
+                        </div>
+                        <!--<div>
+                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
