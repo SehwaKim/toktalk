@@ -1,4 +1,4 @@
-package com.chat.toktalk.controller;
+package com.chat.toktalk.controller.api;
 
 import com.chat.toktalk.domain.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
