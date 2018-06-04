@@ -13,6 +13,8 @@ public class SocketSecurityConfig extends AbstractSecurityWebSocketMessageBroker
 
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
-        messages.simpDestMatchers("/sock/**").hasRole("ADMIN");
+        messages
+                .simpDestMatchers("/sock/**").hasRole("USER")
+                .anyMessage().authenticated();
     }
 }
