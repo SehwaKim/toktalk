@@ -7,7 +7,6 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Ena
 @Configuration
 public class RedisConfig {
     private @Value("${spring.redis.host}") String redisHost;
