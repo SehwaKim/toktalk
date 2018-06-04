@@ -25,6 +25,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     UserService userService;
 
+    //TODO
+    //RedisService
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
@@ -34,6 +36,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             name = principal.getName();
             System.out.println("접속자 : " + name);
 
+            //TODO
+                //RedisService.setSession();
             //User user = userService.getUserByEmail(principal.getName());
 
         }

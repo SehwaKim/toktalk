@@ -1,6 +1,14 @@
 spring:
  profiles:
    active: local
+ redis:
+   host: 127.0.0.1
+   port: 6379
+ session:
+   store-type: redis
+#   redis:
+#     flush-mode:
+#     namespace:
  jpa:
    hibernate:
      ddl-auto: create-drop
@@ -27,3 +35,5 @@ spring:
    port: 5672
    username: guest
    password: guest
+
+
