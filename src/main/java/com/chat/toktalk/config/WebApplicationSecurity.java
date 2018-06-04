@@ -27,8 +27,10 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().fullyAuthenticated()
                 .and().formLogin()
-                .loginProcessingUrl("/users/login")
-                .loginPage("/users/login").usernameParameter("email").passwordParameter("password")
+                .loginPage("/users/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler(new UserAuthenticationSuccessHandler())
                 .and().csrf().disable();
     }
 }
