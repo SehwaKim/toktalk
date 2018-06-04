@@ -18,7 +18,6 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
         System.out.println("request.getLocalAddress() : " + request.getLocalAddress());
         System.out.println("request.getRemoteAddress() : " + request.getRemoteAddress());
 
-
         ServletServerHttpRequest servletServerHttpRequest = (ServletServerHttpRequest) request;
 
         HttpServletRequest httpServletRequest = servletServerHttpRequest.getServletRequest();
@@ -32,5 +31,6 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
         System.out.println("악수 후 가로챔");
+
     }
 }

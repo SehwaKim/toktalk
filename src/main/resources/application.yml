@@ -4,6 +4,11 @@ spring:
  redis:
    host: 127.0.0.1
    port: 6379
+ session:
+   store-type: redis
+#   redis:
+#     flush-mode:
+#     namespace:
  jpa:
    hibernate:
      ddl-auto: create-drop
