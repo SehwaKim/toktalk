@@ -19,14 +19,18 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/users/login").and().authorizeRequests()
+        http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/users/login")
+                .and().authorizeRequests()
                 .antMatchers("/users/**").permitAll()
+                .antMatchers("/sock/**").hasRole("ADMIN")
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().fullyAuthenticated()
                 .and().formLogin()
-                .loginProcessingUrl("/users/login")
-                .loginPage("/users/login").usernameParameter("email").passwordParameter("password")
+                .loginPage("/users/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler(new UserAuthenticationSuccessHandler())
                 .and().csrf().disable();
     }
 }

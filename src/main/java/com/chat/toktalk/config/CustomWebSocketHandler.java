@@ -1,4 +1,4 @@
-package com.chat.toktalk.websocket;
+package com.chat.toktalk.config;
 
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.service.UserService;
@@ -62,7 +62,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             username = principal.getName();
             System.out.println("sender : " + username);
         }
-
+        System.out.println("session.getUri() : " + session.getUri());
         JSONObject jsonObject = new JSONObject(message.getPayload());
         channelId = (Integer) jsonObject.get("channelId");
         text = (String) jsonObject.get("text");
