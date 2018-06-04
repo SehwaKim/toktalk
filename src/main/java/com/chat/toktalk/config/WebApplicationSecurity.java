@@ -22,7 +22,6 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
         http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/users/login")
                 .and().authorizeRequests()
                 .antMatchers("/users/**").permitAll()
-                .antMatchers("/sock/**").hasRole("ADMIN")
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().fullyAuthenticated()
