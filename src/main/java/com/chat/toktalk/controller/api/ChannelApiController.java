@@ -7,7 +7,7 @@ import com.chat.toktalk.service.ChannelService;
 import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.MessageService;
 import com.chat.toktalk.service.UserService;
-import com.chat.toktalk.websocket.CustomWebSocketHandler;
+import com.chat.toktalk.config.CustomWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +61,7 @@ public class ChannelApiController {
     @PostMapping(path = "/{channelId}/messages")
     public void sendMessages(Principal principal, @PathVariable(value = "channelId") Long channelId, @RequestBody Message message) throws Exception{
         User user = null;
-
+        System.out.println(message);
         if(principal != null){
             user = userService.getUserByEmail(principal.getName());
         }

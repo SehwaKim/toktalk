@@ -5,8 +5,7 @@ insert into user (id, email, password, nickname, regdate) VALUES (3, 'test3', '{
 insert into user_roles(id, role_name, user_id) VALUES (1, 'USER', 1);
 insert into user_roles(id, role_name, user_id) VALUES (2, 'ADMIN', 1);
 insert into user_roles(id, role_name, user_id) VALUES (3, 'USER', 2);
-insert into user_roles(id, role_name, user_id) VALUES (4, 'ADMIN', 2);
-insert into user_roles(id, role_name, user_id) VALUES (5, 'USER', 3);
+insert into user_roles(id, role_name, user_id) VALUES (4, 'USER', 3);
 
 insert into channel (id, name, regdate) VALUES (1, 'room number 1', now());
 insert into channel (id, name, regdate) VALUES (2, 'room number 2', now());
