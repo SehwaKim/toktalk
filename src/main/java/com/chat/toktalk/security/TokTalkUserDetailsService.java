@@ -31,9 +31,6 @@ public class TokTalkUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> list = new ArrayList<>();
         user.getRoles().forEach(role -> list.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName())));
 
-        LoginUserInfo userDetails = new LoginUserInfo(user.getEmail(), user.getPassword(), list);
-        userDetails.setId(user.getId());
-        userDetails.setNickname(user.getNickname());
-        return userDetails;
+        return new LoginUserInfo(user.getEmail(), user.getPassword(), list,user.getId(),user.getNickname());
     }
 }

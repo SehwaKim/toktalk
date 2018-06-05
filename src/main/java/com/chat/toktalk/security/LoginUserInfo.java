@@ -9,14 +9,17 @@ import java.util.Collection;
 public class LoginUserInfo extends User implements Serializable {
     private Long id;
     private String nickname;
-    private String email;
 
-    public LoginUserInfo(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public LoginUserInfo(String username, String password, Collection<? extends GrantedAuthority> authorities, Long id, String nickname) {
         super(username, password, authorities);
+        this.id = id;
+        this.nickname = nickname;
     }
 
-    public LoginUserInfo(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+    public LoginUserInfo(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities, Long id, String nickname) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+        this.id = id;
+        this.nickname = nickname;
     }
 
     public Long getId() {
@@ -39,7 +42,4 @@ public class LoginUserInfo extends User implements Serializable {
         this.nickname = name;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }
