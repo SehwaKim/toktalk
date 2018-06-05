@@ -1,7 +1,10 @@
 package com.chat.toktalk.config;
 
 import com.chat.toktalk.domain.Message;
+import com.chat.toktalk.domain.User;
+import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +15,20 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
 public class CustomWebSocketHandler extends TextWebSocketHandler {
-    private static List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+    private List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
-    // private static List<Map<WebSocketSession, User>> sessionInfo = new CopyOnWriteArrayList<>();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
+    RedisService redisService;
 
     @Autowired
     UserService userService;
@@ -29,18 +37,26 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     //RedisService
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        // 1,2,3 번방 입장할 때...
+        redisService.addChannelForUser(session.getId().toString(),1L);
+        redisService.addChannelForUser(session.getId().toString(),2L);
+        redisService.addChannelForUser(session.getId().toString(),3L);
+        System.out.println("참여한 방정보 : "+redisService.getChannels(session.getId().toString()));
+
         sessions.add(session);
         Principal principal = session.getPrincipal();
         String name = "";
         if(principal != null){
             name = principal.getName();
             System.out.println("접속자 : " + name);
-
-            //TODO
-                //RedisService.setSession();
-            //User user = userService.getUserByEmail(principal.getName());
-
         }
+
+        // 1번 방에 입장 했을 때.
+        redisService.addChannelUser(1L,principal.getName());
+        List<User> userList = new ArrayList<>();
+        userList = redisService.getUsers(1L);
+        System.out.println("1번방 참여한 사람 : " + userList);
+
         System.out.println("------------ 새로운 웹소켓 연결 --------------");
         System.out.println("sessions.size() : " + sessions.size());
         System.out.println("session.getUri() : " + session.getUri());
@@ -56,31 +72,28 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("----------- 메세지 수신 --------------");
-        Principal principal = session.getPrincipal();
-        String username = "";
-        String text = "";
-        Integer channelId;
+        Map<String, Object> attributes = session.getAttributes();
 
-        if(principal != null){
-            username = principal.getName();
-            System.out.println("sender : " + username);
+        String nickname = "";
+        if(attributes.get("nickname") != null){
+            nickname = (String) attributes.get("nickname");
         }
-        System.out.println("session.getUri() : " + session.getUri());
-        JSONObject jsonObject = new JSONObject(message.getPayload());
-        channelId = (Integer) jsonObject.get("channelId");
-        text = (String) jsonObject.get("text");
 
-        String textMessage = "[" + username + "] " + text;
+        TypeReference<HashMap<String,Object>> typeRef
+                = new TypeReference<HashMap<String,Object>>() {};
+        HashMap<String, String> map = objectMapper.readValue(message.getPayload(), typeRef);
+        map.put("nickname", nickname);
 
-        System.out.println("channelId : " + channelId);
-        System.out.println("text : " + text);
+        String msg = objectMapper.writeValueAsString(map);
+        TextMessage textMessage = new TextMessage(msg);
 
-        System.out.println("세션 수 : "+sessions.size());
-
-        for(WebSocketSession webSocketSession : sessions){
-            webSocketSession.sendMessage(new TextMessage("{ \"channelId\":"+channelId+", \"text\":\""+textMessage+"\" }"));
-        }
+        sessions.stream().forEach(s -> {
+            try {
+                s.sendMessage(textMessage);
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        });
     }
 
     @Override

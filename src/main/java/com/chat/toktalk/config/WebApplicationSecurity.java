@@ -1,6 +1,7 @@
 package com.chat.toktalk.config;
 
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -34,4 +35,13 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
               //  .failureHandler(new UserAuthenticationFailureHandler())
                 .and().csrf().disable();
     }
+
+//     @Bean
+//     public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler(){
+//         UserAuthenticationSuccessHandler customAuthenticationSuccessHandler = new UserAuthenticationSuccessHandler();
+//         customAuthenticationSuccessHandler.setDefaultUrl("/");
+//         customAuthenticationSuccessHandler.setTargetUrlParameter("loginRedirect");
+//         customAuthenticationSuccessHandler.setUseReferer(true);
+//         return customAuthenticationSuccessHandler;
+//     }
 }
