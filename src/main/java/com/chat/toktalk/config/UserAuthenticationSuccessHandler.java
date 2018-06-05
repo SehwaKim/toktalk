@@ -35,6 +35,7 @@ public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+
         // TODO Auto-generated method stub
         clearAuthenticationAttributes(request);
 
@@ -140,5 +141,6 @@ public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHa
         }
 
         return result;
+
     }
 }
