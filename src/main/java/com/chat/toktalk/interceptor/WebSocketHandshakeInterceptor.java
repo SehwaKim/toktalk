@@ -1,8 +1,11 @@
 package com.chat.toktalk.interceptor;
 
+import com.chat.toktalk.security.LoginUserInfo;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
@@ -13,24 +16,23 @@ import java.util.Map;
 public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        System.out.println("가로챔");
-        System.out.println("request.getMethodValue() : " + request.getMethodValue());
-        System.out.println("request.getLocalAddress() : " + request.getLocalAddress());
-        System.out.println("request.getRemoteAddress() : " + request.getRemoteAddress());
-
         ServletServerHttpRequest servletServerHttpRequest = (ServletServerHttpRequest) request;
+        HttpServletRequest req = servletServerHttpRequest.getServletRequest();
 
-        HttpServletRequest httpServletRequest = servletServerHttpRequest.getServletRequest();
+        HttpSession session = req.getSession();
+        SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        Authentication authentication = securityContext.getAuthentication();
 
-        HttpSession session = httpServletRequest.getSession();
-        System.out.println(session.getServletContext().getServerInfo());
+        if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
+            LoginUserInfo loginUserInfo = (LoginUserInfo)authentication.getPrincipal();
+            attributes.put("userId", loginUserInfo.getId());
+            attributes.put("nickname", loginUserInfo.getNickname());
+        }
 
         return true;
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-        System.out.println("악수 후 가로챔");
-
     }
 }
