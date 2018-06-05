@@ -38,9 +38,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // 1,2,3 번방 입장할 때...
-        redisService.addChannel(session.getId().toString(),1L);
-        redisService.addChannel(session.getId().toString(),2L);
-        redisService.addChannel(session.getId().toString(),3L);
+        redisService.addChannelForUser(session.getId().toString(),1L);
+        redisService.addChannelForUser(session.getId().toString(),2L);
+        redisService.addChannelForUser(session.getId().toString(),3L);
         System.out.println("참여한 방정보 : "+redisService.getChannels(session.getId().toString()));
 
         sessions.add(session);
@@ -52,7 +52,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         }
 
         // 1번 방에 입장 했을 때.
-        redisService.addUser(1L,principal.getName());
+        redisService.addChannelUser(1L,principal.getName());
         List<User> userList = new ArrayList<>();
         userList = redisService.getUsers(1L);
         System.out.println("1번방 참여한 사람 : " + userList);

@@ -26,13 +26,13 @@ public class RedisServiceImpl implements RedisService {
 //    }
 
     @Override
-    public void addUser(Long id, String userId) {
-        redisTemplate.opsForList().rightPush(id,userId);
+    public void addChannelUser(Long channelId, String userId) {
+        redisTemplate.opsForList().rightPush(channelId,userId);
     }
 
     @Override
-    public void addChannel(String userId, Long roomNo) {
-        redisTemplate.opsForList().rightPush(userId,roomNo);
+    public void addChannelForUser(String userId, Long channelId) {
+        redisTemplate.opsForList().rightPush(userId,channelId);
     }
 
     @Override
