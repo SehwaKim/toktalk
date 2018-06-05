@@ -22,4 +22,8 @@ public class RabbitConfig {
          return BindingBuilder.bind(messageQueue).to(fanoutExchange);
     }
 
+    //TODO
+    //Delay Q, Dead Message Q
+    //Queue_NAME은 Server이름 마다 다르게 처리.
+
 }

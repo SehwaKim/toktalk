@@ -30,16 +30,18 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .loginPage("/users/login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .successHandler(userAuthenticationSuccessHandler())
+                .successForwardUrl("/")
+               // .successHandler(new UserAuthenticationSuccessHandler())
+              //  .failureHandler(new UserAuthenticationFailureHandler())
                 .and().csrf().disable();
     }
 
-    @Bean
-    public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler(){
-        UserAuthenticationSuccessHandler customAuthenticationSuccessHandler = new UserAuthenticationSuccessHandler();
-        customAuthenticationSuccessHandler.setDefaultUrl("/");
-        customAuthenticationSuccessHandler.setTargetUrlParameter("loginRedirect");
-        customAuthenticationSuccessHandler.setUseReferer(true);
-        return customAuthenticationSuccessHandler;
-    }
+//     @Bean
+//     public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler(){
+//         UserAuthenticationSuccessHandler customAuthenticationSuccessHandler = new UserAuthenticationSuccessHandler();
+//         customAuthenticationSuccessHandler.setDefaultUrl("/");
+//         customAuthenticationSuccessHandler.setTargetUrlParameter("loginRedirect");
+//         customAuthenticationSuccessHandler.setUseReferer(true);
+//         return customAuthenticationSuccessHandler;
+//     }
 }
