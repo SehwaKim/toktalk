@@ -29,7 +29,9 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .loginPage("/users/login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .successHandler(new UserAuthenticationSuccessHandler())
+                .successForwardUrl("/")
+               // .successHandler(new UserAuthenticationSuccessHandler())
+              //  .failureHandler(new UserAuthenticationFailureHandler())
                 .and().csrf().disable();
     }
 }
