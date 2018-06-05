@@ -8,8 +8,12 @@ import java.security.Principal;
 import java.util.List;
 
 public interface RedisService {
-    // TODO 유저리스트 저장
-    public void addUser(Long id,WebSocketSession session);
+    // 유저리스트 저장
+//    public void addUser(Long id,WebSocketSession session);
+    public void addUser(Long id,String userId);
+
+    // 유저가 참여한 방정보 저장
+    public void addChannel(String userId, Long id);
 
     // TODO 삭제
 
@@ -18,5 +22,6 @@ public interface RedisService {
 
     public User getUser(Principal principal);
 
-    public List<Channel> getChannels();
+    // 해당 유저가 참여한 방목록
+    public List<Channel> getChannels(String id);
 }

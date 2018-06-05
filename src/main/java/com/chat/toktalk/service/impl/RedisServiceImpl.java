@@ -4,13 +4,12 @@ import com.chat.toktalk.domain.Channel;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,13 +17,22 @@ public class RedisServiceImpl implements RedisService {
     @Autowired
     RedisTemplate redisTemplate;
 
-    List<User> userList;
-    List<Channel> channelList;
+    List<User> userList = new ArrayList<>();
+    List<Channel> channelList = new ArrayList<>();
+
+//    @Override
+//    public void addUser(Long id, WebSocketSession session) {
+//        redisTemplate.opsForList().rightPush(id,session.getId());
+//    }
 
     @Override
-    public void addUser(Long id, WebSocketSession session) {
+    public void addUser(Long id, String userId) {
+        redisTemplate.opsForList().rightPush(id,userId);
+    }
 
-        redisTemplate.opsForList().rightPush(id,session);
+    @Override
+    public void addChannel(String userId, Long roomNo) {
+        redisTemplate.opsForList().rightPush(userId,roomNo);
     }
 
     @Override
@@ -48,7 +56,8 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public List<Channel> getChannels() {
-        return null;
+    public List<Channel> getChannels(String userId) {
+        channelList = redisTemplate.opsForList().range(userId,0,-1);
+        return channelList;
     }
 }
