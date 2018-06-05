@@ -1,22 +1,22 @@
 package com.chat.toktalk.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
+import com.chat.toktalk.domain.Channel;
+import com.chat.toktalk.domain.User;
+import org.springframework.web.socket.WebSocketSession;
 
-@Service
-public class RedisService {
-    @Autowired
-    RedisTemplate redisTemplate;
+import java.security.Principal;
+import java.util.List;
 
-    HashOperations<String, Object, Object> hashMap;
+public interface RedisService {
+    // TODO 유저리스트 저장
+    public void addUser(Long id,WebSocketSession session);
 
-    public RedisService(){
-//        hashMap = redisTemplate.opsForHash().keys();
-    }
+    // TODO 삭제
 
-    public void saveRoom(){
-        hashMap.put("romm..", "...", "...");
-    }
+    // TODO 조회
+    public List<User> getUsers(Long id);
+
+    public User getUser(Principal principal);
+
+    public List<Channel> getChannels();
 }
