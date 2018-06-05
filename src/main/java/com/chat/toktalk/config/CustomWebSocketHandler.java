@@ -1,6 +1,8 @@
 package com.chat.toktalk.config;
 
 import com.chat.toktalk.domain.Message;
+import com.chat.toktalk.domain.User;
+import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
@@ -12,15 +14,17 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
 public class CustomWebSocketHandler extends TextWebSocketHandler {
     private static List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
-
+    private List<User> userList = new ArrayList<>();
     // private static List<Map<WebSocketSession, User>> sessionInfo = new CopyOnWriteArrayList<>();
-
+    @Autowired
+    RedisService redisService;
 
     @Autowired
     UserService userService;
@@ -29,17 +33,17 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     //RedisService
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        redisService.addUser(1L,session);
+        userList = redisService.getUsers(1L);
+
+        System.out.println(userList.get(0));
+
         sessions.add(session);
         Principal principal = session.getPrincipal();
         String name = "";
         if(principal != null){
             name = principal.getName();
             System.out.println("접속자 : " + name);
-
-            //TODO
-                //RedisService.setSession();
-            //User user = userService.getUserByEmail(principal.getName());
-
         }
         System.out.println("------------ 새로운 웹소켓 연결 --------------");
         System.out.println("sessions.size() : " + sessions.size());
