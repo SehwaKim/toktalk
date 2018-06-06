@@ -9,7 +9,7 @@ public class RabbitConfig {
     public static final String QUEUE_NAME ="fanout_queue";
     public static final String EXCHANGE_NAME="fanout_exchange";
     @Bean
-     Queue messageQueue(){
+    Queue messageQueue(){
         return QueueBuilder.durable(QUEUE_NAME).build() ;
     }
     @Bean
