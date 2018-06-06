@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
@@ -21,12 +22,14 @@ public class MessageListener{
   @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
   public void recieveAndBroadCastingMessage(ChatMessage chatMessage){
     Set<WebSocketSession> sessions = sessionManager.getWebSocketSessions(chatMessage.getChannelId());
-    sessions.stream().forEach(session->{
-      try {
-        session.sendMessage(chatMessage.getMessage());
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    });
+    if(sessions != null){
+      sessions.stream().forEach(session->{
+        try {
+          session.sendMessage(new TextMessage(chatMessage.getMessage()));
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      });
+    }
   }
 }

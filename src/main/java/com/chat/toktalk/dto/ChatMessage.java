@@ -25,7 +25,7 @@ public class ChatMessage implements Serializable {
         this.channelId = channelId;
     }
 
-    public WebSocketMessage<?> getMessage() {
+    public String getMessage() {
         return message;
     }
 
