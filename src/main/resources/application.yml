@@ -13,6 +13,9 @@ spring:
    hibernate:
      ddl-auto: create-drop
    show-sql: true
+   properties:
+     hibernate:
+       format_sql: true
  thymeleaf:
    cache: false
    check-template: true
