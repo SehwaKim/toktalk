@@ -1,7 +1,10 @@
 package com.chat.toktalk.config;
 
+import com.chat.toktalk.domain.Channel;
+import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
+import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,15 +36,24 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ChannelUserService channelUserService;
+
     //TODO
     //RedisService
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        // 1,2,3 번방 입장할 때...
-        redisService.addChannelForUser(session.getId().toString(),1L);
-        redisService.addChannelForUser(session.getId().toString(),2L);
-        redisService.addChannelForUser(session.getId().toString(),3L);
-        System.out.println("참여한 방정보 : "+redisService.getChannels(session.getId().toString()));
+
+        // online 되자마자 유저가 참여한 방정보 가져오기.
+        Map<String, Object> attributes = session.getAttributes();
+
+        List<ChannelUser> channelUserList = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
+        for(int i=0; i<channelUserList.size(); i++) {
+            redisService.addChannelForUser(attributes.get("userId").toString()
+                                                                ,channelUserList.get(i).getChannel().getId());
+        }
+
+        System.out.println("참여한 방정보 : "+redisService.getChannels(attributes.get("userId").toString()));
 
         sessions.add(session);
         Principal principal = session.getPrincipal();
@@ -98,19 +110,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        Principal principal = session.getPrincipal();
-        String name = "";
-        if(principal != null){
-            name = principal.getName();
+        Map<String, Object> attributes = session.getAttributes();
+        String userId = attributes.get("userId").toString();
+        if(redisService.removeUser(userId)){
+            System.out.println("삭제 성공!!!");
         }
-        System.out.println("------------ 연결 끊김 --------------");
-        System.out.println("삭제 전 세션 갯수 : " + sessions.size());
-        sessions.remove(session);
-        System.out.println("삭제 후 세션 갯수 : " + sessions.size());
-
-
-        // TODO isOnline=false 가 되어야한다.
-
     }
 
     public void broadcast(Message message) throws Exception {
