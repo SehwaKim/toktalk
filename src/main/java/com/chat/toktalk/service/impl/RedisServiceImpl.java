@@ -60,4 +60,9 @@ public class RedisServiceImpl implements RedisService {
         channelList = redisTemplate.opsForList().range(userId,0,-1);
         return channelList;
     }
+
+    @Override
+    public Boolean removeUser(String userId) {
+        return redisTemplate.delete(userId);
+    }
 }

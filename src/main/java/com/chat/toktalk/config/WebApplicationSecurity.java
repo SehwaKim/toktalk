@@ -26,14 +26,17 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().fullyAuthenticated()
-                .and().formLogin()
-                .loginPage("/users/login")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .successForwardUrl("/")
+                .and().headers().frameOptions().disable()
+                .and()
+                    .formLogin()
+                        .loginProcessingUrl("/users/login")
+                        .loginPage("/users/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
                // .successHandler(new UserAuthenticationSuccessHandler())
               //  .failureHandler(new UserAuthenticationFailureHandler())
-                .and().csrf().disable();
+                .and()
+                    .csrf().disable();
     }
 
 //     @Bean
