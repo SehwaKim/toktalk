@@ -24,4 +24,6 @@ public interface RedisService {
 
     // 해당 유저가 참여한 방목록
     public List<Channel> getChannels(String id);
+
+    Boolean removeUser(String userId);
 }
