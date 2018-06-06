@@ -3,6 +3,7 @@ package com.chat.toktalk.amqp;
 import com.chat.toktalk.config.RabbitConfig;
 import com.chat.toktalk.dto.ChatMessage;
 import com.chat.toktalk.websocket.SessionManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -25,7 +26,8 @@ public class MessageListener{
     if(sessions != null){
       sessions.stream().forEach(session->{
         try {
-          session.sendMessage(new TextMessage(chatMessage.getMessage()));
+          String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
+          session.sendMessage(new TextMessage(jsonStr));
         } catch (IOException e) {
           e.printStackTrace();
         }
