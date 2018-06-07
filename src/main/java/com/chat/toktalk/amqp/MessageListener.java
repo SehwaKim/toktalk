@@ -20,6 +20,7 @@ public class MessageListener{
 
   @Autowired
   SessionManager sessionManager;
+
   @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
   public void recieveAndBroadCastingMessage(ChatMessage chatMessage){
     Set<WebSocketSession> sessions = sessionManager.getWebSocketSessions(chatMessage.getChannelId());

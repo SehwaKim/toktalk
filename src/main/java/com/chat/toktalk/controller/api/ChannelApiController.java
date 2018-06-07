@@ -1,8 +1,11 @@
 package com.chat.toktalk.controller.api;
 
+import com.chat.toktalk.domain.Channel;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
+import com.chat.toktalk.dto.ChannelForm;
+import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.ChannelService;
 import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.MessageService;
@@ -11,6 +14,8 @@ import com.chat.toktalk.config.CustomWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -33,6 +38,28 @@ public class ChannelApiController {
 
     @Autowired
     CustomWebSocketHandler customWebSocketHandler;
+
+    @PostMapping
+    public List<Channel> addChannel(Principal principal, @RequestBody ChannelForm channelForm){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
+            LoginUserInfo loginUserInfo = (LoginUserInfo) authentication.getPrincipal();
+            User user = userService.getUserByEmail(loginUserInfo.getUsername());
+
+            ChannelUser channelUser = new ChannelUser();
+            channelUser.setUser(user);
+            channelUser.setIsOperator(true);
+
+            Channel channel = new Channel();
+            channel.addChanneUser(channelUser);
+            channel.setName(channelForm.getName());
+
+            channelService.addChannel(channel);
+            return channelService.getChannels(loginUserInfo.getId());
+        }
+
+        return null;
+    }
 
     @GetMapping(path = "/{channelId}")
     public ResponseEntity<List<Message>> userEnter(Principal principal, @PathVariable(value = "channelId") Long channelId){

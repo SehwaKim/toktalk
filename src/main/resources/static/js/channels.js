@@ -53,23 +53,23 @@ $(document).ready(function () {
 });
 
 function enter(channelId) {
-    if($("#"+channelId).css('display') == 'none'){
-        $.ajax({
-            url: '/api/channels/'+channelId,
-            method: 'get',
-            dataType: "json",
-            contentType: "application/json",
-            success: function (data) {
-                if(data != null){
-                    for(var i=0;i<data.length;i++){
-                        showMessage(data[i]);
-                    }
+    // if(!$("#"+channelId).css('display') == 'none'){
+    $.ajax({
+        url: '/api/channels/'+channelId,
+        method: 'get',
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+            if(data != null){
+                for(var i=0;i<data.length;i++){
+                    showMessage(data[i]);
                 }
             }
-        });
+        }
+    });
 
-        $("#"+channelId).show();
-    }
+    // $("#"+channelId).show();
+    // }
 }
 
 function sendMsg(channelId) {
@@ -101,7 +101,52 @@ function disconnect() {
 
 function showMessage(data) {
     $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
-
     var textArea = $('#messages_'+data.channelId);
     textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
+}
+
+function getFormData($form){
+    var unindexed_array = $form.serializeArray();
+    var indexed_array = {};
+
+    $.map(unindexed_array, function(n, i){
+        indexed_array[n['name']] = n['value'];
+    });
+
+    return indexed_array;
+}
+
+function createChannel() {
+    var $form = $("#creatForm");
+    var data = getFormData($form)
+    var jsonData = JSON.stringify(data);
+
+    $.ajax({
+        url: '/api/channels',
+        method: 'post',
+        data: jsonData,
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+            freshChannelList(data);
+            $('.pop-layer').hide();
+            $('#name').val("");
+            $('#purpose').val("");
+            $('#invite').val("");
+        }
+    });
+}
+
+function freshChannelList(data) {
+    $("#channelList").empty();
+    alert("mmmm");
+    for(var key in data){
+        // var $div = $('<div></div>').appendTo($("#channelList"));
+        // $('<a></a>').attr('onclick', 'enter(1)').attr('value', data[key].name)
+        //                         .addClass('btn btn-light btn-block').appendTo($div);
+        // $('<a></a>').attr('onclick', 'enter(1)').attr('value', data[key].name)
+        //                         .appendTo($div);
+        $("#channelList").innerHTML = data[key].name;
+
+    }
 }

@@ -5,6 +5,7 @@ import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.service.ChannelUserService;
+import com.chat.toktalk.service.MessageService;
 import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,6 +30,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     private List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    MessageService messageService;
 
     @Autowired
     RedisService redisService;
@@ -86,16 +90,25 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
 
+        Message messageNew = new Message();
+        Long userId;
         String nickname = "";
-        if(attributes.get("nickname") != null){
-            nickname = (String) attributes.get("nickname");
-        }
 
         TypeReference<HashMap<String,Object>> typeRef
                 = new TypeReference<HashMap<String,Object>>() {};
-        HashMap<String, String> map = objectMapper.readValue(message.getPayload(), typeRef);
-        map.put("nickname", nickname);
+        HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
 
+        if(attributes.get("userId") != null && attributes.get("nickname") != null){
+            userId = (Long) attributes.get("userId");
+            nickname = (String) attributes.get("nickname");
+            messageNew.setUserId(userId);
+            messageNew.setNickname(nickname);
+            messageNew.setChannelId(new Long((Integer)map.get("channelId")));
+            messageNew.setText((String)map.get("text"));
+            messageService.addMessage(messageNew); // DB에 저장하는 부분
+        }
+
+        map.put("nickname", nickname);
         String msg = objectMapper.writeValueAsString(map);
         TextMessage textMessage = new TextMessage(msg);
 
