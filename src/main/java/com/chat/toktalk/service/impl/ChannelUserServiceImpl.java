@@ -28,4 +28,9 @@ public class ChannelUserServiceImpl implements ChannelUserService {
         return channelUserRepository.findAllByUserId(userId);
     }
 
+    @Override
+    public List<ChannelUser> getChannelUsersByChannelId(Long channelId) {
+        return channelUserRepository.findAllByChannelId(channelId);
+    }
+
 }
