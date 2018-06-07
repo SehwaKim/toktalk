@@ -1,5 +1,7 @@
 package com.chat.toktalk.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "channel")
+@JsonIgnoreProperties(value={"hibernateLazyInitializer", "handler"})
 @Data
 public class Channel implements Serializable {
     public Channel() {
@@ -25,6 +28,7 @@ public class Channel implements Serializable {
     private String data; // 메타데이터
     private String type;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChannelUser> channelUsers = new ArrayList<>();
 

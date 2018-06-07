@@ -18,11 +18,11 @@ public class ChannelUser implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = Channel.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
