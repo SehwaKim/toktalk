@@ -64,10 +64,16 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         }
 
         // 1번 방에 입장 했을 때.
-        redisService.addChannelUser(1L,principal.getName());
-        List<User> userList = new ArrayList<>();
-        userList = redisService.getUsers(1L);
-        System.out.println("1번방 참여한 사람 : " + userList);
+//        redisService.addChannelUser(1L,principal.getName());
+//        List<User> userList = new ArrayList<>();
+//        userList = redisService.getUsers(1L);
+//        System.out.println("1번방 참여한 사람 : " + userList);
+
+        // 접속하면 해당 웹소켓 아이디 저장.   방 1, 2 있을 떄 로그인 --> 회원 ㅇ.
+        for(int i=0; i<channelUserList.size(); i++) {
+            redisService.addUserAtSocket(session.getId(),attributes.get("userId").toString());
+            System.out.println(session.getId() + " 로 참여한 사람 : "+attributes.get("userId"));
+        }
 
         System.out.println("------------ 새로운 웹소켓 연결 --------------");
         System.out.println("sessions.size() : " + sessions.size());
