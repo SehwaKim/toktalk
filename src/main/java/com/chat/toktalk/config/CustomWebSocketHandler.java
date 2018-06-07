@@ -13,9 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.security.Principal;
@@ -77,23 +75,24 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         System.out.println("1번방 참여한 사람 : " + userList);
 
         System.out.println("------------ 새로운 웹소켓 연결 --------------");
-        System.out.println("sessions.size() : " + sessions.size());
-        System.out.println("session.getUri() : " + session.getUri());
 
         System.out.println("session.getAttributes().size() : " + session.getAttributes().size());
         for(String key : session.getAttributes().keySet()){
             System.out.println(session.getAttributes().get(key));
         }
-
-        //TODO 이 때 isOnline=true 가 되야겟지?
-
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        if("h".equals(message.getPayload())){
+            System.out.println(message.getPayload());
+            return;
+        }
+
         TypeReference<HashMap<String,Object>> typeRef
                 = new TypeReference<HashMap<String,Object>>() {};
         HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
+
         Long channelId = new Long((Integer)map.get("channelId"));
         String textMessage = (String) map.get("text");
 
@@ -121,5 +120,15 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             System.out.println("삭제 성공!!!");
         }
         sessions.remove(session);
+    }
+
+    @Override
+    protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
+        super.handlePongMessage(session, message);
+    }
+
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        super.handleBinaryMessage(session, message);
     }
 }
