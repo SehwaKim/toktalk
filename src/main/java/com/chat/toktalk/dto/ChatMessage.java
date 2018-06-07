@@ -7,14 +7,16 @@ import java.io.Serializable;
 public class ChatMessage implements Serializable {
 
     private Long channelId;
+    private String nickname;
     private String message;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(Long channelId, String message) {
+    public ChatMessage(Long channelId, String message, String nickname) {
         this.channelId = channelId;
         this.message = message;
+        this.nickname = nickname;
     }
 
     public Long getChannelId() {
@@ -31,5 +33,13 @@ public class ChatMessage implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

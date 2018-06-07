@@ -74,24 +74,6 @@ function enter(channelId) {
 
 function sendMsg(channelId) {
     sock.send(JSON.stringify({'channelId' : channelId, 'text' : $("#chatInput_"+channelId).val()}));
-
-    /*var JSONObject= {
-        "channelId" : channelId,
-        "text" : $("#chatInput_"+channelId).val()
-    };
-    var jsonData = JSON.stringify( JSONObject );
-
-    $.ajax({
-        url: '/api/channels/'+channelId+'/messages',
-        method: 'post',
-        data: jsonData,
-        dataType: "json",
-        contentType: "application/json",
-        success: function (data) {
-            // showMessage(data);
-        }
-    });*/
-
     $("#chatInput_"+channelId).val("");
 }
 
@@ -139,14 +121,9 @@ function createChannel() {
 
 function freshChannelList(data) {
     $("#channelList").empty();
-    alert("mmmm");
     for(var key in data){
-        // var $div = $('<div></div>').appendTo($("#channelList"));
-        // $('<a></a>').attr('onclick', 'enter(1)').attr('value', data[key].name)
-        //                         .addClass('btn btn-light btn-block').appendTo($div);
-        // $('<a></a>').attr('onclick', 'enter(1)').attr('value', data[key].name)
-        //                         .appendTo($div);
-        $("#channelList").innerHTML = data[key].name;
-
+        var $div = $('<div></div>').appendTo($("#channelList"));
+        $('<a></a>').attr('onclick', 'enter(1)').attr('value', data[key].name)
+                                .addClass('btn btn-light btn-block').appendTo($div);
     }
 }

@@ -17,22 +17,24 @@ import java.util.Set;
 
 @Component
 public class MessageListener{
+    @Autowired
+    SessionManager sessionManager;
 
-  @Autowired
-  SessionManager sessionManager;
+    @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
+    public void receiveAndBroadcastMessage(ChatMessage chatMessage){
+        Long channelId = chatMessage.getChannelId();
 
-  @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
-  public void recieveAndBroadCastingMessage(ChatMessage chatMessage){
-    Set<WebSocketSession> sessions = sessionManager.getWebSocketSessions(chatMessage.getChannelId());
-    if(sessions != null){
-      sessions.stream().forEach(session->{
-        try {
-          String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
-          session.sendMessage(new TextMessage(jsonStr));
-        } catch (IOException e) {
-          e.printStackTrace();
+        Set<WebSocketSession> sessions = sessionManager.getWebSocketSessions(channelId);
+
+        if(sessions != null){
+            sessions.stream().forEach(session->{
+                try {
+                  String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
+                  session.sendMessage(new TextMessage(jsonStr));
+                } catch (IOException e) {
+                  e.printStackTrace();
+                }
+            });
         }
-      });
     }
-  }
 }
