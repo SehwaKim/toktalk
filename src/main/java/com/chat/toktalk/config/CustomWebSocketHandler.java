@@ -115,6 +115,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         if(redisService.removeUser(userId)){
             System.out.println("삭제 성공!!!");
         }
+        sessions.remove(session);
     }
 
     public void broadcast(Message message) throws Exception {
