@@ -8,7 +8,7 @@ import java.util.*;
 @Component
 public class SessionManager {
     //List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
-    private Map<Long,Set<WebSocketSession>> sessions = Collections.synchronizedMap(new HashMap<>());//방번호,세션들
+    private Map<Long,WebSocketSession> sessions = Collections.synchronizedMap(new HashMap<>());//방번호,세션들
 
 
     public void addWebSocketSession(Long channelId,WebSocketSession session){
