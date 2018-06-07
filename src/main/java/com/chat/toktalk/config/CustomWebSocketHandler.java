@@ -13,9 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.security.Principal;
@@ -86,14 +84,14 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        if("h".equals(message.getPayload())){
+            System.out.println(message.getPayload());
+            return;
+        }
+
         TypeReference<HashMap<String,Object>> typeRef
                 = new TypeReference<HashMap<String,Object>>() {};
         HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
-
-        if(map.get("heartbeat") != null){
-            System.out.println((String) map.get("heartbeat")); // pong
-            return;
-        }
 
         Long channelId = new Long((Integer)map.get("channelId"));
         String textMessage = (String) map.get("text");
@@ -122,5 +120,15 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             System.out.println("삭제 성공!!!");
         }
         sessions.remove(session);
+    }
+
+    @Override
+    protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
+        super.handlePongMessage(session, message);
+    }
+
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        super.handleBinaryMessage(session, message);
     }
 }

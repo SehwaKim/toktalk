@@ -21,9 +21,9 @@ $(document).ready(function () {
         console.log('disconnected');
     };
 
-    sock.onheartbeat = function () {
-        console.log("ping from server");
-        sock.send(JSON.stringify({'heartbeat' : 'pong'}));
+    sock.onheartbeat = function (e) {
+        console.log(e);
+        sock.send("h");
     }
 
     $("#chatInput_1").keypress(function(e) {
