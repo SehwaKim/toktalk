@@ -47,7 +47,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     //RedisService
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-
         // online 되자마자 유저가 참여한 방정보 가져오기.
         Map<String, Object> attributes = session.getAttributes();
 
@@ -73,10 +72,10 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 //        userList = redisService.getUsers(1L);
 //        System.out.println("1번방 참여한 사람 : " + userList);
 
-        // 접속하면 해당 웹소켓 아이디 저장.   방 1, 2 있을 떄 로그인 --> 회원 ㅇ.
+        // 접속하면 해당 웹소켓 아이디(key), 유저id(value) 저장.
+        redisService.addUserAtSocket(session.getId(),attributes.get("userId").toString());
         for(int i=0; i<channelUserList.size(); i++) {
-            redisService.addUserAtSocket(session.getId(),attributes.get("userId").toString());
-            System.out.println(session.getId() + " 로 참여한 사람 : "+attributes.get("userId"));
+            System.out.println(session.getId() + " WebSocket으로 참여한 사람 : "+attributes.get("userId"));
         }
 
         System.out.println("------------ 새로운 웹소켓 연결 --------------");
