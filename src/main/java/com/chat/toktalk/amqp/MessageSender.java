@@ -11,7 +11,8 @@ public class MessageSender {
 
     @Autowired
     private RabbitTemplate template;
+
     public void sendMessage(ChatMessage chatMessage){
-        template.convertAndSend(RabbitConfig.EXCHANGE_NAME,"NO_ROUTING_KEY",chatMessage);
+        template.convertAndSend(RabbitConfig.EXCHANGE_NAME,"NO_ROUTING_KEY", chatMessage);
     }
 }

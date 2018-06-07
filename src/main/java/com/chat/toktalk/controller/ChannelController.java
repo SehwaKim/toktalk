@@ -1,8 +1,6 @@
 package com.chat.toktalk.controller;
 
-import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.Channel;
-import com.chat.toktalk.dto.ChatMessage;
 import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +11,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpSession;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +20,7 @@ public class ChannelController {
     @Autowired
     ChannelService channelService;
 
-    @Autowired
-    MessageSender messageSender;
-
+    /* 채널 목록 가져오기 (로그인 후 메인) */
     @GetMapping
     public String channels(ModelMap modelMap){
         List<Channel> channels = new ArrayList<>();
@@ -41,11 +35,4 @@ public class ChannelController {
 
         return "channels/channels";
     }
-
-    /*@GetMapping
-    public String channels(){
-        //아래는 테스트 코드,
-        messageSender.sendMessage(new ChatMessage(1L,"Hello!!"));
-        return "channels/channels";
-    }*/
 }
