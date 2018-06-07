@@ -13,6 +13,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -24,11 +25,12 @@ public class MessageListener{
     public void receiveAndBroadcastMessage(ChatMessage chatMessage){
         Long channelId = chatMessage.getChannelId();
 
-        Set<WebSocketSession> sessions = sessionManager.getWebSocketSessions(channelId);
+        Map<Long,WebSocketSession> sessions = sessionManager.getWebSocketSessions(channelId);
 
         if(sessions != null){
-            sessions.stream().forEach(session->{
+            sessions.values().forEach(session->{
                 try {
+                    System.out.println(session.getPrincipal().getName()+"님이 메시지보냄");
                   String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
                   session.sendMessage(new TextMessage(jsonStr));
                 } catch (IOException e) {
