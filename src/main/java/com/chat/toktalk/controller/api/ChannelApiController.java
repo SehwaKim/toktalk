@@ -39,8 +39,9 @@ public class ChannelApiController {
     @Autowired
     CustomWebSocketHandler customWebSocketHandler;
 
+    /* 새 채널 생성 */
     @PostMapping
-    public List<Channel> addChannel(Principal principal, @RequestBody ChannelForm channelForm){
+    public List<Channel> addChannel(@RequestBody ChannelForm channelForm){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
             LoginUserInfo loginUserInfo = (LoginUserInfo) authentication.getPrincipal();
@@ -61,6 +62,7 @@ public class ChannelApiController {
         return null;
     }
 
+    /* 채널 입장 */
     @GetMapping(path = "/{channelId}")
     public ResponseEntity<List<Message>> userEnter(Principal principal, @PathVariable(value = "channelId") Long channelId){
         User user = null;
@@ -83,18 +85,5 @@ public class ChannelApiController {
         }
 
         return null;
-    }
-
-    @PostMapping(path = "/{channelId}/messages")
-    public void sendMessages(Principal principal, @PathVariable(value = "channelId") Long channelId, @RequestBody Message message) throws Exception{
-        User user = null;
-        System.out.println(message);
-        if(principal != null){
-            user = userService.getUserByEmail(principal.getName());
-        }
-        message.setUserId(user.getId());
-        message.setNickname(user.getNickname());
-        Message savedMessage = messageService.addMessage(message);
-        customWebSocketHandler.broadcast(savedMessage);
     }
 }
