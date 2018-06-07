@@ -10,14 +10,21 @@ $(document).ready(function () {
     sock.onmessage = function (e) {
         var data = JSON.parse(e.data);
         var channelId = data.channelId;
-        if($("#"+channelId).css('display') != 'none'){
+        console.log(data);
+        showMessage(data);
+        /*if($("#"+channelId).css('display') != 'none'){
             showMessage(data);
-        }
+        }*/
     };
 
     sock.onclose = function () {
         console.log('disconnected');
     };
+
+    sock.onheartbeat = function () {
+        console.log("ping from server");
+        sock.send(JSON.stringify({'heartbeat' : 'pong'}));
+    }
 
     $("#chatInput_1").keypress(function(e) {
 
