@@ -1,9 +1,11 @@
 package com.chat.toktalk.dto;
 
+import lombok.ToString;
 import org.springframework.web.socket.WebSocketMessage;
 
 import java.io.Serializable;
 
+@ToString
 public class ChatMessage implements Serializable {
 
     private Long channelId;

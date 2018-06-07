@@ -77,16 +77,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         System.out.println("1번방 참여한 사람 : " + userList);
 
         System.out.println("------------ 새로운 웹소켓 연결 --------------");
-        System.out.println("sessions.size() : " + sessions.size());
-        System.out.println("session.getUri() : " + session.getUri());
 
         System.out.println("session.getAttributes().size() : " + session.getAttributes().size());
         for(String key : session.getAttributes().keySet()){
             System.out.println(session.getAttributes().get(key));
         }
-
-        //TODO 이 때 isOnline=true 가 되야겟지?
-
     }
 
     @Override
@@ -94,6 +89,12 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         TypeReference<HashMap<String,Object>> typeRef
                 = new TypeReference<HashMap<String,Object>>() {};
         HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
+
+        if(map.get("heartbeat") != null){
+            System.out.println((String) map.get("heartbeat")); // pong
+            return;
+        }
+
         Long channelId = new Long((Integer)map.get("channelId"));
         String textMessage = (String) map.get("text");
 
