@@ -1,16 +1,16 @@
 package com.chat.toktalk.config;
 
-import com.chat.toktalk.domain.Channel;
+import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
+import com.chat.toktalk.dto.ChatMessage;
 import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.MessageService;
 import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -42,6 +42,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Autowired
     ChannelUserService channelUserService;
+
+    @Autowired
+    MessageSender messageSender;
 
     //TODO
     //RedisService
@@ -93,37 +96,26 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        Map<String, Object> attributes = session.getAttributes();
-
-        Message messageNew = new Message();
-        Long userId;
-        String nickname = "";
-
         TypeReference<HashMap<String,Object>> typeRef
                 = new TypeReference<HashMap<String,Object>>() {};
         HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
+        Long channelId = new Long((Integer)map.get("channelId"));
+        String textMessage = (String) map.get("text");
 
-        if(attributes.get("userId") != null && attributes.get("nickname") != null){
-            userId = (Long) attributes.get("userId");
-            nickname = (String) attributes.get("nickname");
-            messageNew.setUserId(userId);
-            messageNew.setNickname(nickname);
-            messageNew.setChannelId(new Long((Integer)map.get("channelId")));
-            messageNew.setText((String)map.get("text"));
-            messageService.addMessage(messageNew); // DB에 저장하는 부분
-        }
+        Map<String, Object> attributes = session.getAttributes();
+        Long userId = (Long) attributes.get("userId");
+        String nickname = (String) attributes.get("nickname");
 
-        map.put("nickname", nickname);
-        String msg = objectMapper.writeValueAsString(map);
-        TextMessage textMessage = new TextMessage(msg);
+        // 1. 새 Message 엔티티 DB에 저장
+        Message messageNew = new Message();
+        messageNew.setUserId(userId);
+        messageNew.setNickname(nickname);
+        messageNew.setChannelId(channelId);
+        messageNew.setText(textMessage);
+        messageService.addMessage(messageNew);
 
-        sessions.stream().forEach(s -> {
-            try {
-                s.sendMessage(textMessage);
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        });
+        // 2. 메세지큐에 내보내기
+        messageSender.sendMessage(new ChatMessage(channelId, textMessage, nickname));
     }
 
     @Override
@@ -134,17 +126,5 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             System.out.println("삭제 성공!!!");
         }
         sessions.remove(session);
-    }
-
-    public void broadcast(Message message) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonStr = mapper.writeValueAsString(message);
-
-        for(WebSocketSession webSocketSession : sessions){
-            webSocketSession.sendMessage(new TextMessage(jsonStr));
-            // TODO 이렇게 하면 모든 웹소켓세션에 메세지가 가게 됨 ..
-            // TODO 해당 채널에 속한 웹소켓만 골라서 메세지가 가게 해야되나?
-            // TODO WebSocketSession 정보를 ChannelUser 에 매핑?
-        }
     }
 }
