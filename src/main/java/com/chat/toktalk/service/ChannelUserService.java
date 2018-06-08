@@ -10,4 +10,6 @@ public interface ChannelUserService {
     public ChannelUser getChannelUser(Long channelId, Long userId);
 
     List<ChannelUser> getChannelUsersByUserId(Long userId);
+
+    List<ChannelUser> getChannelUsersByChannelId(Long channelId);
 }

@@ -8,35 +8,31 @@ import java.util.*;
 @Component
 public class SessionManager {
 
-    private Map<Long, Set<WebSocketSession>> sessions = Collections.synchronizedMap(new HashMap<>());//방번호,세션들
+    private Map<Long, WebSocketSession> sessions = new HashMap<>();//유저아이디(key),세션들(value)
     /*
     *  1. 웹소켓 연결 open 할 때
     *  2. 한 채널 입장 시
     * */
-    public void addWebSocketSession(Long channelId,WebSocketSession session){
-        Set<WebSocketSession> sessionContainer = getWebSocketSessionContainer(channelId);
-        sessionContainer.add(session);
-        sessions.put(channelId,sessionContainer);
+    public void addWebSocketSession(Long userId,WebSocketSession session){
+//        Set<WebSocketSession> sessionContainer = getWebSocketSessionContainer(channelId);
+//        sessionContainer.add(session);
+        sessions.put(userId,session);
     }
 
     /*
      *  1. 웹소켓 연결 close 할 때
      *  2. 한 채널 퇴장 시
      * */
-    public void removeWebSocketSession(Long channelId,WebSocketSession webSocketSession){
-        Set<WebSocketSession> sessionContainer = getWebSocketSessionContainer(channelId);
-        sessionContainer.remove(webSocketSession);
+    // userId(Key)로 세션 지우기
+    public void removeWebSocketSession(Long userId){
+         // 방어적 코드 세션값이 없을때 고려ㅣ..
+        sessions.remove(userId);
     }
 
-    public Set<WebSocketSession> getWebSocketSessions(Long channelId){
-        return sessions.get(channelId);
+    // userId(Key)로 WebsocketSession 꺼내기
+    public Map<Long,WebSocketSession> getWebSocketSessions(Long channelId){
+        return sessions;
     }
 
-    private Set<WebSocketSession> getWebSocketSessionContainer(Long channelId){
-        if(!sessions.containsKey(channelId)){
-            return Collections.synchronizedSet(new HashSet<WebSocketSession>());
-        }else{
-            return sessions.get(channelId);
-        }
-    }
+
 }
