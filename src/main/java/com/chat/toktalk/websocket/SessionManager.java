@@ -20,7 +20,9 @@ public class SessionManager {
     }
 
     public void removeWebSocketSession(Long userId){
-        sessions.remove(userId);
+        if(sessions.get(userId) != null){
+            sessions.remove(userId);
+        }
     }
 
     public List<WebSocketSession> getWebSocketSessionsByChannelId(Long channelId){
@@ -35,4 +37,10 @@ public class SessionManager {
         }
         return targetSessions;
     }
+
+
+    public Map<Long,WebSocketSession> getWebSocketSessions(Long channelId){
+        return sessions;
+    }
+
 }

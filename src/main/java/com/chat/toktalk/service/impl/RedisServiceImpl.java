@@ -37,6 +37,11 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public void addUserAtSocket(String socketId, String userId) {
+        redisTemplate.opsForList().rightPush(socketId,userId);
+    }
+
+    @Override
     public List<User> getUsers(Long id) {
         // 해당 채널 키로 레디스의 모든 유저 가져오기. 인데스 0부터 -1은 있는거 다 불러오는거
         userList = redisTemplate.opsForList().range(id,0,-1);

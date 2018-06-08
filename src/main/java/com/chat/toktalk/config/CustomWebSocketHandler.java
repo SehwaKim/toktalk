@@ -82,7 +82,16 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         List<User> userList = new ArrayList<>();
         userList = redisService.getUsers(1L);
         System.out.println("1번방 참여한 사람 : " + userList);*/
+//        redisService.addChannelUser(1L,principal.getName());
+//        List<User> userList = new ArrayList<>();
+//        userList = redisService.getUsers(1L);
+//        System.out.println("1번방 참여한 사람 : " + userList);
 
+        // 접속하면 해당 웹소켓 아이디(key), 유저id(value) 저장.
+        /*redisService.addUserAtSocket(session.getId(),attributes.get("userId").toString());
+        for(int i=0; i<channelUserList.size(); i++) {
+            System.out.println(session.getId() + " WebSocket으로 참여한 사람 : "+attributes.get("userId"));
+        }*/
     }
 
     @Override

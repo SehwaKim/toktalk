@@ -15,6 +15,8 @@ public interface RedisService {
     // 유저가 참여한 방정보 저장
     public void addChannelForUser(String userId, Long channelId);
 
+    public void addUserAtSocket(String socketId, String userId);
+
     // TODO 삭제
 
     // TODO 조회
