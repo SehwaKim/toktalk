@@ -1,5 +1,8 @@
 package com.chat.toktalk.controller.api;
 
+import com.chat.toktalk.domain.UploadFile;
+import com.chat.toktalk.service.UploadFileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,7 +17,10 @@ import java.util.Iterator;
 @RestController
 @RequestMapping("/api/messages")
 public class MessageApiController {
-    
+
+    @Autowired
+    UploadFileService uploadFileService;
+
     @RequestMapping(value = "/fileUpload/post") //ajax에서 호출하는 부분
     @ResponseBody
     public String upload(MultipartHttpServletRequest multipartRequest) { //Multipart로 받는다.
@@ -34,8 +40,9 @@ public class MessageApiController {
             MultipartFile mpf = multipartRequest.getFile(itr.next());
 
             String originalFilename = mpf.getOriginalFilename(); //파일명
-
             String fileFullPath = filePath+"/"+originalFilename; //파일 전체 경로
+            String fileType = mpf.getContentType();
+            Long fileLen = mpf.getSize();
 
             try {
                 //임시파일 저장... 디비에 일단 저장해야함.... 그후 프론트 처리...
@@ -44,13 +51,19 @@ public class MessageApiController {
                 System.out.println("originalFilename => "+originalFilename);
                 System.out.println("fileFullPath => "+fileFullPath);
 
+                UploadFile uploadFile = new UploadFile();
+                uploadFile.setFileName(originalFilename);
+                uploadFile.setContentType(fileType);
+                uploadFile.setLength(fileLen);
+
+                uploadFileService.addUploadFile(uploadFile);
+                System.out.println("파일 저장 성공!");
+
             } catch (Exception e) {
                 System.out.println("postTempFile_ERROR======>"+fileFullPath);
                 e.printStackTrace();
             }
-
         }
-
         return "success";
     }
 }
