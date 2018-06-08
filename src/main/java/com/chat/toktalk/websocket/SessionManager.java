@@ -37,10 +37,4 @@ public class SessionManager {
         }
         return targetSessions;
     }
-
-
-    public Map<Long,WebSocketSession> getWebSocketSessions(Long channelId){
-        return sessions;
-    }
-
 }

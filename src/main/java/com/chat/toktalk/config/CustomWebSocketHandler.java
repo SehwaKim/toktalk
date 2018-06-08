@@ -1,6 +1,7 @@
 package com.chat.toktalk.config;
 
 import com.chat.toktalk.amqp.MessageSender;
+import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.dto.ChatMessage;
 import com.chat.toktalk.service.ChannelUserService;
@@ -132,12 +133,19 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // Redis 웹소켓세션 삭제
         redisService.removeWebSocketSessionByUser(userId, session);
+        redisService.removeActiveChannelInfo(session);
 
-        // TODO 이 웹소켓세션 주인이 마지막으로 보고 있던 채널의 lastReadId 를 업데이트해야 함
+        // 마지막으로 보고 있던 채널의 lastReadId 를 업데이트
+        Long channelId = redisService.getActiveChannelInfo(session);
+        if(channelId != null){
+            ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, userId);
+            // alreadyUser.setLastReadId(???); TODO 엥 어떻게해야하지?
+            channelUserService.updateChannelUser(alreadyUser);
+        }
 
         // 레디스 정보 삭제
-        if(redisService.removeUser(attributes.get("userId").toString())){
+        /*if(redisService.removeUser(attributes.get("userId").toString())){
             System.out.println("삭제 성공!!!");
-        }
+        }*/
     }
 }

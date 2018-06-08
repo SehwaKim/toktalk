@@ -11,6 +11,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -22,10 +23,10 @@ public class MessageListener{
     public void receiveAndBroadcastMessage(ChatMessage chatMessage){
         Long channelId = chatMessage.getChannelId();
 
-        Map<Long,WebSocketSession> sessions = sessionManager.getWebSocketSessions(channelId);
+        List<WebSocketSession> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
 
         if(sessions != null){
-            sessions.values().forEach(session->{
+            sessions.stream().forEach(session->{
                 try {
                     String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
                     session.sendMessage(new TextMessage(jsonStr));

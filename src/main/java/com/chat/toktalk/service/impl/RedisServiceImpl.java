@@ -106,6 +106,19 @@ public class RedisServiceImpl implements RedisService {
         if(id != null){
             System.out.println("활성화된 채널의 아이디 " + id);
         }
+    }
 
+    @Override
+    public void removeActiveChannelInfo(WebSocketSession session) {
+        redisTemplate.delete(session.getId());
+    }
+
+    @Override
+    public Long getActiveChannelInfo(WebSocketSession session) {
+        Long channelId = (Long) redisTemplate.opsForValue().get(session.getId());
+        if (channelId != null){
+            return channelId;
+        }
+        return null;
     }
 }

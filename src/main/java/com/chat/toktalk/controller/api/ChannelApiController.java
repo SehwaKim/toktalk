@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.security.Principal;
 import java.util.List;
@@ -71,26 +72,24 @@ public class ChannelApiController {
             user = userService.getUserByEmail(principal.getName());
         }
 
-        String sessionId = customWebSocketHandler.getWebSocketSession().getId();
+        /* 마지막으로 보고 있던 채널의 lastReadId 를 업데이트 */
+        WebSocketSession webSocketSession = customWebSocketHandler.getWebSocketSession();
+        Long beforeId = redisService.getActiveChannelInfo(webSocketSession);
+        if(beforeId != null){
+            ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, user.getId());
+            // alreadyUser.setLastReadId(???); TODO how can i know this
+            channelUserService.updateChannelUser(alreadyUser);
+        }
+
+        /* active channel 등록 */
+        String sessionId = webSocketSession.getId();
         redisService.addActiveChannelInfo(sessionId, channelId);
-
-
-        // 이 user 가 보고있는 채널이 이 채널이라는걸 Redis 에 공유시켜야 한다
-        // key - userId
-        // value - hash 로 channelId 들을 저장
-        // 이미 value 로 channelId 존재하면 다른 기기에서 보고 있다는 거니까 skip
-        // 음 그런데 .. 브라우저도 폰도 5번 채널을 보고있었는데 redis 에는 값이 하나만 올라가있다면
-        // 내가 브라우저에서 4번 채널로 돌렸을 때 5를 삭제하고 4를 추가하면
-        // 폰은 여전히 5번을 보고있어도 레디스상에서 정보가 삭제되버리니까
-        // 웹소켓세션별로 저장을 해야겠네
-        // *****공유되어야할 것은 이 user 가 보고 있는 채널들임!!!
-        // 중복 저장 yes? no?
-
 
         ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, user.getId());
 
         if(alreadyUser != null){ // 이미 합류한 유저
-            // 마지막으로 읽은 메세지 id 갱신한 뒤 메세지 리스트 리턴
+            // 1. 마지막으로 읽은 메세지 id 업데이트
+            // 2. 메세지 리스트 리턴
             List<Message> messages = messageService.getMessagesByChannelId(channelId);
             if(messages != null && messages.size() > 0){
                 alreadyUser.setLastReadId(messages.get(messages.size()-1).getId());

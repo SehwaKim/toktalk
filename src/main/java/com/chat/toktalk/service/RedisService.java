@@ -34,4 +34,8 @@ public interface RedisService {
     void removeWebSocketSessionByUser(Long userId, WebSocketSession session);
 
     void addActiveChannelInfo(String sessionId, Long channelId);
+
+    void removeActiveChannelInfo(WebSocketSession session);
+
+    Long getActiveChannelInfo(WebSocketSession session);
 }
