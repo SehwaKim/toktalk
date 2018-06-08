@@ -1,5 +1,8 @@
 package com.chat.toktalk.websocket;
 
+import com.chat.toktalk.domain.ChannelUser;
+import com.chat.toktalk.service.ChannelUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -7,36 +10,29 @@ import java.util.*;
 
 @Component
 public class SessionManager {
+    @Autowired
+    ChannelUserService channelUserService;
 
-    private Map<Long, Set<WebSocketSession>> sessions = Collections.synchronizedMap(new HashMap<>());//방번호,세션들
-    /*
-    *  1. 웹소켓 연결 open 할 때
-    *  2. 한 채널 입장 시
-    * */
-    public void addWebSocketSession(Long channelId,WebSocketSession session){
-        Set<WebSocketSession> sessionContainer = getWebSocketSessionContainer(channelId);
-        sessionContainer.add(session);
-        sessions.put(channelId,sessionContainer);
+    private Map<Long, WebSocketSession> sessions = Collections.synchronizedMap(new HashMap<>()); // userId, WebSocketSession
+
+    public void addWebSocketSession(Long userId, WebSocketSession session){
+        sessions.put(userId, session);
     }
 
-    /*
-     *  1. 웹소켓 연결 close 할 때
-     *  2. 한 채널 퇴장 시
-     * */
-    public void removeWebSocketSession(Long channelId,WebSocketSession webSocketSession){
-        Set<WebSocketSession> sessionContainer = getWebSocketSessionContainer(channelId);
-        sessionContainer.remove(webSocketSession);
+    public void removeWebSocketSession(Long userId){
+        sessions.remove(userId);
     }
 
-    public Set<WebSocketSession> getWebSocketSessions(Long channelId){
-        return sessions.get(channelId);
-    }
+    public List<WebSocketSession> getWebSocketSessionsByChannelId(Long channelId){
+        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByChannelId(channelId);
+        List<WebSocketSession> targetSessions = new ArrayList<>();
 
-    private Set<WebSocketSession> getWebSocketSessionContainer(Long channelId){
-        if(!sessions.containsKey(channelId)){
-            return Collections.synchronizedSet(new HashSet<WebSocketSession>());
-        }else{
-            return sessions.get(channelId);
+        for(ChannelUser channelUser : channelUsers){
+            Long targetUserId = channelUser.getUser().getId();
+            if(sessions.containsKey(targetUserId)){
+                targetSessions.add(sessions.get(targetUserId));
+            }
         }
+        return targetSessions;
     }
 }

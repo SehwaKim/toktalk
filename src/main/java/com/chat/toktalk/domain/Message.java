@@ -18,7 +18,7 @@ public class Message implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String text;
-    private String type;
+    private String type; // deleted or system - 삭제된메세지 혹은 시스템메세지 구분
     private String data; // 메타데이터
     @Column(name = "user_id")
     private Long userId;

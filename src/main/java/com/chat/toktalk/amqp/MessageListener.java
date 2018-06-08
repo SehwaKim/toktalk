@@ -13,6 +13,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -24,17 +25,25 @@ public class MessageListener{
     public void receiveAndBroadcastMessage(ChatMessage chatMessage){
         Long channelId = chatMessage.getChannelId();
 
-        Set<WebSocketSession> sessions = sessionManager.getWebSocketSessions(channelId);
+        List<WebSocketSession> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
 
         if(sessions != null){
             sessions.stream().forEach(session->{
                 try {
-                  String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
-                  session.sendMessage(new TextMessage(jsonStr));
+                    String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
+                    session.sendMessage(new TextMessage(jsonStr));
                 } catch (IOException e) {
-                  e.printStackTrace();
+                    e.printStackTrace();
                 }
             });
         }
+
+        // 이 메세지가 알림으로 떠야하나 말아야하나를 판단
+        // 이 세션이 채널을 보고있으면 no
+        // 이 세션말고도 사용자의 다른 세션이 채널을 보고있으면 no
+        // 어떤 세션도 이 채널을 보고있지 않으면 yes
+
+        // 이 채널이 유저의 어떤 세션이라도 active 인가
+
     }
 }

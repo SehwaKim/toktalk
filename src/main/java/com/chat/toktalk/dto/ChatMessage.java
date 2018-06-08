@@ -10,14 +10,14 @@ public class ChatMessage implements Serializable {
 
     private Long channelId;
     private String nickname;
-    private String message;
+    private String text;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(Long channelId, String message, String nickname) {
+    public ChatMessage(Long channelId, String text, String nickname) {
         this.channelId = channelId;
-        this.message = message;
+        this.text = text;
         this.nickname = nickname;
     }
 
@@ -29,12 +29,12 @@ public class ChatMessage implements Serializable {
         this.channelId = channelId;
     }
 
-    public String getMessage() {
-        return message;
+    public String getText() {
+        return text;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getNickname() {

@@ -26,4 +26,10 @@ public interface RedisService {
     public List<Channel> getChannels(String id);
 
     Boolean removeUser(String userId);
+
+    void addWebSocketSessionByUser(Long userId, WebSocketSession session);
+
+    void removeWebSocketSessionByUser(Long userId, WebSocketSession session);
+
+    void addActiveChannelInfo(String sessionId, Long channelId);
 }

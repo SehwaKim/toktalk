@@ -11,6 +11,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class RedisServiceImpl implements RedisService {
@@ -64,5 +65,42 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Boolean removeUser(String userId) {
         return redisTemplate.delete(userId);
+    }
+
+    @Override
+    public void addWebSocketSessionByUser(Long userId, WebSocketSession session) {
+        redisTemplate.opsForSet().add(userId, session.getId());
+        Set<String> sessions = redisTemplate.opsForSet().members(userId);
+        for(String id : sessions){
+            System.out.println("id : " + id);
+        }
+    }
+
+    @Override
+    public void removeWebSocketSessionByUser(Long userId, WebSocketSession session) {
+        Set<String> sessionIdSet = redisTemplate.opsForSet().members(userId);
+        if(sessionIdSet.contains(session.getId())){
+            redisTemplate.opsForSet().remove(userId, session.getId());
+        }
+        Set<String> sessions = redisTemplate.opsForSet().members(userId);
+        if(sessions != null) {
+            for (String id : sessions) {
+                System.out.println("id : " + id);
+            }
+        }
+    }
+
+    @Override
+    public void addActiveChannelInfo(String sessionId, Long channelId) {
+        if(redisTemplate.hasKey(sessionId)){
+            redisTemplate.opsForValue().getAndSet(sessionId, channelId);
+        }else {
+            redisTemplate.opsForValue().set(sessionId, channelId);
+        }
+        Long id = (Long) redisTemplate.opsForValue().get(sessionId);
+        if(id != null){
+            System.out.println("활성화된 채널의 아이디 " + id);
+        }
+
     }
 }
