@@ -25,6 +25,10 @@ public class SessionManager {
         }
     }
 
+    public WebSocketSession getWebSocketSession(Long userId) {
+        return sessions.get(userId);
+    }
+
     public List<WebSocketSession> getWebSocketSessionsByChannelId(Long channelId){
         List<ChannelUser> channelUsers = channelUserService.getChannelUsersByChannelId(channelId);
         List<WebSocketSession> targetSessions = new ArrayList<>();

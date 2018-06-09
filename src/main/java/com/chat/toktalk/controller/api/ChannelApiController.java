@@ -8,6 +8,7 @@ import com.chat.toktalk.dto.ChannelForm;
 import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.*;
 import com.chat.toktalk.config.CustomWebSocketHandler;
+import com.chat.toktalk.websocket.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class ChannelApiController {
     RedisService redisService;
 
     @Autowired
-    CustomWebSocketHandler customWebSocketHandler;
+    SessionManager sessionManager;
 
     /* 새 채널 생성 */
     @PostMapping
@@ -56,7 +57,9 @@ public class ChannelApiController {
             channel.addChanneUser(channelUser);
             channel.setName(channelForm.getName());
 
-            channelService.addChannel(channel);
+            channel = channelService.addChannel(channel);
+            redisService.createMessageIdCounter(channel.getId());
+
             return channelService.getChannels(loginUserInfo.getId());
         }
 
@@ -73,11 +76,11 @@ public class ChannelApiController {
         }
 
         /* 마지막으로 보고 있던 채널의 lastReadId 를 업데이트 */
-        WebSocketSession webSocketSession = customWebSocketHandler.getWebSocketSession();
+        WebSocketSession webSocketSession = sessionManager.getWebSocketSession(user.getId());
         Long beforeId = redisService.getActiveChannelInfo(webSocketSession);
         if(beforeId != null){
             ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, user.getId());
-            // alreadyUser.setLastReadId(???); TODO how can i know this
+            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(channelId));
             channelUserService.updateChannelUser(alreadyUser);
         }
 

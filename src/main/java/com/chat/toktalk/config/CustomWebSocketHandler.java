@@ -4,6 +4,7 @@ import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.dto.ChatMessage;
+import com.chat.toktalk.dto.UnreadMessageInfo;
 import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.MessageService;
 import com.chat.toktalk.service.RedisService;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -45,26 +48,30 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    WebSocketSession webSocketSession;
-
-    public WebSocketSession getWebSocketSession() {
-        return webSocketSession;
-    }
-
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
 
-        // 새 웹소켓세션 등록
-        webSocketSession = session;
-
-        logger.info(">>>>>>>>>>>>>>웹소켓 세션 id : " + session.getId());
+        logger.info("새로운 웹소켓 세션 id : " + session.getId());
         Long userId = (Long) attributes.get("userId");
         sessionManager.addWebSocketSession(userId, session);
 
         // Redis 웹소켓세션 등록
         redisService.addWebSocketSessionByUser(userId, session);
 
+        // 채널별로 읽지 않은 메세지 수 구해서 뿌려주기
+        List<UnreadMessageInfo> unreadMessages = new ArrayList<>();
+        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
+        for(ChannelUser channelUser : channelUsers){
+            Long cnt = messageService.countUnreadMessageByChannelUser(channelUser);
+            if(cnt != null){
+                unreadMessages.add(new UnreadMessageInfo(channelUser.getChannel().getId(), cnt));
+            }
+        }
+
+        String jsonStr = objectMapper.writeValueAsString(unreadMessages);
+        logger.info(jsonStr);
+        session.sendMessage(new TextMessage(jsonStr));
 
         // online 되자마자 유저가 참여한 방정보 가져오기.
         /*List<ChannelUser> channelUserList = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
@@ -136,17 +143,17 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long userId = (Long) attributes.get("userId");
         sessionManager.removeWebSocketSession(userId);
 
-        // Redis 웹소켓세션 삭제
-        redisService.removeWebSocketSessionByUser(userId, session);
-        redisService.removeActiveChannelInfo(session);
-
         // 마지막으로 보고 있던 채널의 lastReadId 를 업데이트
         Long channelId = redisService.getActiveChannelInfo(session);
         if(channelId != null){
             ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, userId);
-            // alreadyUser.setLastReadId(???); TODO 엥 어떻게해야하지?
+            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(channelId));
             channelUserService.updateChannelUser(alreadyUser);
         }
+
+        // Redis 웹소켓세션 삭제
+        redisService.removeWebSocketSessionByUser(userId, session);
+        redisService.removeActiveChannelInfo(session);
 
         // 레디스 정보 삭제
         /*if(redisService.removeUser(attributes.get("userId").toString())){
