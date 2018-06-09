@@ -2,6 +2,7 @@ package com.chat.toktalk.controller.api;
 
 import com.chat.toktalk.domain.UploadFile;
 import com.chat.toktalk.service.UploadFileService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,8 @@ public class MessageApiController {
     @ResponseBody
     public String upload(MultipartHttpServletRequest multipartRequest) { //Multipart로 받는다.
 
+        ObjectMapper objectMapper = new ObjectMapper();
+
         Iterator<String> itr =  multipartRequest.getFileNames();
 
         String filePath = "/Users/osejin/fileEx"; //설정파일로 뺀다. 윈도우는 다른 패스로...
@@ -46,7 +49,7 @@ public class MessageApiController {
 
             try {
                 //임시파일 저장... 디비에 일단 저장해야함.... 그후 프론트 처리...
-                mpf.transferTo(new File(fileFullPath)); //파일저장 실제로는 service에서 처리
+                mpf.transferTo(new File(fileFullPath)); //파일저장 실제로는 service에서 처리.
 
                 System.out.println("originalFilename => "+originalFilename);
                 System.out.println("fileFullPath => "+fileFullPath);
@@ -56,8 +59,12 @@ public class MessageApiController {
                 uploadFile.setContentType(fileType);
                 uploadFile.setLength(fileLen);
 
+                // 나중에 h2나 mysql로 넣어야함... 회의 한 후에
                 uploadFileService.addUploadFile(uploadFile);
                 System.out.println("파일 저장 성공!");
+
+                // json test
+                String strJson = objectMapper.writeValueAsString(uploadFile);
 
             } catch (Exception e) {
                 System.out.println("postTempFile_ERROR======>"+fileFullPath);

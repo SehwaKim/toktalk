@@ -4,10 +4,7 @@ import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.dto.ChatMessage;
-import com.chat.toktalk.service.ChannelUserService;
-import com.chat.toktalk.service.MessageService;
-import com.chat.toktalk.service.RedisService;
-import com.chat.toktalk.service.UserService;
+import com.chat.toktalk.service.*;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +39,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Autowired
     MessageSender messageSender;
+
+    @Autowired
+    UploadFileService uploadFileService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -128,6 +128,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // 2. 메세지큐에 내보내기
         messageSender.sendMessage(new ChatMessage(channelId, textMessage, nickname));
+
+        // 3. 첨부파일 있으면 보내기
+
     }
 
     @Override
