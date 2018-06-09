@@ -10,4 +10,8 @@ public interface ChannelUserService {
     public ChannelUser getChannelUser(Long channelId, Long userId);
 
     List<ChannelUser> getChannelUsersByUserId(Long userId);
+
+    void updateChannelUser(ChannelUser alreadyUser);
+
+    List<ChannelUser> getChannelUsersByChannelId(Long channelId);
 }

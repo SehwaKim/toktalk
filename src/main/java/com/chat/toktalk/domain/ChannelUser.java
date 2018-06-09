@@ -26,6 +26,11 @@ public class ChannelUser implements Serializable {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
+    @Column(name = "last_read_id") // 마지막으로 읽은 메세지 id
+    private Long lastReadId;
+
+    // select count(m) from Message m where m.channelId = :channelId and m.id > :lastReadId
+
     @Column(name = "is_operator")
     private Boolean isOperator;
     private LocalDateTime regdate;

@@ -1,5 +1,6 @@
 package com.chat.toktalk.service.impl;
 
+import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.repository.MessageRepository;
 import com.chat.toktalk.service.MessageService;
