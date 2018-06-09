@@ -10,7 +10,6 @@ $(document).ready(function () {
     sock.onmessage = function (e) {
         var data = JSON.parse(e.data);
         var channelId = data.channelId;
-        console.log(data);
         showMessage(data);
         /*if($("#"+channelId).css('display') != 'none'){
             showMessage(data);

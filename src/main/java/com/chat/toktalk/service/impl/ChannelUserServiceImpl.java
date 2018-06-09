@@ -29,8 +29,12 @@ public class ChannelUserServiceImpl implements ChannelUserService {
     }
 
     @Override
+    public void updateChannelUser(ChannelUser alreadyUser) {
+        channelUserRepository.saveAndFlush(alreadyUser);
+    }
+
+    @Override
     public List<ChannelUser> getChannelUsersByChannelId(Long channelId) {
         return channelUserRepository.findAllByChannelId(channelId);
     }
-
 }

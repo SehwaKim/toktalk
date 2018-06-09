@@ -11,5 +11,7 @@ public interface ChannelUserService {
 
     List<ChannelUser> getChannelUsersByUserId(Long userId);
 
+    void updateChannelUser(ChannelUser alreadyUser);
+
     List<ChannelUser> getChannelUsersByChannelId(Long channelId);
 }

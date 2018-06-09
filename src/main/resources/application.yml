@@ -36,7 +36,13 @@ spring:
  rabbitmq:
    host: localhost
    port: 5672
-   username: test
-   password: test
-
-
+   username: guest
+   password: guest
+logging:
+  file: logs/dev_app.log
+  pattern:
+    file: "%d %-5level [%thread] %logger : %msg%n"
+  level:
+    org.springframework.web: INFO
+    guru.springframework.controllers: INFO
+    org.hibernate: INFO

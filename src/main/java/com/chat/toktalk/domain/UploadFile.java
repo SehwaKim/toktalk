@@ -3,12 +3,13 @@ package com.chat.toktalk.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "upload_file")
 @Data
-public class UploadFile {
+public class UploadFile implements Serializable {
     public UploadFile() {
         this.regdate = LocalDateTime.now();
     }

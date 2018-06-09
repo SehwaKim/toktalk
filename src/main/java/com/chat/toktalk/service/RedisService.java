@@ -29,4 +29,13 @@ public interface RedisService {
 
     Boolean removeUser(String userId);
 
+    void addWebSocketSessionByUser(Long userId, WebSocketSession session);
+
+    void removeWebSocketSessionByUser(Long userId, WebSocketSession session);
+
+    void addActiveChannelInfo(String sessionId, Long channelId);
+
+    void removeActiveChannelInfo(WebSocketSession session);
+
+    Long getActiveChannelInfo(WebSocketSession session);
 }
