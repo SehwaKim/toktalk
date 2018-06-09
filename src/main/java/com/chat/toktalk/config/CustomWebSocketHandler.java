@@ -11,6 +11,8 @@ import com.chat.toktalk.service.UserService;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -21,6 +23,8 @@ import java.util.Map;
 
 @Component
 public class CustomWebSocketHandler extends TextWebSocketHandler {
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     SessionManager sessionManager;
 
@@ -53,7 +57,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // 새 웹소켓세션 등록
         webSocketSession = session;
-        System.out.println(">>>>>>>>>>>>>>웹소켓 세션 id : " + session.getId());
+
+        logger.info(">>>>>>>>>>>>>>웹소켓 세션 id : " + session.getId());
         Long userId = (Long) attributes.get("userId");
         sessionManager.addWebSocketSession(userId, session);
 
