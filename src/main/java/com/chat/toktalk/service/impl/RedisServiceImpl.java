@@ -118,6 +118,7 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void addActiveChannelInfo(String sessionId, Long channelId) {
         String key = "websocketsession:"+sessionId;
+        logger.info(key);
         if(redisTemplate.hasKey(key)){
             redisTemplate.opsForValue().getAndSet(key, channelId.toString());
         }else {

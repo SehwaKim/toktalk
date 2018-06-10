@@ -77,14 +77,14 @@ public class ChannelApiController {
 
         /* 마지막으로 보고 있던 채널의 lastReadId 를 업데이트 */
         WebSocketSession webSocketSession = sessionManager.getWebSocketSession(user.getId());
-        Long beforeId = redisService.getActiveChannelInfo(webSocketSession);
-        if(beforeId != null){
-            ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, user.getId());
-            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(channelId));
+        Long activeChannelId = redisService.getActiveChannelInfo(webSocketSession);
+        if(activeChannelId != null){
+            ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
+            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
             channelUserService.updateChannelUser(alreadyUser);
         }
 
-        /* active channel 등록 */
+        /* active channel 업데이트 */
         String sessionId = webSocketSession.getId();
         redisService.addActiveChannelInfo(sessionId, channelId);
 

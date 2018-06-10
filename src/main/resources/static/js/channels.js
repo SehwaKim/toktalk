@@ -1,4 +1,5 @@
 var sock = null;
+var current = 0;
 
 $(document).ready(function () {
     sock = new SockJS('/sock');
@@ -9,8 +10,17 @@ $(document).ready(function () {
 
     sock.onmessage = function (e) {
         var data = JSON.parse(e.data);
-        var channelId = data.channelId;
-        showMessage(data);
+
+        if('message' == data.type){
+            if(data.notification){
+                notifyUnread(data);
+            }else {
+                showMessage(data);
+            }
+        }else if('unread' == data.type){
+            markAsUnread(data);
+        }
+
         /*if($("#"+channelId).css('display') != 'none'){
             showMessage(data);
         }*/
@@ -21,7 +31,6 @@ $(document).ready(function () {
     };
 
     sock.onheartbeat = function (e) {
-        console.log(e);
         sock.send("h");
     }
 
@@ -58,7 +67,12 @@ $(document).ready(function () {
     });
 });
 
-function enter(channelId) {
+function enter(element) {
+    var channelId = element.id;
+    if(channelId == current){
+        return false;
+    }
+    current = channelId;
     // if(!$("#"+channelId).css('display') == 'none'){
     $.ajax({
         url: '/api/channels/'+channelId,
@@ -68,6 +82,7 @@ function enter(channelId) {
         success: function (data) {
             if(data != null){
                 for(var i=0;i<data.length;i++){
+                    markAsRead(channelId);
                     showMessage(data[i]);
                 }
             }
@@ -129,7 +144,33 @@ function freshChannelList(data) {
     $("#channelList").empty();
     for(var key in data){
         var $div = $('<div></div>').appendTo($("#channelList"));
-        $('<a></a>').attr('onclick', 'enter(1)').attr('value', data[key].name)
-                                .addClass('btn btn-light btn-block').appendTo($div);
+        var $a = $('<a></a>')
+                    .attr('href', 'javascript:void(0);')
+                    .attr('id', data[key].id)
+                    .attr('onclick', 'enter(this)')
+                    .attr('style', 'text-align:left;')
+                    .addClass('btn btn-light btn-block').appendTo($div);
+        $('<span></span>').text(data[key].name).appendTo($a);
+        $('<span></span>').attr('style', 'badge badge-pill badge-danger unread').appendTo($a);
     }
+}
+
+function markAsUnread(data) {
+    var arr = data.unreadMessages;
+    for(key in arr){
+        $('#'+arr[key].channelId).find('.unread').text(arr[key].unreadCnt);
+    }
+}
+
+function markAsRead(channelId) {
+    $('#'+channelId).find('.unread').text('');
+}
+
+function notifyUnread(data) {
+    var cnt = $('#'+data.channelId).find('.unread').text();
+    if(typeof cnt === "undefined" || cnt == ''){
+        console.log(cnt);
+        cnt = 0;
+    }
+    $('#'+data.channelId).find('.unread').text(++cnt);
 }

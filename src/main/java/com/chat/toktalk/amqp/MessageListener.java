@@ -1,7 +1,8 @@
 package com.chat.toktalk.amqp;
 
 import com.chat.toktalk.config.RabbitConfig;
-import com.chat.toktalk.dto.ChatMessage;
+import com.chat.toktalk.dto.SocketMessage;
+import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -12,23 +13,30 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class MessageListener{
     @Autowired
     SessionManager sessionManager;
 
+    @Autowired
+    RedisService redisService;
+
     @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
-    public void receiveAndBroadcastMessage(ChatMessage chatMessage){
-        Long channelId = chatMessage.getChannelId();
+    public void receiveAndBroadcastMessage(SocketMessage socketMessage){
+        Long channelId = socketMessage.getChannelId();
 
         List<WebSocketSession> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
 
         if(sessions != null){
             sessions.stream().forEach(session->{
                 try {
-                    String jsonStr = new ObjectMapper().writeValueAsString(chatMessage);
+                    if(!socketMessage.getChannelId().equals(redisService.getActiveChannelInfo(session))){
+                        socketMessage.setNotification(true);
+                    }else {
+                        socketMessage.setNotification(false);
+                    }
+                    String jsonStr = new ObjectMapper().writeValueAsString(socketMessage);
                     session.sendMessage(new TextMessage(jsonStr));
                 } catch (IOException e) {
                     e.printStackTrace();

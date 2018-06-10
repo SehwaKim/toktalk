@@ -3,7 +3,7 @@ package com.chat.toktalk.config;
 import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
-import com.chat.toktalk.dto.ChatMessage;
+import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.dto.UnreadMessageInfo;
 import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.MessageService;
@@ -69,7 +69,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             }
         }
 
-        String jsonStr = objectMapper.writeValueAsString(unreadMessages);
+        String jsonStr = objectMapper.writeValueAsString(new SocketMessage(unreadMessages));
         logger.info(jsonStr);
         session.sendMessage(new TextMessage(jsonStr));
 
@@ -109,8 +109,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        if("h".equals(message.getPayload())){
-            System.out.println(message.getPayload());
+        if("h".equals(message.getPayload())){ // pong
             return;
         }
 
@@ -134,7 +133,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         messageService.addMessage(messageNew);
 
         // 2. 메세지큐에 내보내기
-        messageSender.sendMessage(new ChatMessage(channelId, textMessage, nickname));
+        messageSender.sendMessage(new SocketMessage(channelId, textMessage, nickname));
     }
 
     @Override
@@ -144,10 +143,10 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         sessionManager.removeWebSocketSession(userId);
 
         // 마지막으로 보고 있던 채널의 lastReadId 를 업데이트
-        Long channelId = redisService.getActiveChannelInfo(session);
-        if(channelId != null){
-            ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, userId);
-            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(channelId));
+        Long activeChannelId = redisService.getActiveChannelInfo(session);
+        if(activeChannelId != null){
+            ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, userId);
+            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
             channelUserService.updateChannelUser(alreadyUser);
         }
 
