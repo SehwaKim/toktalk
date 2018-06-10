@@ -172,6 +172,10 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
                 session.sendMessage(new TextMessage(jsonStr));
             }
 
+            // 이 유저가 가진 웹소켓세션에도 이 채널 unread mark 지우라고 해야함
+            messageSender.sendMessage(new SocketMessage(channelId, user.getId()));
+
+
         // 새롭게 채널에 합류한 유저
         }else{
             ChannelUser channelUser = new ChannelUser();

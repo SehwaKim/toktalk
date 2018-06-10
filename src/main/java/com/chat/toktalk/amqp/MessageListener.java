@@ -4,7 +4,6 @@ import com.chat.toktalk.config.RabbitConfig;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.websocket.SessionManager;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,8 +26,22 @@ public class MessageListener{
     public void receiveAndBroadcastMessage(SocketMessage socketMessage){
         Long channelId = socketMessage.getChannelId();
 
-        Map<Long, Set<WebSocketSession>> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
+        if("channel_mark".equals(socketMessage.getType())){
+            Set<WebSocketSession> sessions = sessionManager.getWebSocketSessionsByUser(socketMessage.getUserId());
+            if(sessions != null) {
+                sessions.stream().forEach(session -> {
+                    try {
+                        String jsonStr = new ObjectMapper().writeValueAsString(socketMessage);
+                        session.sendMessage(new TextMessage(jsonStr));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            return;
+        }
 
+        Map<Long, Set<WebSocketSession>> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
         if(sessions != null){
             if("typing".equals(socketMessage.getType())) {
                 sessions.remove(socketMessage.getUserId());

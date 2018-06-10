@@ -45,6 +45,12 @@ public class SocketMessage implements Serializable {
         this.text = systemMsg;
     }
 
+    public SocketMessage(Long channelId, Long userId) {
+        this.type = "channel_mark";
+        this.channelId = channelId;
+        this.userId = userId;
+    }
+
     public SocketMessage(Long channelId, Long userId, String typingAlarm) {
         this.type = "typing";
         this.channelId = channelId;

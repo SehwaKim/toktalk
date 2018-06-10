@@ -43,6 +43,10 @@ public class SessionManager {
         }
     }
 
+    public Set<WebSocketSession> getWebSocketSessionsByUser(Long userId){
+        return sessions.get(userId);
+    }
+
     /*
     *   MessageListener 에서 웹소켓세션에 접근할 때 호출되는 메소드
     */

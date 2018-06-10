@@ -149,7 +149,7 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Boolean isChannelInSight(Long userId, Long channelId) {
         Boolean isChannelInSight = false;
-        String key = "userId:"+userId.toString();
+        String key = "user:"+userId.toString();
         Set<String> sessionIdSet = redisTemplate.opsForSet().members(key);
 
         for(String sessionId : sessionIdSet){

@@ -33,6 +33,8 @@ $(document).ready(function () {
             setTimeout(function () {
                 $("#typingAlarm").text('');
             }, 5000);
+        }else if('channel_mark' == data.type){
+            markAsRead(data.channelId);
         }
     };
 
@@ -45,9 +47,10 @@ $(document).ready(function () {
     }
 
     $("#chatInput").keypress(function(e) {
-        // if($("#chatInput").val().length > 0){
-        //     sock.send(JSON.stringify({'type' : 'typing'}));
-        // }
+        // TODO 고쳐야됨
+        if($("#chatInput").val().length > 0){
+            sock.send(JSON.stringify({'type' : 'typing'}));
+        }
         if (e.keyCode == 13){
             sendMsg(1);
         }
