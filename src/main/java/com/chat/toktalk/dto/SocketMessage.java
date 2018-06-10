@@ -1,5 +1,6 @@
 package com.chat.toktalk.dto;
 
+import com.chat.toktalk.domain.Message;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,9 +18,16 @@ public class SocketMessage implements Serializable {
     private String nickname;
     private String text;
     private Boolean notification;
+    private List<Message> messages;
     private List<UnreadMessageInfo> unreadMessages;
 
     public SocketMessage() {
+    }
+
+    public SocketMessage(Long channelId, List<Message> messages){
+        this.type = "messageList";
+        this.channelId = channelId;
+        this.messages = messages;
     }
 
     public SocketMessage(List<UnreadMessageInfo> unreadMessages){
@@ -28,7 +36,7 @@ public class SocketMessage implements Serializable {
     }
 
     public SocketMessage(Long channelId, String text, String nickname) {
-        this.type = "message";
+        this.type = "chat";
         this.channelId = channelId;
         this.text = text;
         this.nickname = nickname;

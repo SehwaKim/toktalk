@@ -3,12 +3,10 @@ package com.chat.toktalk.config;
 import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
+import com.chat.toktalk.domain.User;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.dto.UnreadMessageInfo;
-import com.chat.toktalk.service.ChannelUserService;
-import com.chat.toktalk.service.MessageService;
-import com.chat.toktalk.service.RedisService;
-import com.chat.toktalk.service.UserService;
+import com.chat.toktalk.service.*;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +40,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Autowired
     ChannelUserService channelUserService;
+
+    @Autowired
+    ChannelService channelService;
 
     @Autowired
     MessageSender messageSender;
@@ -109,16 +110,81 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        if("h".equals(message.getPayload())){ // pong
-            return;
-        }
-
-        TypeReference<HashMap<String,Object>> typeRef
-                = new TypeReference<HashMap<String,Object>>() {};
+        TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>(){};
         HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
+        String type = (String) map.get("type");
+
+        if("pong".equals(type)){
+            return;
+
+        }else if("switch".equals(type)){
+            switchChannel(session, map);
+
+        }else if("chat".equals(type)){
+            handleChatMessage(session, map);
+        }
+    }
+
+    private void switchChannel(WebSocketSession session, HashMap<String, Object> map) throws Exception {
+        Map<String, Object> attributes = session.getAttributes();
+        String username = attributes.get("username").toString();
+        String nickname = attributes.get("nickname").toString();
+        User user = userService.getUserByEmail(username);
 
         Long channelId = new Long((Integer)map.get("channelId"));
-        String textMessage = (String) map.get("text");
+
+        /*
+        *   switch 하기 전 active channel 의 lastReadId 를 업데이트
+        */
+        Long activeChannelId = redisService.getActiveChannelInfo(session);
+        if(activeChannelId != null){
+            ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
+            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+            channelUserService.updateChannelUser(alreadyUser);
+        }
+
+        /*
+        *   active channel 바꾸기
+        */
+        String sessionId = session.getId();
+        redisService.addActiveChannelInfo(sessionId, channelId);
+
+        ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, user.getId());
+        List<Message> messages = null;
+
+        if(alreadyUser != null){
+            // 1. 마지막으로 읽은 메세지 id 업데이트
+            // 2. 메세지 리스트 리턴
+            messages = messageService.getMessagesByChannelId(channelId);
+            if(messages != null && messages.size() > 0){
+                alreadyUser.setLastReadId(messages.get(messages.size()-1).getId());
+                channelUserService.updateChannelUser(alreadyUser);
+                String jsonStr = new ObjectMapper().writeValueAsString(new SocketMessage(channelId, messages));
+                session.sendMessage(new TextMessage(jsonStr));
+            }
+
+        }else{
+            ChannelUser channelUser = new ChannelUser();
+            channelUser.setUser(user);
+            channelUser.setChannel(channelService.getChannel(channelId));
+            channelUserService.addChannelUser(channelUser);
+
+            // 입장메세지
+            String welcomeMsg = "\"" + nickname + "\" 님이 입장하셨습니다.";
+            Message messageNew = new Message();
+            messageNew.setType("system");
+            messageNew.setNickname("알림");
+            messageNew.setChannelId(channelId);
+            messageNew.setText(welcomeMsg);
+            messageService.addMessage(messageNew);
+
+            messageSender.sendMessage(new SocketMessage(channelId, welcomeMsg, "알림"));
+        }
+    }
+
+    private void handleChatMessage(WebSocketSession session, HashMap<String, Object> map) {
+        Long channelId = new Long((Integer)map.get("channelId"));
+        String message = (String) map.get("text");
 
         Map<String, Object> attributes = session.getAttributes();
         Long userId = (Long) attributes.get("userId");
@@ -129,18 +195,18 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         messageNew.setUserId(userId);
         messageNew.setNickname(nickname);
         messageNew.setChannelId(channelId);
-        messageNew.setText(textMessage);
+        messageNew.setText(message);
         messageService.addMessage(messageNew);
 
         // 2. 메세지큐에 내보내기
-        messageSender.sendMessage(new SocketMessage(channelId, textMessage, nickname));
+        messageSender.sendMessage(new SocketMessage(channelId, message, nickname));
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
         Long userId = (Long) attributes.get("userId");
-        sessionManager.removeWebSocketSession(userId);
+        sessionManager.removeWebSocketSession(userId, session);
 
         // 마지막으로 보고 있던 채널의 lastReadId 를 업데이트
         Long activeChannelId = redisService.getActiveChannelInfo(session);

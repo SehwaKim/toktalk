@@ -251,7 +251,7 @@
                 <div class="row">
                     <div class="col-2" id="channelList">
                         <div th:if="${not #lists.isEmpty(list)}" th:each="channel : ${list}">
-                            <a href="javascript:void(0);" class="btn btn-light btn-block" th:attrappend="id=${channel.getId()}" onclick="enter(this)" style="text-align:left;">
+                            <a href="javascript:void(0);" class="btn btn-light btn-block" th:attrappend="id=${channel.getId()}" onclick="switchChannel(this)" style="text-align:left;">
                                 <span th:text="${channel.name}"></span><span style="float: right" class="badge badge-pill badge-danger unread"></span>
                             </a>
                         </div>
@@ -273,84 +273,6 @@
                 </div>
             </div>
         </div>
-        <!--<div class="row">
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('1')">1번 채널 입장</button>
-                </div>
-                <div id="1" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_1" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_1"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(1)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('2')">2번 채널 입장</button>
-                </div>
-                <div id="2" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_2" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_2"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(2)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('3')">3번 채널 입장</button>
-                </div>
-                <div id="3" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_3" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_3"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(3)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('4')">4번 채널 입장</button>
-                </div>
-                <div id="4" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_4" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_4"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(4)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-        </div>-->
     </div>
 </div>
 </body>

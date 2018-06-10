@@ -11,19 +11,22 @@ $(document).ready(function () {
     sock.onmessage = function (e) {
         var data = JSON.parse(e.data);
 
-        if('message' == data.type){
-            if(data.notification){
+        if('chat' == data.type) {
+            if (data.notification) {
                 notifyUnread(data);
-            }else {
+            } else {
                 showMessage(data);
+            }
+        }else if('messageList' == data.type){
+            if(data.messages != null){
+                for(var i=0;i<data.messages.length;i++){
+                    markAsRead(data.channelId);
+                    showMessage(data.messages[i]);
+                }
             }
         }else if('unread' == data.type){
             markAsUnread(data);
         }
-
-        /*if($("#"+channelId).css('display') != 'none'){
-            showMessage(data);
-        }*/
     };
 
     sock.onclose = function () {
@@ -31,7 +34,7 @@ $(document).ready(function () {
     };
 
     sock.onheartbeat = function (e) {
-        sock.send("h");
+        sock.send(JSON.stringify({'type' : 'pong'}));
     }
 
     $("#chatInput_1").keypress(function(e) {
@@ -67,34 +70,17 @@ $(document).ready(function () {
     });
 });
 
-function enter(element) {
+function switchChannel(element) {
     var channelId = element.id;
     if(channelId == current){
         return false;
     }
     current = channelId;
-    // if(!$("#"+channelId).css('display') == 'none'){
-    $.ajax({
-        url: '/api/channels/'+channelId,
-        method: 'get',
-        dataType: "json",
-        contentType: "application/json",
-        success: function (data) {
-            if(data != null){
-                for(var i=0;i<data.length;i++){
-                    markAsRead(channelId);
-                    showMessage(data[i]);
-                }
-            }
-        }
-    });
-
-    // $("#"+channelId).show();
-    // }
+    sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
 }
 
 function sendMsg(channelId) {
-    sock.send(JSON.stringify({'channelId' : channelId, 'text' : $("#chatInput_"+channelId).val()}));
+    sock.send(JSON.stringify({'type' : 'chat', 'channelId' : channelId, 'text' : $("#chatInput_"+channelId).val()}));
     $("#chatInput_"+channelId).val("");
 }
 
@@ -147,7 +133,7 @@ function freshChannelList(data) {
         var $a = $('<a></a>')
                     .attr('href', 'javascript:void(0);')
                     .attr('id', data[key].id)
-                    .attr('onclick', 'enter(this)')
+                    .attr('onclick', 'switchChannel(this)')
                     .attr('style', 'text-align:left;')
                     .addClass('btn btn-light btn-block').appendTo($div);
         $('<span></span>').text(data[key].name).appendTo($a);

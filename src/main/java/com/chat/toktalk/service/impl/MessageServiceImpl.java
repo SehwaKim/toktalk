@@ -1,13 +1,13 @@
 package com.chat.toktalk.service.impl;
 
 import com.chat.toktalk.domain.ChannelUser;
+import com.chat.toktalk.domain.ExcludedMessage;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.repository.ExcludedMessageRepository;
 import com.chat.toktalk.repository.MessageRepository;
 import com.chat.toktalk.service.MessageService;
 import com.chat.toktalk.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +25,16 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void addMessage(Message message) {
-        messageRepository.save(message);
+        Message saved = messageRepository.save(message);
         redisService.increaseMessageIdByChannel(message.getChannelId());
+
+        if("system".equals(message.getType())){
+            ExcludedMessage excludedMessage = new ExcludedMessage();
+            excludedMessage.setType("system");
+            excludedMessage.setMessageId(saved.getId());
+            excludedMessage.setChannelId(saved.getChannelId());
+            excludedMessageRepository.save(excludedMessage);
+        }
     }
 
     @Override

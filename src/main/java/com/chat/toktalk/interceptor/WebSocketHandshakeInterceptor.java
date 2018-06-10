@@ -27,6 +27,7 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
             LoginUserInfo loginUserInfo = (LoginUserInfo)authentication.getPrincipal();
             attributes.put("userId", loginUserInfo.getId());
             attributes.put("nickname", loginUserInfo.getNickname());
+            attributes.put("username", loginUserInfo.getEmail());
         }
 
         return true;
