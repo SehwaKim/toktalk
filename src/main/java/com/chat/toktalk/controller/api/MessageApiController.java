@@ -4,6 +4,7 @@ import com.chat.toktalk.domain.UploadFile;
 import com.chat.toktalk.service.UploadFileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,7 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -24,6 +29,7 @@ public class MessageApiController {
 
     @RequestMapping(value = "/fileUpload/post") //ajax에서 호출하는 부분
     @ResponseBody
+    @Transactional
     public String upload(MultipartHttpServletRequest multipartRequest) { //Multipart로 받는다.
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -48,7 +54,7 @@ public class MessageApiController {
             Long fileLen = mpf.getSize();
 
             try {
-                //임시파일 저장... 디비에 일단 저장해야함.... 그후 프론트 처리...
+                //임시파일 저장
                 mpf.transferTo(new File(fileFullPath)); //파일저장 실제로는 service에서 처리.
 
                 System.out.println("originalFilename => "+originalFilename);
@@ -59,12 +65,20 @@ public class MessageApiController {
                 uploadFile.setContentType(fileType);
                 uploadFile.setLength(fileLen);
 
-                // 나중에 h2나 mysql로 넣어야함... 회의 한 후에
+                // 나중에  mysql로 넣어야함... 회의 한 후에
                 uploadFileService.addUploadFile(uploadFile);
                 System.out.println("파일 저장 성공!");
 
                 // json test
                 String strJson = objectMapper.writeValueAsString(uploadFile);
+
+                // 다운로드해보기
+                List<String> mapstream = Collections.emptyList();
+                try (Stream<UploadFile> stream = uploadFileService.getUploadFileByFileName(originalFilename)) {
+                    mapstream = stream.map(uploadFile1 -> uploadFile1.toString()).collect(Collectors.toList());
+                }
+
+                System.out.println("download : " + mapstream.toString());
 
             } catch (Exception e) {
                 System.out.println("postTempFile_ERROR======>"+fileFullPath);
