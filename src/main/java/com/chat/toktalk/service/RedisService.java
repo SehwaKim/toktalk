@@ -36,6 +36,8 @@ public interface RedisService {
     void removeActiveChannelInfo(WebSocketSession session);
     Long getActiveChannelInfo(WebSocketSession session);
 
+    Boolean isChannelInSight(Long userId, Long channelId);
+
     void createMessageIdCounter(Long channelId);
     void increaseMessageIdByChannel(Long channelId);
     Long getLastMessageIdByChannel(Long channelId);

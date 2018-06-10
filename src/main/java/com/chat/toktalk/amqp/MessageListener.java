@@ -4,6 +4,7 @@ import com.chat.toktalk.config.RabbitConfig;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.websocket.SessionManager;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class MessageListener{
@@ -26,30 +29,38 @@ public class MessageListener{
     public void receiveAndBroadcastMessage(SocketMessage socketMessage){
         Long channelId = socketMessage.getChannelId();
 
-        List<WebSocketSession> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
+        Map<Long, Set<WebSocketSession>> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
 
         if(sessions != null){
-            sessions.stream().forEach(session->{
-                try {
-                    if(!socketMessage.getChannelId().equals(redisService.getActiveChannelInfo(session))){
-                        socketMessage.setNotification(true);
-                    }else {
+            if("typing".equals(socketMessage.getType())) {
+                sessions.remove(socketMessage.getUserId());
+            }
+
+            for(Long userId : sessions.keySet()){
+                if("chat".equals(socketMessage.getType())){
+                    Boolean isChannelInSight = redisService.isChannelInSight(userId, channelId);
+
+                    if (isChannelInSight) {
                         socketMessage.setNotification(false);
+                    }else {
+                        socketMessage.setNotification(true);
                     }
-                    String jsonStr = new ObjectMapper().writeValueAsString(socketMessage);
-                    session.sendMessage(new TextMessage(jsonStr));
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            });
+
+                sessions.get(userId).stream().forEach(session -> {
+                    try {
+                        String jsonStr = new ObjectMapper().writeValueAsString(socketMessage);
+                        session.sendMessage(new TextMessage(jsonStr));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
         }
 
         // 이 메세지가 알림으로 떠야하나 말아야하나를 판단
-        // 이 세션이 채널을 보고있으면 no
-        // 이 세션말고도 사용자의 다른 세션이 채널을 보고있으면 no
-        // 어떤 세션도 이 채널을 보고있지 않으면 yes
-
-        // 이 채널이 유저의 어떤 세션이라도 active 인가
-
+        // 해당 웹소켓세션이 채널을 보고있으면 notification = false
+        // 이 웹소켓세션 아니어도 같은 사용자의 다른 세션이 이 채널을 보고있으면 notification = false
+        // 사용자의 어떠한 웹소켓세션도 이 채널을 보고있지 않으면 notification = true
     }
 }

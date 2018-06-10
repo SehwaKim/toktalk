@@ -147,6 +147,24 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public Boolean isChannelInSight(Long userId, Long channelId) {
+        Boolean isChannelInSight = false;
+        String key = "userId:"+userId.toString();
+        Set<String> sessionIdSet = redisTemplate.opsForSet().members(key);
+
+        for(String sessionId : sessionIdSet){
+            String sKey = "websocketsession:"+sessionId;
+            String activeChannelId = (String) redisTemplate.opsForValue().get(sKey);
+            if(channelId.toString().equals(activeChannelId)){
+                isChannelInSight = true;
+                break;
+            }
+        }
+
+        return isChannelInSight;
+    }
+
+    @Override
     public void createMessageIdCounter(Long channelId) {
         String key = "channel:"+channelId.toString();
         redisTemplate.opsForValue().set(key, "0");

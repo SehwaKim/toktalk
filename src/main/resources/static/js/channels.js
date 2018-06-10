@@ -26,6 +26,13 @@ $(document).ready(function () {
             }
         }else if('unread' == data.type){
             markAsUnread(data);
+        }else if('system' == data.type){
+            showMessage(data);
+        }else if('typing' == data.type){
+            $("#typingAlarm").text(data.text);
+            setTimeout(function () {
+                $("#typingAlarm").text('');
+            }, 5000);
         }
     };
 
@@ -37,51 +44,30 @@ $(document).ready(function () {
         sock.send(JSON.stringify({'type' : 'pong'}));
     }
 
-    $("#chatInput_1").keypress(function(e) {
-
+    $("#chatInput").keypress(function(e) {
+        // if($("#chatInput").val().length > 0){
+        //     sock.send(JSON.stringify({'type' : 'typing'}));
+        // }
         if (e.keyCode == 13){
             sendMsg(1);
-
-        }
-    });
-
-    $("#chatInput_2").keypress(function(e) {
-
-        if (e.keyCode == 13){
-            sendMsg(2);
-
-        }
-    });
-
-    $("#chatInput_3").keypress(function(e) {
-
-        if (e.keyCode == 13){
-            sendMsg(3);
-
-        }
-    });
-
-    $("#chatInput_4").keypress(function(e) {
-
-        if (e.keyCode == 13){
-            sendMsg(4);
-
         }
     });
 });
 
-function switchChannel(element) {
-    var channelId = element.id;
+function switchChannel(channelId) {
     if(channelId == current){
         return false;
     }
+    $('#'+current).removeClass('active');
     current = channelId;
     sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
+    //active
+    $('#'+channelId).addClass('active');
 }
 
 function sendMsg(channelId) {
-    sock.send(JSON.stringify({'type' : 'chat', 'channelId' : channelId, 'text' : $("#chatInput_"+channelId).val()}));
-    $("#chatInput_"+channelId).val("");
+    sock.send(JSON.stringify({'type' : 'chat', 'channelId' : channelId, 'text' : $("#chatInput").val()}));
+    $("#chatInput").val("");
 }
 
 function disconnect() {
@@ -89,7 +75,11 @@ function disconnect() {
 }
 
 function showMessage(data) {
-    $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+    if('system' == data.type){
+        $('#messages_'+data.channelId).append(data.text + '\n');
+    }else {
+        $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+    }
     var textArea = $('#messages_'+data.channelId);
     textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
 }
@@ -122,6 +112,8 @@ function createChannel() {
             $('#name').val("");
             $('#purpose').val("");
             $('#invite').val("");
+            var lastIdx = data.length-1;
+            switchChannel(data[lastIdx].id);
         }
     });
 }

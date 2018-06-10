@@ -46,19 +46,17 @@ public class SessionManager {
     /*
     *   MessageListener 에서 웹소켓세션에 접근할 때 호출되는 메소드
     */
-    public List<WebSocketSession> getWebSocketSessionsByChannelId(Long channelId){
+    public Map<Long, Set<WebSocketSession>> getWebSocketSessionsByChannelId(Long channelId){
         List<ChannelUser> channelUsers = channelUserService.getChannelUsersByChannelId(channelId);
-        // DB에서 채널에 속한 유저리스트를 갖고오고 있는데 이 정보를 Redis에 올려야 할지
+        // DB에서 채널에 속한 유저리스트를 갖고오고 있는데 이 정보를 그냥 Redis에 올려야 할지
         // (그렇게되면 ChannelUser 가 생성될 때마다 레디스에 올리고 나갈땐 내려야 한다)
-        // ex) key - channelId / value - Set<userId>
-        List<WebSocketSession> targetSessions = new ArrayList<>();
+        // ex) 레디스에 key - channelId / value - Set<userId> 이렇게 올라가게끔
+        Map<Long, Set<WebSocketSession>> targetSessions = new HashMap<>();
 
         for(ChannelUser channelUser : channelUsers){
             Long userId = channelUser.getUser().getId();
             if(sessions.containsKey(userId)){
-                for(WebSocketSession session : sessions.get(userId)){
-                    targetSessions.add(session);
-                }
+                targetSessions.put(userId, sessions.get(userId));
             }
         }
 
@@ -66,12 +64,8 @@ public class SessionManager {
 //        List<Long> userIdList = redisService.getUsersByChannelId(channelId)
 //        for(Long userId : userIdList){
 //            if(sessions.containsKey(userId)){
-//                for(WebSocketSession session : sessions.get(userId)){
-//                    targetSessions.add(session);
-//                }
-//            }
+//                targetSessions.put(userId, sessions.get(userId));
 //        }
-
         return targetSessions;
     }
 }

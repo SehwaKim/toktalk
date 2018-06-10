@@ -114,15 +114,23 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
         String type = (String) map.get("type");
 
-        if("pong".equals(type)){
+        if("pong".equals(type)) {
             return;
-
+        }else if("typing".equals(type)){
+            alertTyping(session);
         }else if("switch".equals(type)){
             switchChannel(session, map);
-
         }else if("chat".equals(type)){
             handleChatMessage(session, map);
         }
+    }
+
+    private void alertTyping(WebSocketSession session) {
+        Long channelId = redisService.getActiveChannelInfo(session);
+        String nickname = (String) session.getAttributes().get("nickname");
+        Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
+        String typingAlarm = nickname+"님이 뭔가를 입력 중 입니다";
+        messageSender.sendMessage(new SocketMessage(channelId, userId, typingAlarm));
     }
 
     private void switchChannel(WebSocketSession session, HashMap<String, Object> map) throws Exception {
@@ -131,7 +139,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         String nickname = attributes.get("nickname").toString();
         User user = userService.getUserByEmail(username);
 
-        Long channelId = new Long((Integer)map.get("channelId"));
+        Long channelId = Long.parseLong(map.get("channelId").toString());
 
         /*
         *   switch 하기 전 active channel 의 lastReadId 를 업데이트
@@ -152,6 +160,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, user.getId());
         List<Message> messages = null;
 
+        // 이미 채널에 존재하는 유저
         if(alreadyUser != null){
             // 1. 마지막으로 읽은 메세지 id 업데이트
             // 2. 메세지 리스트 리턴
@@ -163,6 +172,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
                 session.sendMessage(new TextMessage(jsonStr));
             }
 
+        // 새롭게 채널에 합류한 유저
         }else{
             ChannelUser channelUser = new ChannelUser();
             channelUser.setUser(user);
@@ -170,15 +180,14 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             channelUserService.addChannelUser(channelUser);
 
             // 입장메세지
-            String welcomeMsg = "\"" + nickname + "\" 님이 입장하셨습니다.";
+            String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";
             Message messageNew = new Message();
             messageNew.setType("system");
-            messageNew.setNickname("알림");
             messageNew.setChannelId(channelId);
-            messageNew.setText(welcomeMsg);
+            messageNew.setText(systemMsg);
             messageService.addMessage(messageNew);
 
-            messageSender.sendMessage(new SocketMessage(channelId, welcomeMsg, "알림"));
+            messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
         }
     }
 

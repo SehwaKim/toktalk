@@ -15,6 +15,7 @@ public class SocketMessage implements Serializable {
 
     private String type;
     private Long channelId;
+    private Long userId;
     private String nickname;
     private String text;
     private Boolean notification;
@@ -30,11 +31,6 @@ public class SocketMessage implements Serializable {
         this.messages = messages;
     }
 
-    public SocketMessage(List<UnreadMessageInfo> unreadMessages){
-        this.type = "unread";
-        this.unreadMessages = unreadMessages;
-    }
-
     public SocketMessage(Long channelId, String text, String nickname) {
         this.type = "chat";
         this.channelId = channelId;
@@ -43,5 +39,22 @@ public class SocketMessage implements Serializable {
         this.notification = false;
     }
 
+    public SocketMessage(Long channelId, String systemMsg) {
+        this.type = "system";
+        this.channelId = channelId;
+        this.text = systemMsg;
+    }
+
+    public SocketMessage(Long channelId, Long userId, String typingAlarm) {
+        this.type = "typing";
+        this.channelId = channelId;
+        this.userId = userId;
+        this.text = typingAlarm;
+    }
+
+    public SocketMessage(List<UnreadMessageInfo> unreadMessages){
+        this.type = "unread";
+        this.unreadMessages = unreadMessages;
+    }
     // TODO 파일정보 보낼때도 type 구분하기
 }
