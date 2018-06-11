@@ -6,3 +6,7 @@ insert into user_roles(id, role_name, user_id) VALUES (1, 'USER', 1);
 insert into user_roles(id, role_name, user_id) VALUES (2, 'ADMIN', 1);
 insert into user_roles(id, role_name, user_id) VALUES (3, 'USER', 2);
 insert into user_roles(id, role_name, user_id) VALUES (4, 'USER', 3);
+
+insert into channel(id, name, regdate) VALUES (1, 'general', now());
+insert into channel_user(id, user_id, channel_id) VALUES (1, 1, 1);
+insert into channel_user(id, user_id, channel_id) VALUES (2, 2, 1);

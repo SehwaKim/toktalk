@@ -3,8 +3,12 @@ package com.chat.toktalk.service.impl;
 import com.chat.toktalk.domain.Channel;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.service.RedisService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -15,30 +19,40 @@ import java.util.Set;
 
 @Service
 public class RedisServiceImpl implements RedisService {
-    @Autowired
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
     RedisTemplate redisTemplate;
 
+    RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+
     List<User> userList = new ArrayList<>();
+
     List<Channel> channelList = new ArrayList<>();
 
-//    @Override
+    public RedisServiceImpl(RedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+        this.redisTemplate.setKeySerializer(redisSerializer);
+        this.redisTemplate.setValueSerializer(redisSerializer);
+    }
+
+    //    @Override
 //    public void addUser(Long id, WebSocketSession session) {
 //        redisTemplate.opsForList().rightPush(id,session.getId());
 //    }
 
     @Override
     public void addChannelUser(Long channelId, String userId) {
-        redisTemplate.opsForList().rightPush(channelId,userId);
+        redisTemplate.opsForList().rightPush(channelId.toString(), userId.toString());
     }
 
     @Override
     public void addChannelForUser(String userId, Long channelId) {
-        redisTemplate.opsForList().rightPush(userId,channelId);
+        redisTemplate.opsForList().rightPush(userId.toString(), channelId.toString());
     }
 
     @Override
     public void addUserAtSocket(String socketId, String userId) {
-        redisTemplate.opsForList().rightPush(socketId,userId);
+        redisTemplate.opsForList().rightPush(socketId.toString(), userId.toString());
     }
 
     @Override
@@ -74,51 +88,102 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void addWebSocketSessionByUser(Long userId, WebSocketSession session) {
-        redisTemplate.opsForSet().add(userId, session.getId());
-        Set<String> sessions = redisTemplate.opsForSet().members(userId);
-        for(String id : sessions){
-            System.out.println("id : " + id);
+        String key = "user:"+userId.toString();
+        redisTemplate.opsForSet().add(key, session.getId().toString());
+        Set<String> sessionIdSet = redisTemplate.opsForSet().members(key);
+        logger.info("userId " + userId +"의 웹소켓세션");
+        for(String id : sessionIdSet){
+            logger.info("WebSocketSession id: " + id);
         }
     }
 
     @Override
     public void removeWebSocketSessionByUser(Long userId, WebSocketSession session) {
-        Set<String> sessionIdSet = redisTemplate.opsForSet().members(userId);
-        if(sessionIdSet.contains(session.getId())){
-            redisTemplate.opsForSet().remove(userId, session.getId());
+        String key = "user:"+userId.toString();
+        Set<String> sessionIdSet = redisTemplate.opsForSet().members(key);
+        if(sessionIdSet.contains(session.getId().toString())){
+            redisTemplate.opsForSet().remove(key, session.getId().toString());
         }
-        Set<String> sessions = redisTemplate.opsForSet().members(userId);
-        if(sessions != null) {
+        Set<String> sessions = redisTemplate.opsForSet().members(key);
+        logger.info("user " + userId +"의 웹소켓세션");
+        if(sessions.size() > 0) {
             for (String id : sessions) {
-                System.out.println("id : " + id);
+                logger.info("WebSocketSession id: " + id);
             }
+        }else {
+            logger.info("없음");
         }
     }
 
     @Override
     public void addActiveChannelInfo(String sessionId, Long channelId) {
-        if(redisTemplate.hasKey(sessionId)){
-            redisTemplate.opsForValue().getAndSet(sessionId, channelId);
+        String key = "websocketsession:"+sessionId;
+        logger.info(key);
+        if(redisTemplate.hasKey(key)){
+            redisTemplate.opsForValue().getAndSet(key, channelId.toString());
         }else {
-            redisTemplate.opsForValue().set(sessionId, channelId);
+            redisTemplate.opsForValue().set(key, channelId.toString());
         }
-        Long id = (Long) redisTemplate.opsForValue().get(sessionId);
+        String id = (String) redisTemplate.opsForValue().get(key);
         if(id != null){
-            System.out.println("활성화된 채널의 아이디 " + id);
+            logger.info("currently active channel id: " + id);
         }
     }
 
     @Override
     public void removeActiveChannelInfo(WebSocketSession session) {
-        redisTemplate.delete(session.getId());
+        String key = "websocketsession:"+session.getId().toString();
+        redisTemplate.delete(key);
     }
 
     @Override
     public Long getActiveChannelInfo(WebSocketSession session) {
-        Long channelId = (Long) redisTemplate.opsForValue().get(session.getId());
+        String key = "websocketsession:"+session.getId().toString();
+        String channelId = (String) redisTemplate.opsForValue().get(key);
         if (channelId != null){
-            return channelId;
+            return Long.parseLong(channelId);
         }
+        return null;
+    }
+
+    @Override
+    public Boolean isChannelInSight(Long userId, Long channelId) {
+        Boolean isChannelInSight = false;
+        String key = "user:"+userId.toString();
+        Set<String> sessionIdSet = redisTemplate.opsForSet().members(key);
+
+        for(String sessionId : sessionIdSet){
+            String sKey = "websocketsession:"+sessionId;
+            String activeChannelId = (String) redisTemplate.opsForValue().get(sKey);
+            if(channelId.toString().equals(activeChannelId)){
+                isChannelInSight = true;
+                break;
+            }
+        }
+
+        return isChannelInSight;
+    }
+
+    @Override
+    public void createMessageIdCounter(Long channelId) {
+        String key = "channel:"+channelId.toString();
+        redisTemplate.opsForValue().set(key, "0");
+    }
+
+    @Override
+    public void increaseMessageIdByChannel(Long channelId) {
+        String key = "channel:"+channelId.toString();
+        redisTemplate.opsForValue().increment(key, 1);
+    }
+
+    @Override
+    public Long getLastMessageIdByChannel(Long channelId) {
+        String key = "channel:"+channelId.toString();
+        String lastMessageId = (String) redisTemplate.opsForValue().get(key);
+        if (lastMessageId != null) {
+            return Long.parseLong(lastMessageId);
+        }
+
         return null;
     }
 }

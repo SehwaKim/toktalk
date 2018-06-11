@@ -2,7 +2,7 @@ spring:
  profiles:
    active: local
  redis:
-   host: localhost
+   host: 192.168.99.100
    port: 6379
  session:
    store-type: redis
@@ -34,7 +34,7 @@ spring:
    console:
      enabled: true
  rabbitmq:
-   host: localhost
+   host: 192.168.99.100
    port: 5672
    username: test
    password: test

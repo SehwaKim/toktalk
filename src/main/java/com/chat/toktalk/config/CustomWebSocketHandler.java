@@ -3,7 +3,9 @@ package com.chat.toktalk.config;
 import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
-import com.chat.toktalk.dto.ChatMessage;
+import com.chat.toktalk.domain.User;
+import com.chat.toktalk.dto.SocketMessage;
+import com.chat.toktalk.dto.UnreadMessageInfo;
 import com.chat.toktalk.service.*;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -38,6 +42,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     ChannelUserService channelUserService;
 
     @Autowired
+    ChannelService channelService;
+
+    @Autowired
     MessageSender messageSender;
 
     @Autowired
@@ -45,26 +52,30 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    WebSocketSession webSocketSession;
-
-    public WebSocketSession getWebSocketSession() {
-        return webSocketSession;
-    }
-
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
 
-        // 새 웹소켓세션 등록
-        webSocketSession = session;
-
-        logger.info(">>>>>>>>>>>>>>웹소켓 세션 id : " + session.getId());
+        logger.info("새로운 웹소켓 세션 id : " + session.getId());
         Long userId = (Long) attributes.get("userId");
         sessionManager.addWebSocketSession(userId, session);
 
         // Redis 웹소켓세션 등록
         redisService.addWebSocketSessionByUser(userId, session);
 
+        // 채널별로 읽지 않은 메세지 수 구해서 뿌려주기
+        List<UnreadMessageInfo> unreadMessages = new ArrayList<>();
+        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
+        for(ChannelUser channelUser : channelUsers){
+            Long cnt = messageService.countUnreadMessageByChannelUser(channelUser);
+            if(cnt != null){
+                unreadMessages.add(new UnreadMessageInfo(channelUser.getChannel().getId(), cnt));
+            }
+        }
+
+        String jsonStr = objectMapper.writeValueAsString(new SocketMessage(unreadMessages));
+        logger.info(jsonStr);
+        session.sendMessage(new TextMessage(jsonStr));
 
         // online 되자마자 유저가 참여한 방정보 가져오기.
         /*List<ChannelUser> channelUserList = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
@@ -102,17 +113,94 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        if("h".equals(message.getPayload())){
-            System.out.println(message.getPayload());
+        TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>(){};
+        HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
+        String type = (String) map.get("type");
+
+        if("pong".equals(type)) {
             return;
+        }else if("typing".equals(type)){
+            alertTyping(session);
+        }else if("switch".equals(type)){
+            switchChannel(session, map);
+        }else if("chat".equals(type)){
+            handleChatMessage(session, map);
+        }
+    }
+
+    private void alertTyping(WebSocketSession session) {
+        Long channelId = redisService.getActiveChannelInfo(session);
+        String nickname = (String) session.getAttributes().get("nickname");
+        Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
+        String typingAlarm = nickname+"님이 뭔가를 입력 중 입니다";
+        messageSender.sendMessage(new SocketMessage(channelId, userId, typingAlarm));
+    }
+
+    private void switchChannel(WebSocketSession session, HashMap<String, Object> map) throws Exception {
+        Map<String, Object> attributes = session.getAttributes();
+        String username = attributes.get("username").toString();
+        String nickname = attributes.get("nickname").toString();
+        User user = userService.getUserByEmail(username);
+
+        Long channelId = Long.parseLong(map.get("channelId").toString());
+
+        /*
+        *   switch 하기 전 active channel 의 lastReadId 를 업데이트
+        */
+        Long activeChannelId = redisService.getActiveChannelInfo(session);
+        if(activeChannelId != null){
+            ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
+            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+            channelUserService.updateChannelUser(alreadyUser);
         }
 
-        TypeReference<HashMap<String,Object>> typeRef
-                = new TypeReference<HashMap<String,Object>>() {};
-        HashMap<String, Object> map = objectMapper.readValue(message.getPayload(), typeRef);
+        /*
+        *   active channel 바꾸기
+        */
+        String sessionId = session.getId();
+        redisService.addActiveChannelInfo(sessionId, channelId);
 
+        ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, user.getId());
+        List<Message> messages = null;
+
+        // 이미 채널에 존재하는 유저
+        if(alreadyUser != null){
+            // 1. 마지막으로 읽은 메세지 id 업데이트
+            // 2. 메세지 리스트 리턴
+            messages = messageService.getMessagesByChannelId(channelId);
+            if(messages != null && messages.size() > 0){
+                alreadyUser.setLastReadId(messages.get(messages.size()-1).getId());
+                channelUserService.updateChannelUser(alreadyUser);
+                String jsonStr = new ObjectMapper().writeValueAsString(new SocketMessage(channelId, messages));
+                session.sendMessage(new TextMessage(jsonStr));
+            }
+
+            // 이 유저가 가진 웹소켓세션에도 이 채널 unread mark 지우라고 해야함
+            messageSender.sendMessage(new SocketMessage(channelId, user.getId()));
+
+
+        // 새롭게 채널에 합류한 유저
+        }else{
+            ChannelUser channelUser = new ChannelUser();
+            channelUser.setUser(user);
+            channelUser.setChannel(channelService.getChannel(channelId));
+            channelUserService.addChannelUser(channelUser);
+
+            // 입장메세지
+            String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";
+            Message messageNew = new Message();
+            messageNew.setType("system");
+            messageNew.setChannelId(channelId);
+            messageNew.setText(systemMsg);
+            messageService.addMessage(messageNew);
+
+            messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
+        }
+    }
+
+    private void handleChatMessage(WebSocketSession session, HashMap<String, Object> map) {
         Long channelId = new Long((Integer)map.get("channelId"));
-        String textMessage = (String) map.get("text");
+        String message = (String) map.get("text");
 
         Map<String, Object> attributes = session.getAttributes();
         Long userId = (Long) attributes.get("userId");
@@ -123,11 +211,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         messageNew.setUserId(userId);
         messageNew.setNickname(nickname);
         messageNew.setChannelId(channelId);
-        messageNew.setText(textMessage);
+        messageNew.setText(message);
         messageService.addMessage(messageNew);
 
         // 2. 메세지큐에 내보내기
-        messageSender.sendMessage(new ChatMessage(channelId, textMessage, nickname));
+        messageSender.sendMessage(new SocketMessage(channelId, message, nickname));
 
         // 3. 첨부파일 있으면 보내기
 
@@ -137,19 +225,19 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
         Long userId = (Long) attributes.get("userId");
-        sessionManager.removeWebSocketSession(userId);
+        sessionManager.removeWebSocketSession(userId, session);
+
+        // 마지막으로 보고 있던 채널의 lastReadId 를 업데이트
+        Long activeChannelId = redisService.getActiveChannelInfo(session);
+        if(activeChannelId != null){
+            ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, userId);
+            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+            channelUserService.updateChannelUser(alreadyUser);
+        }
 
         // Redis 웹소켓세션 삭제
         redisService.removeWebSocketSessionByUser(userId, session);
         redisService.removeActiveChannelInfo(session);
-
-        // 마지막으로 보고 있던 채널의 lastReadId 를 업데이트
-        Long channelId = redisService.getActiveChannelInfo(session);
-        if(channelId != null){
-            ChannelUser alreadyUser = channelUserService.getChannelUser(channelId, userId);
-            // alreadyUser.setLastReadId(???); TODO 엥 어떻게해야하지?
-            channelUserService.updateChannelUser(alreadyUser);
-        }
 
         // 레디스 정보 삭제
         /*if(redisService.removeUser(attributes.get("userId").toString())){
