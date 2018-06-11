@@ -1,5 +1,6 @@
 var sock = null;
 var current = 0;
+var in5Sec = false;
 
 $(document).ready(function () {
     sock = new SockJS('/sock');
@@ -47,15 +48,27 @@ $(document).ready(function () {
     }
 
     $("#chatInput").keypress(function(e) {
-        // TODO 고쳐야됨
-        if($("#chatInput").val().length > 0){
-            sock.send(JSON.stringify({'type' : 'typing'}));
-        }
         if (e.keyCode == 13){
             sendMsg(1);
         }
     });
+
+    $("#chatInput").keydown(function(e) {
+        typingAlarm();
+    });
 });
+
+function typingAlarm() {
+    if($("#chatInput").val().length > 0){
+        if(!in5Sec){
+            sock.send(JSON.stringify({'type' : 'typing'}));
+            in5Sec = true;
+            setTimeout(function () {
+                in5Sec = false;
+            }, 5000);
+        }
+    }
+}
 
 function switchChannel(channelId) {
     if(channelId == current){
