@@ -1,6 +1,8 @@
 var sock = null;
 var current = 0;
 var in5Sec = false;
+var timer1;
+var timer2;
 
 $(document).ready(function () {
     sock = new SockJS('/sock');
@@ -16,6 +18,8 @@ $(document).ready(function () {
             if (data.notification) {
                 notifyUnread(data);
             } else {
+                $("#typingAlarm").text('');
+                clearTimeout(timer1);
                 showMessage(data);
             }
         }else if('messageList' == data.type){
@@ -31,9 +35,9 @@ $(document).ready(function () {
             showMessage(data);
         }else if('typing' == data.type){
             $("#typingAlarm").text(data.text);
-            setTimeout(function () {
+            timer1 = setTimeout(function () {
                 $("#typingAlarm").text('');
-            }, 5000);
+            }, 6000);
         }else if('channel_mark' == data.type){
             markAsRead(data.channelId);
         }
@@ -59,15 +63,15 @@ $(document).ready(function () {
 });
 
 function typingAlarm() {
-    if($("#chatInput").val().length > 0){
+    // if($("#chatInput").val().length > 0){
         if(!in5Sec){
             sock.send(JSON.stringify({'type' : 'typing'}));
             in5Sec = true;
-            setTimeout(function () {
+            timer2 = setTimeout(function () {
                 in5Sec = false;
             }, 5000);
         }
-    }
+    // }
 }
 
 function switchChannel(channelId) {
@@ -84,6 +88,8 @@ function switchChannel(channelId) {
 function sendMsg(channelId) {
     sock.send(JSON.stringify({'type' : 'chat', 'channelId' : channelId, 'text' : $("#chatInput").val()}));
     $("#chatInput").val("");
+    clearTimeout(timer2);
+    in5Sec = false;
 }
 
 function disconnect() {
