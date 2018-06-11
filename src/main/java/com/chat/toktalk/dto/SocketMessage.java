@@ -1,6 +1,7 @@
 package com.chat.toktalk.dto;
 
 import com.chat.toktalk.domain.Message;
+import com.chat.toktalk.domain.UploadFile;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,6 +22,7 @@ public class SocketMessage implements Serializable {
     private Boolean notification;
     private List<Message> messages;
     private List<UnreadMessageInfo> unreadMessages;
+    private List<UploadFile> uploadFiles;
 
     public SocketMessage() {
     }
@@ -62,5 +64,11 @@ public class SocketMessage implements Serializable {
         this.type = "unread";
         this.unreadMessages = unreadMessages;
     }
-    // TODO 파일정보 보낼때도 type 구분하기
+
+    public SocketMessage(Long channelId,String nickname, List<UploadFile> uploadFiles){
+        this.type = "upload_file";
+        this.channelId = channelId;
+        this.nickname = nickname;
+        this.uploadFiles = uploadFiles;
+    }
 }

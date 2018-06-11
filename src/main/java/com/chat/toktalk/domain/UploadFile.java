@@ -44,4 +44,7 @@ public class UploadFile implements Serializable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     private LocalDateTime regdate;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Message message;
 }
