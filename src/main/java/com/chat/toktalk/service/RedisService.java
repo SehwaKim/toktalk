@@ -30,12 +30,15 @@ public interface RedisService {
     Boolean removeUser(String userId);
 
     void addWebSocketSessionByUser(Long userId, WebSocketSession session);
-
     void removeWebSocketSessionByUser(Long userId, WebSocketSession session);
 
     void addActiveChannelInfo(String sessionId, Long channelId);
-
     void removeActiveChannelInfo(WebSocketSession session);
-
     Long getActiveChannelInfo(WebSocketSession session);
+
+    Boolean isChannelInSight(Long userId, Long channelId);
+
+    void createMessageIdCounter(Long channelId);
+    void increaseMessageIdByChannel(Long channelId);
+    Long getLastMessageIdByChannel(Long channelId);
 }

@@ -1,4 +1,5 @@
 var sock = null;
+var current = 0;
 
 $(document).ready(function () {
     sock = new SockJS('/sock');
@@ -9,11 +10,32 @@ $(document).ready(function () {
 
     sock.onmessage = function (e) {
         var data = JSON.parse(e.data);
-        var channelId = data.channelId;
-        showMessage(data);
-        /*if($("#"+channelId).css('display') != 'none'){
+
+        if('chat' == data.type) {
+            if (data.notification) {
+                notifyUnread(data);
+            } else {
+                showMessage(data);
+            }
+        }else if('messageList' == data.type){
+            if(data.messages != null){
+                for(var i=0;i<data.messages.length;i++){
+                    markAsRead(data.channelId);
+                    showMessage(data.messages[i]);
+                }
+            }
+        }else if('unread' == data.type){
+            markAsUnread(data);
+        }else if('system' == data.type){
             showMessage(data);
-        }*/
+        }else if('typing' == data.type){
+            $("#typingAlarm").text(data.text);
+            setTimeout(function () {
+                $("#typingAlarm").text('');
+            }, 5000);
+        }else if('channel_mark' == data.type){
+            markAsRead(data.channelId);
+        }
     };
 
     sock.onclose = function () {
@@ -21,66 +43,34 @@ $(document).ready(function () {
     };
 
     sock.onheartbeat = function (e) {
-        console.log(e);
-        sock.send("h");
+        sock.send(JSON.stringify({'type' : 'pong'}));
     }
 
-    $("#chatInput_1").keypress(function(e) {
-
+    $("#chatInput").keypress(function(e) {
+        // TODO 고쳐야됨
+        if($("#chatInput").val().length > 0){
+            sock.send(JSON.stringify({'type' : 'typing'}));
+        }
         if (e.keyCode == 13){
             sendMsg(1);
-
-        }
-    });
-
-    $("#chatInput_2").keypress(function(e) {
-
-        if (e.keyCode == 13){
-            sendMsg(2);
-
-        }
-    });
-
-    $("#chatInput_3").keypress(function(e) {
-
-        if (e.keyCode == 13){
-            sendMsg(3);
-
-        }
-    });
-
-    $("#chatInput_4").keypress(function(e) {
-
-        if (e.keyCode == 13){
-            sendMsg(4);
-
         }
     });
 });
 
-function enter(channelId) {
-    // if(!$("#"+channelId).css('display') == 'none'){
-    $.ajax({
-        url: '/api/channels/'+channelId,
-        method: 'get',
-        dataType: "json",
-        contentType: "application/json",
-        success: function (data) {
-            if(data != null){
-                for(var i=0;i<data.length;i++){
-                    showMessage(data[i]);
-                }
-            }
-        }
-    });
-
-    // $("#"+channelId).show();
-    // }
+function switchChannel(channelId) {
+    if(channelId == current){
+        return false;
+    }
+    $('#'+current).removeClass('active');
+    current = channelId;
+    sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
+    //active
+    $('#'+channelId).addClass('active');
 }
 
 function sendMsg(channelId) {
-    sock.send(JSON.stringify({'channelId' : channelId, 'text' : $("#chatInput_"+channelId).val()}));
-    $("#chatInput_"+channelId).val("");
+    sock.send(JSON.stringify({'type' : 'chat', 'channelId' : channelId, 'text' : $("#chatInput").val()}));
+    $("#chatInput").val("");
 }
 
 function disconnect() {
@@ -88,7 +78,11 @@ function disconnect() {
 }
 
 function showMessage(data) {
-    $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+    if('system' == data.type){
+        $('#messages_'+data.channelId).append(data.text + '\n');
+    }else {
+        $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+    }
     var textArea = $('#messages_'+data.channelId);
     textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
 }
@@ -121,6 +115,8 @@ function createChannel() {
             $('#name').val("");
             $('#purpose').val("");
             $('#invite').val("");
+            var lastIdx = data.length-1;
+            switchChannel(data[lastIdx].id);
         }
     });
 }
@@ -129,7 +125,33 @@ function freshChannelList(data) {
     $("#channelList").empty();
     for(var key in data){
         var $div = $('<div></div>').appendTo($("#channelList"));
-        $('<a></a>').attr('onclick', 'enter(1)').attr('value', data[key].name)
-                                .addClass('btn btn-light btn-block').appendTo($div);
+        var $a = $('<a></a>')
+                    .attr('href', 'javascript:void(0);')
+                    .attr('id', data[key].id)
+                    .attr('onclick', 'switchChannel(this)')
+                    .attr('style', 'text-align:left;')
+                    .addClass('btn btn-light btn-block').appendTo($div);
+        $('<span></span>').text(data[key].name).appendTo($a);
+        $('<span></span>').attr('style', 'badge badge-pill badge-danger unread').appendTo($a);
     }
+}
+
+function markAsUnread(data) {
+    var arr = data.unreadMessages;
+    for(key in arr){
+        $('#'+arr[key].channelId).find('.unread').text(arr[key].unreadCnt);
+    }
+}
+
+function markAsRead(channelId) {
+    $('#'+channelId).find('.unread').text('');
+}
+
+function notifyUnread(data) {
+    var cnt = $('#'+data.channelId).find('.unread').text();
+    if(typeof cnt === "undefined" || cnt == ''){
+        console.log(cnt);
+        cnt = 0;
+    }
+    $('#'+data.channelId).find('.unread').text(++cnt);
 }

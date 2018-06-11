@@ -216,42 +216,54 @@
     <div style="margin: 20px">
         <button type="button" id="btn-create" class="btn btn-info">새 채널 시작</button>
         <button type="button" class="btn btn-dark" onclick="location.href='/logout'">로그아웃</button>
-        <hr>
     </div>
     <!-- popup start -->
     <div id="createChannel" class="pop-layer">
-        <div class="pop-container">
             <div class="text-center mb-4">
                 <!--content //-->
-                <h1 class="h3 mb-3 font-weight-normal">새로운 채널 시작</h1>
-                <form id="creatForm">
-                    <div class="form-label-group">
-                        <label for="name">채널 이름</label>
-                        <input type="text" id="name" name="name" class="form-control" required autofocus>
-                    </div>
-                    <div class="form-label-group">
-                        <label for="purpose">목적 (선택)</label>
-                        <input type="text" id="purpose" name="purpose" class="form-control">
-                    </div>
-                    <div class="form-label-group">
-                        <label for="invite">초대하기 (선택)</label>
-                        <input type="text" id="invite" name="invite" class="form-control">
-                    </div>
-                    <button type="button" class="btn btn-success" onclick="createChannel()">시작하기</button>
-                    <button type="button" class="btn btn-light btn-close">취소</button>
-                </form>
+                <div style="padding-top: 50px; padding-bottom: 50px; padding-right: 100px">
+                    <!--<button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close">-->
+                        <!--<span aria-hidden="true"><h1>&times;</h1></span>-->
+                    <!--</button>-->
+                </div>
+                <div style="width: 70%; display: inline-block;">
+                    <h2 class="h2 mb-3 font-weight-normal">새로운 채널 시작</h2>
+                </div>
+                <hr>
+                <div style="width: 40%; display: inline-block;">
+                    <form id="creatForm">
+                        <div class="form-label-group" style="padding-bottom: 20px">
+                            <label for="name" style="float: left"><b>채널 이름</b></label>
+                            <input type="text" id="name" name="name" class="form-control form-control-lg" required autofocus>
+                        </div>
+                        <div class="form-label-group" style="padding-bottom: 20px">
+                            <label for="purpose" style="float: left"><b>목적</b> (선택)</label>
+                            <input type="text" id="purpose" name="purpose" class="form-control form-control-lg">
+                        </div>
+                        <div class="form-label-group" style="padding-bottom: 20px">
+                            <label for="invite" style="float: left"><b>초대하기</b> (선택)</label>
+                            <input type="text" id="invite" name="invite" class="form-control form-control-lg">
+                        </div>
+                        <div style="padding-top: 20px">
+                            <button type="button" class="btn btn-success btn-lg btn-start" onclick="createChannel()" disabled>시작하기</button>
+                            <button type="button" class="btn btn-light btn-lg btn-close">취소</button>
+                        </div>
+                    </form>
+                </div>
                 <!--// content-->
             </div>
-        </div>
     </div>
     <!-- popup end -->
+    <hr>
     <div class="container-fluid">
         <div class="row justify-content-md-center">
             <div class="col">
                 <div class="row">
                     <div class="col-2" id="channelList">
                         <div th:if="${not #lists.isEmpty(list)}" th:each="channel : ${list}">
-                            <a href="javascript:void(0);" class="btn btn-light btn-block" onclick="enter('1')" th:text="${channel.name}"></a>
+                            <a href="javascript:void(0);" class="btn btn-light btn-block" th:attrappend="id=${channel.getId()}" onclick="switchChannel(this.id)" style="text-align:left;">
+                                <span th:text="${channel.name}"></span><span style="float: right" class="badge badge-pill badge-danger unread"></span>
+                            </a>
                         </div>
                     </div>
                     <div class="col">
@@ -262,7 +274,10 @@
                                     <div id="fileUpload" class="dragAndDropDiv">Drag & Drop Files Here</div>
                                 </div>
                                 <div>
-                                    <input type="text" size="90" id="chatInput_1"/>
+                                    <small><span id="typingAlarm"></span></small>
+                                </div>
+                                <div>
+                                    <input type="text" size="90" id="chatInput"/>
                                     <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(1)">전송</button>
                                 </div>
                             </div>
@@ -271,84 +286,6 @@
                 </div>
             </div>
         </div>
-        <!--<div class="row">
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('1')">1번 채널 입장</button>
-                </div>
-                <div id="1" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_1" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_1"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(1)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('2')">2번 채널 입장</button>
-                </div>
-                <div id="2" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_2" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_2"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(2)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('3')">3번 채널 입장</button>
-                </div>
-                <div id="3" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_3" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_3"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(3)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div style="padding-bottom: 10px">
-                    <button type="button" class="btn btn-success" onclick="enter('4')">4번 채널 입장</button>
-                </div>
-                <div id="4" style="display: none">
-                    <div>
-                        <div>
-                            <textarea cols="40" rows="20" id="messages_4" readonly></textarea>
-                        </div>
-                        <div>
-                            <input type="text" size="30" id="chatInput_4"/>
-                            <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(4)">전송</button>
-                        </div>
-                        &lt;!&ndash;<div>
-                            <button type="button" class="btn btn-dark btn-sm">나가기</button>
-                        </div>&ndash;&gt;
-                    </div>
-                </div>
-            </div>
-        </div>-->
     </div>
 </div>
 </body>

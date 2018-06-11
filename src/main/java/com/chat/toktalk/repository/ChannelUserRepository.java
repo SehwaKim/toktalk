@@ -10,7 +10,7 @@ import java.util.List;
 public interface ChannelUserRepository extends JpaRepository<ChannelUser, Long> {
     ChannelUser findChannelUserByChannelIdAndUserId(Long channelId, Long userId);
 
-    @Query("select c from ChannelUser c where c.user.id = :userId")
+    @Query("select c from ChannelUser c where c.user.id = :userId order by c.channel.id asc")
     List<ChannelUser> findAllByUserId(@Param("userId") Long userId);
 
     @Query("select c from ChannelUser c where c.channel.id = :channelId")
