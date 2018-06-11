@@ -4,21 +4,21 @@ import com.chat.toktalk.domain.UploadFile;
 import com.chat.toktalk.service.UploadFileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
-import java.util.Collections;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -73,12 +73,13 @@ public class MessageApiController {
                 String strJson = objectMapper.writeValueAsString(uploadFile);
 
                 // 다운로드해보기
-                List<String> mapstream = Collections.emptyList();
-                try (Stream<UploadFile> stream = uploadFileService.getUploadFileByFileName(originalFilename)) {
-                    mapstream = stream.map(uploadFile1 -> uploadFile1.toString()).collect(Collectors.toList());
-                }
-
-                System.out.println("download : " + mapstream.toString());
+//                List<String> mapstream = Collections.emptyList();
+//                try (Stream<UploadFile> stream = uploadFileService.getUploadFileByFileName(originalFilename)) {
+//                    mapstream = stream.map(uploadFile1 -> uploadFile1.toString()).collect(Collectors.toList());
+//                }
+//
+//                System.out.println("download : " + mapstream.toString());
+                // 다운로드 2
 
             } catch (Exception e) {
                 System.out.println("postTempFile_ERROR======>"+fileFullPath);
