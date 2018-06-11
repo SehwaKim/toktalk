@@ -1,15 +1,24 @@
 package com.chat.toktalk.config;
 
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import javax.servlet.Filter;
 
 @Configuration
 public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
+    private final Filter filter;
+
+    public WebApplicationSecurity(Filter googleFilter) {
+        this.filter = googleFilter;
+    }
+
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
@@ -36,7 +45,8 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
                // .successHandler(new UserAuthenticationSuccessHandler())
               //  .failureHandler(new UserAuthenticationFailureHandler())
                 .and()
-                    .csrf().disable();
+                    .csrf().disable()
+                    .addFilterBefore(filter, BasicAuthenticationFilter.class);
     }
 
 //     @Bean
