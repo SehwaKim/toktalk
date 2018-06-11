@@ -7,6 +7,10 @@ import com.chat.toktalk.service.UploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 @Service
 public class UploadFileServiceImpl implements UploadFileService {
 
@@ -16,8 +20,10 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Autowired
     ChannelRepository channelRepository;
 
+    private final Path rootLocation = Paths.get("filestorage");
+
     @Override
-    public UploadFile getUploadFileByFileName(String fileName) {
+    public Stream<UploadFile> getUploadFileByFileName(String fileName) {
         return uploadFileRepository.findUploadFileByFileName(fileName);
     }
 
@@ -25,4 +31,5 @@ public class UploadFileServiceImpl implements UploadFileService {
     public void addUploadFile(UploadFile file) {
         uploadFileRepository.save(file);
     }
+
 }

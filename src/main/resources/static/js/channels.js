@@ -83,6 +83,11 @@ function sendMsg(channelId) {
     $("#chatInput_"+channelId).val("");
 }
 
+// function downFile(channelId) {
+//     sock.send(JSON.stringify({'channelId' : channelId, 'text' : $("#chatInput_"+channelId).val()}));
+//     $("#chatInput_"+channelId).val("");
+// }
+
 function disconnect() {
     sock.close();
 }

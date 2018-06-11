@@ -97,6 +97,7 @@
                 var files = e.originalEvent.dataTransfer.files;
 
                 handleFileUpload(files,objDragAndDrop);
+                // uploadFileUrl(files,objDragAndDrop);
             });
 
             $(document).on('dragenter', function (e){
@@ -123,7 +124,19 @@
                     var status = new createStatusbar(obj); //Using this we can set progress.
                     status.setFileNameSize(files[i].name,files[i].size);
                     sendFileToServer(fd,status);
+                }
+            }
 
+            //ajax 다운로드
+            jQuery.download = function(url,data,method)
+            {
+                if(url&&data){
+                    data = typeof data == 'string' ? data : jQuery.param(data);
+                    var inputs = '';
+                    jQuery.each(data.split('&'), function(){
+                        var pair = this.split('=');
+                        inputs+='<input type="hidden" name="'+ pair[0] +'" value="'+ pair[1] +'" />';
+                    });
                 }
             }
 
@@ -203,6 +216,11 @@
                     data: formData,
                     success: function(data){
                         status.setProgress(100);
+                        var myTextArea = $('#messages_1messages_1');
+                        // myTextArea.val(myTextArea.val() + '\n filedown' );
+                        myTextArea.append("filedown");
+                        myTextArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
+
                         //$("#status1").append("File upload Done<br>");
                     }
                 });
@@ -258,12 +276,13 @@
                         <div id="1">
                             <div>
                                 <div>
-                                    <textarea cols="100" rows="25" id="messages_1" readonly></textarea>
+                                    <textarea cols="100" rows="25" id="messages_1messages_1" readonly></textarea>
                                     <div id="fileUpload" class="dragAndDropDiv">Drag & Drop Files Here</div>
                                 </div>
                                 <div>
                                     <input type="text" size="90" id="chatInput_1"/>
                                     <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(1)">전송</button>
+                                    <button type="button" class="btn btn-dark btn-sm" onclick="downFile(1)">다운로드</button>
                                 </div>
                             </div>
                         </div>
