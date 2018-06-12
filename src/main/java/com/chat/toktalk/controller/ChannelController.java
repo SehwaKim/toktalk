@@ -22,12 +22,11 @@ public class ChannelController {
 
     /* 채널 목록 가져오기 (로그인 후 메인) */
     @GetMapping
-    public String channels(ModelMap modelMap){
+    public String channels(ModelMap modelMap, LoginUserInfo loginUserInfo){
         List<Channel> channels = new ArrayList<>();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
-            LoginUserInfo loginUserInfo = (LoginUserInfo) authentication.getPrincipal();
             channels = channelService.getChannels(loginUserInfo.getId());
         }
 

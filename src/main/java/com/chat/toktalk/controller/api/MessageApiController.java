@@ -54,7 +54,7 @@ public class MessageApiController {
     @PostMapping(value = "/file") //ajax에서 호출하는 부분
     @ResponseBody
     @Transactional
-    public String upload(MultipartHttpServletRequest multipartRequest) { //Multipart로 받는다.
+    public String upload(MultipartHttpServletRequest multipartRequest,LoginUserInfo loginUserInfo) { //Multipart로 받는다.
         ObjectMapper objectMapper = new ObjectMapper();
 
         Iterator<String> itr =  multipartRequest.getFileNames();
@@ -69,7 +69,6 @@ public class MessageApiController {
         Long channelId = Long.parseLong(multipartRequest.getParameter("channelId"));
 
         if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
-            LoginUserInfo loginUserInfo = (LoginUserInfo)authentication.getPrincipal();
             nickname = loginUserInfo.getNickname();
             userId = loginUserInfo.getId();
         }
@@ -127,7 +126,6 @@ public class MessageApiController {
 //                }
 //
 //                System.out.println("download : " + mapstream.toString());
-                // 다운로드 2
 
             } catch (Exception e) {
                 System.out.println("postTempFile_ERROR======>"+fileFullPath);
