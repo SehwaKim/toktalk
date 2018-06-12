@@ -1,18 +1,39 @@
 package com.chat.toktalk.controller.api;
 
+import com.chat.toktalk.amqp.MessageSender;
+import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.UploadFile;
+import com.chat.toktalk.domain.User;
+import com.chat.toktalk.dto.SocketMessage;
+import com.chat.toktalk.security.LoginUserInfo;
+import com.chat.toktalk.service.MessageService;
 import com.chat.toktalk.service.UploadFileService;
+import com.chat.toktalk.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.File;
-import java.util.Iterator;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static java.time.LocalDateTime.now;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -21,13 +42,36 @@ public class MessageApiController {
     @Autowired
     UploadFileService uploadFileService;
 
-    @RequestMapping(value = "/fileUpload/post") //ajax에서 호출하는 부분
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    MessageSender messageSender;
+
+    @Autowired
+    MessageService messageService;
+
+    @PostMapping(value = "/file") //ajax에서 호출하는 부분
     @ResponseBody
-    public String upload(MultipartHttpServletRequest multipartRequest) { //Multipart로 받는다.
+    @Transactional
+    public String upload(MultipartHttpServletRequest multipartRequest,LoginUserInfo loginUserInfo) { //Multipart로 받는다.
+        ObjectMapper objectMapper = new ObjectMapper();
 
         Iterator<String> itr =  multipartRequest.getFileNames();
 
         String filePath = "/Users/osejin/fileEx"; //설정파일로 뺀다. 윈도우는 다른 패스로...
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+
+        String nickname = "";
+        Long userId=0L;
+        Long channelId = Long.parseLong(multipartRequest.getParameter("channelId"));
+
+        if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
+            nickname = loginUserInfo.getNickname();
+            userId = loginUserInfo.getId();
+        }
 
         while (itr.hasNext()) { //받은 파일들을 모두 돌린다.
 
@@ -45,8 +89,8 @@ public class MessageApiController {
             Long fileLen = mpf.getSize();
 
             try {
-                //임시파일 저장... 디비에 일단 저장해야함.... 그후 프론트 처리...
-                mpf.transferTo(new File(fileFullPath)); //파일저장 실제로는 service에서 처리
+                //임시파일 저장
+                mpf.transferTo(new File(fileFullPath)); //파일저장 실제로는 service에서 처리.
 
                 System.out.println("originalFilename => "+originalFilename);
                 System.out.println("fileFullPath => "+fileFullPath);
@@ -55,9 +99,33 @@ public class MessageApiController {
                 uploadFile.setFileName(originalFilename);
                 uploadFile.setContentType(fileType);
                 uploadFile.setLength(fileLen);
+                uploadFile.setSaveFileName(filePath);
 
+                // 나중에  mysql로 넣어야함... 회의 한 후에
                 uploadFileService.addUploadFile(uploadFile);
                 System.out.println("파일 저장 성공!");
+
+                Message message = new Message();
+                message.setChannelId(channelId);
+                message.setUserId(userId);
+                message.setNickname(nickname);
+                message.setType("file");
+                message.setUploadFile(uploadFile);
+                message.setRegdate(LocalDateTime.now());
+                messageService.addMessage(message);
+
+                SocketMessage socketMessage = new SocketMessage(channelId,nickname,uploadFile);
+                messageSender.sendMessage(socketMessage);
+                // json test
+                String strJson = objectMapper.writeValueAsString(uploadFile);
+
+                // 다운로드해보기
+//                List<String> mapstream = Collections.emptyList();
+//                try (Stream<UploadFile> stream = uploadFileService.getUploadFileByFileName(originalFilename)) {
+//                    mapstream = stream.map(uploadFile1 -> uploadFile1.toString()).collect(Collectors.toList());
+//                }
+//
+//                System.out.println("download : " + mapstream.toString());
 
             } catch (Exception e) {
                 System.out.println("postTempFile_ERROR======>"+fileFullPath);

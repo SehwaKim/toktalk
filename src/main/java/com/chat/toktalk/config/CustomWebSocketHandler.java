@@ -47,6 +47,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     MessageSender messageSender;
 
+    @Autowired
+    UploadFileService uploadFileService;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -213,6 +216,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // 2. 메세지큐에 내보내기
         messageSender.sendMessage(new SocketMessage(channelId, message, nickname));
+
+        // 3. 첨부파일 있으면 보내기
+
     }
 
     @Override

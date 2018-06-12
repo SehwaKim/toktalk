@@ -29,10 +29,9 @@ public class ChannelApiController {
 
     /* 새 채널 생성 */
     @PostMapping
-    public List<Channel> addChannel(@RequestBody ChannelForm channelForm){
+    public List<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
-            LoginUserInfo loginUserInfo = (LoginUserInfo) authentication.getPrincipal();
             User user = userService.getUserByEmail(loginUserInfo.getUsername());
 
             ChannelUser channelUser = new ChannelUser();
