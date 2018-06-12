@@ -22,7 +22,7 @@ public class SocketMessage implements Serializable {
     private Boolean notification;
     private List<Message> messages;
     private List<UnreadMessageInfo> unreadMessages;
-    private List<UploadFile> uploadFiles;
+    private UploadFile uploadFile;
 
     public SocketMessage() {
     }
@@ -65,10 +65,10 @@ public class SocketMessage implements Serializable {
         this.unreadMessages = unreadMessages;
     }
 
-    public SocketMessage(Long channelId,String nickname, List<UploadFile> uploadFiles){
+    public SocketMessage(Long channelId,String nickname, UploadFile uploadFile){
         this.type = "upload_file";
         this.channelId = channelId;
         this.nickname = nickname;
-        this.uploadFiles = uploadFiles;
+        this.uploadFile = uploadFile;
     }
 }

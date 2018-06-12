@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,7 +51,7 @@ public class MessageApiController {
     @Autowired
     MessageService messageService;
 
-    @RequestMapping(value = "/fileUpload/post") //ajax에서 호출하는 부분
+    @PostMapping(value = "/file") //ajax에서 호출하는 부분
     @ResponseBody
     @Transactional
     public String upload(MultipartHttpServletRequest multipartRequest) { //Multipart로 받는다.
@@ -72,8 +73,6 @@ public class MessageApiController {
             nickname = loginUserInfo.getNickname();
             userId = loginUserInfo.getId();
         }
-
-        List<UploadFile> uploadFiles = new ArrayList<>();
 
         while (itr.hasNext()) { //받은 파일들을 모두 돌린다.
 
@@ -103,8 +102,6 @@ public class MessageApiController {
                 uploadFile.setLength(fileLen);
                 uploadFile.setSaveFileName(filePath);
 
-                uploadFiles.add(uploadFile);
-
                 // 나중에  mysql로 넣어야함... 회의 한 후에
                 uploadFileService.addUploadFile(uploadFile);
                 System.out.println("파일 저장 성공!");
@@ -118,7 +115,7 @@ public class MessageApiController {
                 message.setRegdate(LocalDateTime.now());
                 messageService.addMessage(message);
 
-                SocketMessage socketMessage = new SocketMessage(channelId,nickname,uploadFiles);
+                SocketMessage socketMessage = new SocketMessage(channelId,nickname,uploadFile);
                 messageSender.sendMessage(socketMessage);
                 // json test
                 String strJson = objectMapper.writeValueAsString(uploadFile);

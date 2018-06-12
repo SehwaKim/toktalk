@@ -110,7 +110,7 @@ $(document).ready(function(){
 
     function sendFileToServer(formData,status)
     {
-        var uploadURL = "/api/messages/fileUpload/post"; //Upload URL
+        var uploadURL = "/api/messages/file"; //Upload URL
         var extraData ={}; //Extra Data.
         var jqXHR=$.ajax({
             xhr: function() {

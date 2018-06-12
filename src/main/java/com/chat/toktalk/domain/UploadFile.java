@@ -46,5 +46,6 @@ public class UploadFile implements Serializable {
     private LocalDateTime regdate;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name ="message_id")
     private Message message;
 }
