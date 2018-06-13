@@ -3,7 +3,6 @@ package com.chat.toktalk.controller.api;
 import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.UploadFile;
-import com.chat.toktalk.domain.User;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.MessageService;
@@ -11,12 +10,6 @@ import com.chat.toktalk.service.UploadFileService;
 import com.chat.toktalk.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
-
-import static java.time.LocalDateTime.now;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -54,21 +41,18 @@ public class MessageApiController {
     @PostMapping(value = "/file") //ajax에서 호출하는 부분
     @ResponseBody
     @Transactional
-    public String upload(MultipartHttpServletRequest multipartRequest,LoginUserInfo loginUserInfo) { //Multipart로 받는다.
+    public String upload(MultipartHttpServletRequest multipartRequest, LoginUserInfo loginUserInfo) { //Multipart로 받는다.
         ObjectMapper objectMapper = new ObjectMapper();
 
         Iterator<String> itr =  multipartRequest.getFileNames();
 
         String filePath = "/Users/osejin/fileEx"; //설정파일로 뺀다. 윈도우는 다른 패스로...
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = securityContext.getAuthentication();
-
         String nickname = "";
         Long userId=0L;
         Long channelId = Long.parseLong(multipartRequest.getParameter("channelId"));
 
-        if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
+        if(loginUserInfo != null){
             nickname = loginUserInfo.getNickname();
             userId = loginUserInfo.getId();
         }

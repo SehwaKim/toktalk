@@ -70,5 +70,6 @@ public class SocketMessage implements Serializable {
         this.channelId = channelId;
         this.nickname = nickname;
         this.uploadFile = uploadFile;
+        this.notification = false;
     }
 }

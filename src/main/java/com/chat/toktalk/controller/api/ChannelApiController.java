@@ -9,8 +9,6 @@ import com.chat.toktalk.service.ChannelService;
 import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +28,7 @@ public class ChannelApiController {
     /* 새 채널 생성 */
     @PostMapping
     public List<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null && authentication.getPrincipal() instanceof LoginUserInfo){
+        if(loginUserInfo != null){
             User user = userService.getUserByEmail(loginUserInfo.getUsername());
 
             ChannelUser channelUser = new ChannelUser();
