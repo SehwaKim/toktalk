@@ -1,6 +1,8 @@
 package com.chat.toktalk.config;
 
+import com.chat.toktalk.filter.AlreadyLoginCheckFilter;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -11,10 +13,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import javax.servlet.Filter;
 
 @Configuration
-public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
+public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final Filter filter;
 
-    public WebApplicationSecurity(Filter googleFilter) {
+
+    public WebApplicationSecurityConfig(Filter googleFilter) {
         this.filter = googleFilter;
     }
 
@@ -42,19 +45,17 @@ public class WebApplicationSecurity extends WebSecurityConfigurerAdapter {
                         .loginPage("/users/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
-               // .successHandler(new UserAuthenticationSuccessHandler())
+                        .successHandler(userAuthenticationSuccessHandler())
               //  .failureHandler(new UserAuthenticationFailureHandler())
                 .and()
                     .csrf().disable()
+                    .addFilterBefore(new AlreadyLoginCheckFilter(), BasicAuthenticationFilter.class)
                     .addFilterBefore(filter, BasicAuthenticationFilter.class);
     }
 
-//     @Bean
-//     public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler(){
-//         UserAuthenticationSuccessHandler customAuthenticationSuccessHandler = new UserAuthenticationSuccessHandler();
-//         customAuthenticationSuccessHandler.setDefaultUrl("/");
-//         customAuthenticationSuccessHandler.setTargetUrlParameter("loginRedirect");
-//         customAuthenticationSuccessHandler.setUseReferer(true);
-//         return customAuthenticationSuccessHandler;
-//     }
+
+     @Bean
+     public UserAuthenticationSuccessHandler userAuthenticationSuccessHandler(){
+         return new UserAuthenticationSuccessHandler();
+     }
 }
