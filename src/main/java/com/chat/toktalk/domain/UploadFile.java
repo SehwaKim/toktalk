@@ -3,8 +3,9 @@ package com.chat.toktalk.domain;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,8 +13,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "upload_file")
-@Data
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
+@Getter
+@Setter
 public class UploadFile implements Serializable {
     public UploadFile() {
         this.regdate = LocalDateTime.now();

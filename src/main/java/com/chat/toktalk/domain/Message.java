@@ -1,8 +1,9 @@
 package com.chat.toktalk.domain;
 
-import lombok.Data;
 import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "message")
-@Data
+@Getter
+@Setter
 public class Message implements Serializable {
     public Message() {
         this.regdate = LocalDateTime.now();

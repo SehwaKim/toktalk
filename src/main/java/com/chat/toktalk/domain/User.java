@@ -1,6 +1,7 @@
 package com.chat.toktalk.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,7 +11,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "user")
-@Data
+@Getter
+@Setter
 public class User implements Serializable {
     public User() {
         this.regdate = LocalDateTime.now();
