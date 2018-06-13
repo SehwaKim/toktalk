@@ -1,6 +1,9 @@
 package com.chat.toktalk.domain;
 
-import lombok.Data;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,7 +11,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "message")
-@Data
+@Getter
+@Setter
 public class Message implements Serializable {
     public Message() {
         this.regdate = LocalDateTime.now();
@@ -25,6 +29,8 @@ public class Message implements Serializable {
     private String nickname;
     @Column(name = "channel_id")
     private Long channelId;
-    // private UploadFile uploadFile; TODO 1:1
+    @OneToOne(mappedBy = "message", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @LazyToOne(LazyToOneOption.NO_PROXY)
+    private UploadFile uploadFile;
     private LocalDateTime regdate;
 }

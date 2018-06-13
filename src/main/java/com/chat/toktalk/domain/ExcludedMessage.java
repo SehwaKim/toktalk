@@ -1,6 +1,7 @@
 package com.chat.toktalk.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,7 +9,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "excluded_message")
-@Data
+@Getter
+@Setter
 public class ExcludedMessage implements Serializable {
     public ExcludedMessage() { this.regdate = LocalDateTime.now(); }
 

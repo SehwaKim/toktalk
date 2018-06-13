@@ -48,7 +48,7 @@ public class MessageListener{
             }
 
             for(Long userId : sessions.keySet()){
-                if("chat".equals(socketMessage.getType())){
+                if("chat".equals(socketMessage.getType()) || "upload_file".equals(socketMessage.getType()) ){
                     Boolean isChannelInSight = redisService.isChannelInSight(userId, channelId);
 
                     if (isChannelInSight) {

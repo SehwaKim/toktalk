@@ -1,15 +1,15 @@
 package com.chat.toktalk.domain;
 
-import lombok.*;
 
+import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Data
+
+
 @Getter
 @Setter
 @Table(name = "user")
