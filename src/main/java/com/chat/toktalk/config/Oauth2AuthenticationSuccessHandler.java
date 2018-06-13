@@ -68,7 +68,6 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             }
 
             LoginUserInfo loginUserInfo = new LoginUserInfo(user.getEmail(),user.getPassword(), list,user.getId(),user.getNickname());
-            logger.info("user.getPassowrd()" + user.getPassword());
             SecurityContext securityContext = SecurityContextHolder.getContext();
             securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(loginUserInfo,null, list));
             httpSession = request.getSession(true);
