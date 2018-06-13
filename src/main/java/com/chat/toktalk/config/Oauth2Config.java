@@ -25,13 +25,19 @@ public class Oauth2Config {
     @Qualifier("oauth2ClientContext")
     private OAuth2ClientContext oAuth2ClientContext;
 
+    private final Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+
+    public Oauth2Config(Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
+        this.oauth2AuthenticationSuccessHandler = oauth2AuthenticationSuccessHandler;
+    }
+
     //필터 등록
     @Bean
     public Filter googleFilter(){
-        OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter("/google/login");
+        OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter("/login/google");
         filter.setRestTemplate(new OAuth2RestTemplate(googleClient(),oAuth2ClientContext));//OAuth2ProtectedResourceDetails,OAuth2ClientContext
         filter.setTokenServices(new UserInfoTokenServices(googleResource().getUserInfoUri(),googleClient().getClientId()));//String userInfoEndpointUrl, String clientId
-        filter.setAuthenticationSuccessHandler(new Oauth2AuthenticationSuccessHandler());
+        filter.setAuthenticationSuccessHandler(oauth2AuthenticationSuccessHandler);
 
         return filter;
     }
