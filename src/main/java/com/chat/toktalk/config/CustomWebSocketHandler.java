@@ -129,11 +129,15 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         }else if("chat".equals(type)){
             handleChatMessage(session, map);
         }else if("exit_channel".equals(type)){
-            Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
-            Long channelId = Long.parseLong(map.get("channelId").toString());
-            channelUserService.removeChannelUser(userId, channelId);
+            exitChannel(session, map);
 
         }
+    }
+
+    private void exitChannel(WebSocketSession session, HashMap<String, Object> map) {
+        Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
+        Long channelId = Long.parseLong(map.get("channelId").toString());
+        channelUserService.removeChannelUser(userId, channelId);
     }
 
     private void alertTyping(WebSocketSession session) {
@@ -153,14 +157,18 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         Long channelId = Long.parseLong(map.get("channelId").toString());
 
-        /*
-        *   switch 하기 전 active channel 의 lastReadId 를 업데이트
-        */
-        Long activeChannelId = redisService.getActiveChannelInfo(session);
-        if(activeChannelId != null){
-            ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
-            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
-            channelUserService.updateChannelUser(alreadyUser);
+        if(channelId == 0){ // 채널 나가기 후 channelId 다시 설정해주기
+            channelId = channelUserService.getChannelUsersByUserId(userId).get(0).getChannel().getId();
+        }else{
+            /*
+             *   switch 하기 전 active channel 의 lastReadId 를 업데이트
+             */
+            Long activeChannelId = redisService.getActiveChannelInfo(session);
+            if(activeChannelId != null){
+                ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
+                alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+                channelUserService.updateChannelUser(alreadyUser);
+            }
         }
 
         /*
@@ -175,8 +183,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         // 이미 채널에 존재하는 유저
         if(alreadyUser != null){
             // 1. 마지막으로 읽은 메세지 id 업데이트
-            // 2. 메세지 리스트 리턴
-            messages = messageService.getMessagesByChannelId(channelId);
+            // 2. firstReadId 기준으로 메세지 리스트 리턴
+            Long firstReadId = alreadyUser.getFirstReadId();
+            messages = messageService.getMessagesByChannelUser(channelId, firstReadId);
             if(messages != null && messages.size() > 0){
                 alreadyUser.setLastReadId(messages.get(messages.size()-1).getId());
                 channelUserService.updateChannelUser(alreadyUser);
@@ -200,7 +209,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             messageNew.setType("system");
             messageNew.setChannelId(channelId);
             messageNew.setText(systemMsg);
-            messageService.addMessage(messageNew);
+            Message saved = messageService.addMessage(messageNew);
+
+            // firstReadId 업데이트
+            channelUser.setFirstReadId(saved.getId());
+            channelUserService.updateChannelUser(channelUser);
 
             messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
         }

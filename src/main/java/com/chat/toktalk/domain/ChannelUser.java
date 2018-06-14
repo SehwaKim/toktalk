@@ -32,6 +32,9 @@ public class ChannelUser implements Serializable {
     @JsonBackReference
     private Channel channel;
 
+    @Column(name = "first_read_id") // 처음으로 읽은 메세지 id
+    private Long firstReadId;
+
     @Column(name = "last_read_id") // 마지막으로 읽은 메세지 id
     private Long lastReadId;
 

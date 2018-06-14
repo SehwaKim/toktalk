@@ -206,6 +206,6 @@ function exitChannel() {
         return false;
     }
     sock.send(JSON.stringify({'type' : 'exit_channel', 'channelId' : current}));
-    // 화면 바꾸기
+    switchChannel(0);
 
 }

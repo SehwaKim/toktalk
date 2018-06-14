@@ -3,6 +3,7 @@ package com.chat.toktalk.service.impl;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.ExcludedMessage;
 import com.chat.toktalk.domain.Message;
+import com.chat.toktalk.repository.ChannelUserRepository;
 import com.chat.toktalk.repository.ExcludedMessageRepository;
 import com.chat.toktalk.repository.MessageRepository;
 import com.chat.toktalk.service.MessageService;
@@ -21,12 +22,23 @@ public class MessageServiceImpl implements MessageService {
     ExcludedMessageRepository excludedMessageRepository;
 
     @Autowired
+    ChannelUserRepository channelUserRepository;
+
+    @Autowired
     RedisService redisService;
 
     @Override
-    public void addMessage(Message message) {
+    public Message addMessage(Message message) {
         Message saved = messageRepository.save(message);
         redisService.increaseMessageIdByChannel(message.getChannelId());
+
+        if(saved.getId() == 1){
+            List<ChannelUser> channelUsers = channelUserRepository.findAllByChannelId(saved.getChannelId());
+            for(ChannelUser channelUser : channelUsers){
+                channelUser.setFirstReadId(saved.getId());
+                channelUserRepository.saveAndFlush(channelUser);
+            }
+        }
 
         if("system".equals(message.getType())){
             ExcludedMessage excludedMessage = new ExcludedMessage();
@@ -35,11 +47,13 @@ public class MessageServiceImpl implements MessageService {
             excludedMessage.setChannelId(saved.getChannelId());
             excludedMessageRepository.save(excludedMessage);
         }
+
+        return saved;
     }
 
     @Override
-    public List<Message> getMessagesByChannelId(Long channelId) {
-        return messageRepository.findAllByChannelId(channelId);
+    public List<Message> getMessagesByChannelUser(Long channelId, Long firstReadId) {
+        return messageRepository.findAllByChannelUser(channelId, firstReadId);
     }
 
     @Override
