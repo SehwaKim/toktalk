@@ -76,4 +76,9 @@ public class MessageServiceImpl implements MessageService {
 
         return null;
     }
+
+    @Override
+    public Long getLastIdByChannel(Long channelId) {
+        return messageRepository.getLastId(channelId);
+    }
 }

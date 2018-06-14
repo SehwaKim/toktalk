@@ -104,6 +104,9 @@ function switchChannel(channelId) {
 }
 
 function sendMsg(channelId) {
+    if(channelId == 0){
+        return false;
+    }
     sock.send(JSON.stringify({'type' : 'chat', 'channelId' : channelId, 'text' : $("#chatInput").val()}));
     $("#chatInput").val("");
     clearTimeout(timer2);
@@ -175,7 +178,7 @@ function freshChannelList(data) {
                     .attr('style', 'text-align:left;')
                     .addClass('btn btn-light btn-block').appendTo($div);
         $('<span></span>').text(data[key].name).appendTo($a);
-        $('<span></span>').attr('style', 'badge badge-pill badge-danger unread').appendTo($a);
+        $('<span></span>').attr('style', 'badge badge-pill badge-light unread').appendTo($a);
     }
 }
 
@@ -188,7 +191,7 @@ function addNewChannel(data) {
         .attr('style', 'text-align:left;')
         .addClass('btn btn-light btn-block').appendTo($div);
     $('<span></span>').text(data.name).appendTo($a);
-    $('<span></span>').attr('style', 'badge badge-pill badge-danger unread').appendTo($a);
+    $('<span></span>').attr('style', 'badge badge-pill badge-light unread').appendTo($a);
 }
 
 function markAsUnread(data) {
