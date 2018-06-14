@@ -5,87 +5,21 @@
     <title>Channels</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.0/css/bootstrap.min.css}"/>
     <link rel="stylesheet" href="/css/popup.css"/>
+    <link rel="stylesheet" href="/css/file.css"/>
     <script th:src="@{/webjars/sockjs-client/1.0.2/sockjs.js}"></script>
     <script th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/4.1.0/js/bootstrap.min.js}"></script>
-    <script src="/js/channel.js"></script>
+    <script src="/js/channels.js"></script>
     <script src="/js/popup.js"></script>
     <script src="/js/file.js"></script>
-
-    <style>
-        .dragAndDropDiv {
-            border: 2px dashed #92AAB0;
-            width: 650px;
-            height: 200px;
-            color: #92AAB0;
-            text-align: center;
-            vertical-align: middle;
-            padding: 10px 0px 10px 10px;
-            font-size:200%;
-            display: table-cell;
-        }
-        .progressBar {
-            width: 200px;
-            height: 22px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            display:inline-block;
-            margin:0px 10px 5px 5px;
-            vertical-align:top;
-        }
-
-        .progressBar div {
-            height: 100%;
-            color: #fff;
-            text-align: right;
-            line-height: 22px; /* same as #progressBar height if we want text middle aligned */
-            width: 0;
-            background-color: #0ba1b5; border-radius: 3px;
-        }
-        .statusbar{
-            border-top:1px solid #A9CCD1;
-            min-height:25px;
-            width:99%;
-            padding:10px 10px 0px 10px;
-            vertical-align:top;
-        }
-        .statusbar:nth-child(odd){
-            background:#EBEFF0;
-        }
-        .filename{
-            display:inline-block;
-            vertical-align:top;
-            width:250px;
-        }
-        .filesize{
-            display:inline-block;
-            vertical-align:top;
-            color:#30693D;
-            width:100px;
-            margin-left:10px;
-            margin-right:5px;
-        }
-        .abort{
-            background-color:#A8352F;
-            -moz-border-radius:4px;
-            -webkit-border-radius:4px;
-            border-radius:4px;display:inline-block;
-            color:#fff;
-            font-family:arial;font-size:13px;font-weight:normal;
-            padding:4px 15px;
-            cursor:pointer;
-            vertical-align:top
-        }
-    </style>
-
 </head>
 <body>
 <div>
     <div style="margin: 20px">
-        <button type="button" id="btn-create" class="btn btn-info">새 채널 시작</button>
+        <button type="button" class="btn btn-info" id="btn-create">새 채널 시작</button>
         <button type="button" class="btn btn-dark" onclick="location.href='/logout'">로그아웃</button>
         <button type="button" class="btn btn-info" onclick="location.href='/login/google'">구글 연동하기</button>
+        <button type="button" class="btn btn-secondary" id="btn-exit" onclick="exitChannel()" disabled>현재 채널 나가기</button>
     </div>
     <!-- popup start -->
     <div id="createChannel" class="pop-layer">
@@ -140,7 +74,7 @@
                         <div id="1">
                             <div>
                                 <div>
-                                    <textarea cols="100" rows="25" id="messages_1" readonly></textarea>
+                                    <textarea cols="100" rows="25" id="msgArea" readonly></textarea>
                                     <div id="fileUpload" class="dragAndDropDiv">Drag & Drop Files Here</div>
                                 </div>
                                 <div>
@@ -148,8 +82,8 @@
                                 </div>
                                 <div>
                                     <input type="text" size="90" id="chatInput" />
-                                    <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(1)">전송</button>
-                                    <button type="button" class="btn btn-dark btn-sm" onclick="downFile(1)">다운로드</button>
+                                    <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(current)">전송</button>
+                                    <button type="button" class="btn btn-dark btn-sm" onclick="downFile(current)">다운로드</button>
                                 </div>
                             </div>
                         </div>

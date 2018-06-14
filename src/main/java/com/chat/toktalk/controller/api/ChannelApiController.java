@@ -55,7 +55,7 @@ public class ChannelApiController {
     }
 
     @GetMapping(value = "/{channelId}")
-    public Boolean newChannelCheck(LoginUserInfo loginUserInfo, @PathVariable(value = "channelId") Long channelId){
+    public Boolean isJoiningNewChannel(LoginUserInfo loginUserInfo, @PathVariable(value = "channelId") Long channelId){
         Long userId = null;
         if(loginUserInfo != null) {
             userId = loginUserInfo.getId();

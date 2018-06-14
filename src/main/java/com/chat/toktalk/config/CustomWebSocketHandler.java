@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -127,6 +128,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             switchChannel(session, map);
         }else if("chat".equals(type)){
             handleChatMessage(session, map);
+        }else if("exit_channel".equals(type)){
+            Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
+            Long channelId = Long.parseLong(map.get("channelId").toString());
+            channelUserService.removeChannelUser(userId, channelId);
+
         }
     }
 
@@ -138,10 +144,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         messageSender.sendMessage(new SocketMessage(channelId, userId, typingAlarm));
     }
 
-    private void switchChannel(WebSocketSession session, HashMap<String, Object> map) throws Exception {
+    void switchChannel(WebSocketSession session, HashMap<String, Object> map) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
         String username = attributes.get("username").toString();
         String nickname = attributes.get("nickname").toString();
+        Long userId = Long.parseLong(attributes.get("userId").toString());
         User user = userService.getUserByEmail(username);
 
         Long channelId = Long.parseLong(map.get("channelId").toString());
@@ -183,10 +190,9 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // 새롭게 채널에 합류한 유저
         }else{
+            logger.info("new channel user: "+username);
             ChannelUser channelUser = new ChannelUser();
-            channelUser.setUser(user);
-            channelUser.setChannel(channelService.getChannel(channelId));
-            channelUserService.addChannelUser(channelUser);
+            channelUserService.addChannelUser(channelUser, userId, channelId);
 
             // 입장메세지
             String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";

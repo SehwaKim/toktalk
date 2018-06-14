@@ -55,7 +55,7 @@ $(document).ready(function () {
 
     $("#chatInput").keypress(function(e) {
         if (e.keyCode == 13){
-            sendMsg(1);
+            sendMsg(current);
         }
     });
 
@@ -94,9 +94,11 @@ function switchChannel(channelId) {
             }
             $('#'+current).removeClass('active');
             current = channelId;
+            $('#msgArea').val('');
             sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
             //active
             $('#'+channelId).addClass('active');
+            $("#btn-exit").attr('disabled', false);
         }
     });
 }
@@ -114,14 +116,14 @@ function disconnect() {
 
 function showMessage(data) {
     if('system' == data.type){
-        $('#messages_'+data.channelId).append(data.text + '\n');
+        $('#msgArea').append(data.text + '\n');
     }else if('upload_file' == data.type){
-        $('#messages_'+data.channelId).append("[" + data.nickname + "] "+"fileupload"+" (download)" + '\n');
+        $('#msgArea').append("[" + data.nickname + "] "+"fileupload"+" (download)" + '\n');
     }else {
-        $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+        $('#msgArea').append("[" + data.nickname + "] " + data.text + '\n');
     }
-    var textArea = $('#messages_'+data.channelId);
-    // textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
+    var textArea = $('#msgArea');
+    textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
 }
 
 function getFormData($form){
@@ -191,4 +193,16 @@ function notifyUnread(data) {
         cnt = 0;
     }
     $('#'+data.channelId).find('.unread').text(++cnt);
+}
+
+function exitChannel() {
+    if(current == 0){
+        return false;
+    }
+    if (!window.confirm("현재 채널에서 나가시겠습니까?")) {
+        return false;
+    }
+    sock.send(JSON.stringify({'type' : 'exit_channel', 'channelId' : current}));
+    // 화면 바꾸기
+
 }
