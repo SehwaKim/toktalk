@@ -22,6 +22,7 @@ textarea {
 #chatInput {
     height: auto;
     line-height: normal;
+    padding-left: 10px;
     width: 76%;
     box-sizing : border-box;
     border-top-left-radius: 5px;

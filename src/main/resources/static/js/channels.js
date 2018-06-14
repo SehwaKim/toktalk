@@ -94,11 +94,22 @@ function switchChannel(channelId) {
             }
             $('#'+current).removeClass('active');
             current = channelId;
-            $('#msgArea').val('');
+
+            $('#msgArea').remove();
+            $('<textarea></textarea>')
+                .attr('id', 'msgArea')
+                .attr('rows', '23')
+                .attr('readonly', 'true')
+                .appendTo($('#msgDiv'));
+
             sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
             //active
             $('#'+channelId).addClass('active');
             $("#btn-exit").attr('disabled', false);
+            var channelName = $('#'+channelId).find('.name').text();
+            var input_box = document.getElementById("chatInput");
+            var placeholder = "Message to "+channelName;
+            input_box.placeholder = placeholder;
         }
     });
 }
@@ -176,7 +187,7 @@ function freshChannelList(data) {
                     .attr('id', data[key].id)
                     .attr('onclick', 'switchChannel(this)')
                     .attr('style', 'text-align:left;')
-                    .addClass('btn btn-light btn-block').appendTo($div);
+                    .addClass('btn btn-dark btn-block channel').appendTo($div);
         $('<span></span>').text(data[key].name).appendTo($a);
         $('<span></span>').attr('style', 'badge badge-pill badge-light unread').appendTo($a);
     }
@@ -189,9 +200,13 @@ function addNewChannel(data) {
         .attr('id', data.id)
         .attr('onclick', 'switchChannel(this.id)')
         .attr('style', 'text-align:left;')
-        .addClass('btn btn-light btn-block').appendTo($div);
+        .addClass('btn btn-dark btn-block channel').appendTo($div);
     $('<span></span>').text(data.name).appendTo($a);
     $('<span></span>').attr('style', 'badge badge-pill badge-light unread').appendTo($a);
+
+    var input_box = document.getElementById("chatInput");
+    var placeholder = "Message To "+data.name;
+    input_box.placeholder = placeholder;
 }
 
 function markAsUnread(data) {
@@ -223,7 +238,15 @@ function exitChannel() {
     }
     sock.send(JSON.stringify({'type' : 'exit_channel', 'channelId' : current}));
     $('#'+current).remove();
-    $('#msgArea').val('');
+
+    $('#msgArea').remove();
+    $('<textarea></textarea>')
+        .attr('id', 'msgArea')
+        .attr('rows', '23')
+        .attr('readonly', 'true')
+        .appendTo($('#msgDiv'));
+
     $("#btn-exit").attr('disabled', true);
     current = 0;
+    $('#chatInput').attr('placeholder', '');
 }
