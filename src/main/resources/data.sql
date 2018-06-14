@@ -11,5 +11,3 @@ insert into channel(id, name, regdate) VALUES (1, 'general', now());
 insert into channel_user(id, user_id, channel_id) VALUES (1, 1, 1);
 insert into channel_user(id, user_id, channel_id) VALUES (2, 2, 1);
 
-insert into user_oauth_info(id,access_token,sub,name,picture,email,user_id)
-VALUES (1,'ya29.GlvXBbqz71mWDrxUVDqC2AiZTPHxHMIdch69Ml9NFeKmr9qfVL9g22QA64slm7wS4fiBqW7x24tbGBrMXlj0AqvStYEvPmQMYc4r7V4XgM_R-y9wOoBg-ZVKKss3','105547134406045421901','soso','https://lh3.googleusercontent.com/-EpeCRDESczo/AAAAAAAAAAI/AAAAAAAAA2A/dnUWLQwBFh4/photo.jpg','noriming2@gmail.com',1);
