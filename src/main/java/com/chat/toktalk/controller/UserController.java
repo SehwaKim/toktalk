@@ -24,12 +24,12 @@ public class UserController {
     @PostMapping("/check-oauth")
     @ResponseBody
     public String checkGoogleAccount(LoginUserInfo loginUserInfo){
+        String returnValue = "empty";
         User user = userService.getUserByEmail(loginUserInfo.getEmail());
         boolean isEmptyOauth = user.getOauthInfos().isEmpty();
-        logger.info("구글 연동 여부 : " + isEmptyOauth);
         if(isEmptyOauth == false){
-            return "not_empty";
+            returnValue = "not_empty";
         }
-        return "empty";
+        return returnValue;
     }
 }

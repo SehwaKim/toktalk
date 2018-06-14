@@ -179,3 +179,17 @@ function notifyUnread(data) {
     }
     $('#'+data.channelId).find('.unread').text(++cnt);
 }
+
+
+window.onload = function(){
+    $.ajax({
+        url:'/users/check-oauth',
+        type:'POST',
+        success:function(data){
+            console.log('data :' + data);
+            if(data == 'not_empty') {
+                $('#google').prop("disabled", true);
+            }
+        }
+    });
+}
