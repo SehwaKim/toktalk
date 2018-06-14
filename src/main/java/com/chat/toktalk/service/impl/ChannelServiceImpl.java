@@ -6,10 +6,13 @@ import com.chat.toktalk.repository.ChannelRepository;
 import com.chat.toktalk.repository.ChannelUserRepository;
 import com.chat.toktalk.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ChannelServiceImpl implements ChannelService {
@@ -20,12 +23,14 @@ public class ChannelServiceImpl implements ChannelService {
     ChannelUserRepository channelUserRepository;
 
     @Override
-    public List<Channel> getChannels(Long userId) {
-        List<Channel> channels = new ArrayList<>();
+    public Set<Channel> getChannelsByUser(Long userId) {
         List<ChannelUser> channelUsers = channelUserRepository.findAllByUserId(userId);
+        Set<Channel> channels = channelRepository.findAllPublicChannels();
         for(ChannelUser channelUser : channelUsers){
             channels.add(channelUser.getChannel());
         }
+
+//        return new ArrayList<>(channels);
         return channels;
     }
 
@@ -38,4 +43,5 @@ public class ChannelServiceImpl implements ChannelService {
     public Channel addChannel(Channel channel) {
         return channelRepository.save(channel);
     }
+
 }

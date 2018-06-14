@@ -1,14 +1,14 @@
 package com.chat.toktalk.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 @Getter
 @Setter
@@ -36,9 +36,11 @@ public class User implements Serializable {
     @Column(name = "last_seen_at")
     private LocalDateTime lastSeenAt;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChannelUser> channelUsers = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserRole> roles = new ArrayList<>();
 

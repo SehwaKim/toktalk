@@ -55,7 +55,7 @@ $(document).ready(function () {
 
     $("#chatInput").keypress(function(e) {
         if (e.keyCode == 13){
-            sendMsg(1);
+            sendMsg(current);
         }
     });
 
@@ -81,11 +81,26 @@ function switchChannel(channelId) {
     if(channelId == current){
         return false;
     }
-    $('#'+current).removeClass('active');
-    current = channelId;
-    sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
-    //active
-    $('#'+channelId).addClass('active');
+    $.ajax({
+        url: '/api/channels/'+channelId,
+        method: 'get',
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+            if(data){
+                if (!window.confirm("채널에 입장하시겠습니까?")) {
+                    return false;
+                }
+            }
+            $('#'+current).removeClass('active');
+            current = channelId;
+            $('#msgArea').val('');
+            sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
+            //active
+            $('#'+channelId).addClass('active');
+            $("#btn-exit").attr('disabled', false);
+        }
+    });
 }
 
 function sendMsg(channelId) {
@@ -100,15 +115,18 @@ function disconnect() {
 }
 
 function showMessage(data) {
-    if('system' == data.type){
-        $('#messages_'+data.channelId).append(data.text + '\n');
-    }else if('upload_file' == data.type){
-        $('#messages_'+data.channelId).append("[" + data.nickname + "] "+"fileupload"+" (download)" + '\n');
-    }else {
-        $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+    if(current != data.channelId){
+        return false;
     }
-    var textArea = $('#messages_'+data.channelId);
-    // textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
+    if('system' == data.type){
+        $('#msgArea').append(data.text + '\n');
+    }else if('upload_file' == data.type){
+        $('#msgArea').append("[" + data.nickname + "] "+"fileupload"+" (download)" + '\n');
+    }else {
+        $('#msgArea').append("[" + data.nickname + "] " + data.text + '\n');
+    }
+    var textArea = $('#msgArea');
+    textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
 }
 
 function getFormData($form){
@@ -178,4 +196,18 @@ function notifyUnread(data) {
         cnt = 0;
     }
     $('#'+data.channelId).find('.unread').text(++cnt);
+}
+
+function exitChannel() {
+    if(current == 0){
+        return false;
+    }
+    if (!window.confirm("현재 채널에서 나가시겠습니까?")) {
+        return false;
+    }
+    sock.send(JSON.stringify({'type' : 'exit_channel', 'channelId' : current}));
+    $('#'+current).remove();
+    $('#msgArea').val('');
+    $("#btn-exit").attr('disabled', true);
+    current = 0;
 }

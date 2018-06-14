@@ -52,9 +52,6 @@ public class SessionManager {
     */
     public Map<Long, Set<WebSocketSession>> getWebSocketSessionsByChannelId(Long channelId){
         List<ChannelUser> channelUsers = channelUserService.getChannelUsersByChannelId(channelId);
-        // DB에서 채널에 속한 유저리스트를 갖고오고 있는데 이 정보를 그냥 Redis에 올려야 할지
-        // (그렇게되면 ChannelUser 가 생성될 때마다 레디스에 올리고 나갈땐 내려야 한다)
-        // ex) 레디스에 key - channelId / value - Set<userId> 이렇게 올라가게끔
         Map<Long, Set<WebSocketSession>> targetSessions = new HashMap<>();
 
         for(ChannelUser channelUser : channelUsers){
@@ -64,12 +61,6 @@ public class SessionManager {
             }
         }
 
-//        유저리스트를 Redis에서 가져온다면 위의 과정이 생략되고 아래와 같은 코드 실행
-//        List<Long> userIdList = redisService.getUsersByChannelId(channelId)
-//        for(Long userId : userIdList){
-//            if(sessions.containsKey(userId)){
-//                targetSessions.put(userId, sessions.get(userId));
-//        }
         return targetSessions;
     }
 }
