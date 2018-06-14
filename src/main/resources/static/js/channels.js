@@ -115,6 +115,9 @@ function disconnect() {
 }
 
 function showMessage(data) {
+    if(current != data.channelId){
+        return false;
+    }
     if('system' == data.type){
         $('#msgArea').append(data.text + '\n');
     }else if('upload_file' == data.type){
