@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "user")
+@Entity
 public class User implements Serializable {
     public User() {
         this.regdate = LocalDateTime.now();
