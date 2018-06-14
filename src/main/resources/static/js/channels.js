@@ -55,7 +55,7 @@ $(document).ready(function () {
 
     $("#chatInput").keypress(function(e) {
         if (e.keyCode == 13){
-            sendMsg(1);
+            sendMsg(current);
         }
     });
 
@@ -81,11 +81,26 @@ function switchChannel(channelId) {
     if(channelId == current){
         return false;
     }
-    $('#'+current).removeClass('active');
-    current = channelId;
-    sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
-    //active
-    $('#'+channelId).addClass('active');
+    $.ajax({
+        url: '/api/channels/'+channelId,
+        method: 'get',
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+            if(data){
+                if (!window.confirm("채널에 입장하시겠습니까?")) {
+                    return false;
+                }
+            }
+            $('#'+current).removeClass('active');
+            current = channelId;
+            $('#msgArea').val('');
+            sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
+            //active
+            $('#'+channelId).addClass('active');
+            $("#btn-exit").attr('disabled', false);
+        }
+    });
 }
 
 function sendMsg(channelId) {
@@ -100,15 +115,18 @@ function disconnect() {
 }
 
 function showMessage(data) {
-    if('system' == data.type){
-        $('#messages_'+data.channelId).append(data.text + '\n');
-    }else if('upload_file' == data.type){
-        $('#messages_'+data.channelId).append("[" + data.nickname + "] "+"fileupload"+" (download)" + '\n');
-    }else {
-        $('#messages_'+data.channelId).append("[" + data.nickname + "] " + data.text + '\n');
+    if(current != data.channelId){
+        return false;
     }
-    var textArea = $('#messages_'+data.channelId);
-    // textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
+    if('system' == data.type){
+        $('#msgArea').append(data.text + '\n');
+    }else if('upload_file' == data.type){
+        $('#msgArea').append("[" + data.nickname + "] "+"fileupload"+" (download)" + '\n');
+    }else {
+        $('#msgArea').append("[" + data.nickname + "] " + data.text + '\n');
+    }
+    var textArea = $('#msgArea');
+    textArea.scrollTop( textArea[0].scrollHeight - textArea.height() );
 }
 
 function getFormData($form){
@@ -134,13 +152,14 @@ function createChannel() {
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
-            freshChannelList(data);
+            // freshChannelList(data);
+            addNewChannel(data);
             $('.pop-layer').hide();
             $('#name').val("");
             $('#purpose').val("");
             $('#invite').val("");
-            var lastIdx = data.length-1;
-            switchChannel(data[lastIdx].id);
+            // var lastIdx = data.length-1;
+            switchChannel(data.id);
         }
     });
 }
@@ -160,9 +179,21 @@ function freshChannelList(data) {
     }
 }
 
+function addNewChannel(data) {
+    var $div = $('<div></div>').appendTo($("#channelList"));
+    var $a = $('<a></a>')
+        .attr('href', 'javascript:void(0);')
+        .attr('id', data.id)
+        .attr('onclick', 'switchChannel(this.id)')
+        .attr('style', 'text-align:left;')
+        .addClass('btn btn-light btn-block').appendTo($div);
+    $('<span></span>').text(data.name).appendTo($a);
+    $('<span></span>').attr('style', 'badge badge-pill badge-danger unread').appendTo($a);
+}
+
 function markAsUnread(data) {
     var arr = data.unreadMessages;
-    for(key in arr){
+    for(var key in arr){
         $('#'+arr[key].channelId).find('.unread').text(arr[key].unreadCnt);
     }
 }
@@ -179,7 +210,6 @@ function notifyUnread(data) {
     }
     $('#'+data.channelId).find('.unread').text(++cnt);
 }
-
 
 window.onload = function(){
     $.ajax({

@@ -6,9 +6,9 @@ import com.chat.toktalk.domain.Message;
 import java.util.List;
 
 public interface MessageService {
-    public void addMessage(Message message);
+    public Message addMessage(Message message);
 
-    public List<Message> getMessagesByChannelId(Long channelId);
+    public List<Message> getMessagesByChannelUser(Long channelId, Long firstReadId);
 
     public Long countUnreadMessageByChannelUser(ChannelUser channelUser);
 }

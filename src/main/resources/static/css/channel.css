@@ -1,0 +1,11 @@
+.footer {
+    position: fixed;
+    left: 18%;
+    bottom: 0;
+    width: 100%;
+    text-align: left;
+}
+
+textarea {
+    width: 100%;
+}
