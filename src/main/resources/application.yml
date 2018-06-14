@@ -1,3 +1,13 @@
+google:
+  client:
+    clientId: 855623251265-o3tj3vrj8ep8pa7rgmj2if2gfhumloph.apps.googleusercontent.com
+    clientSecret: IsUDtEn8cSK4Q_HhDvbnxH_9
+    accessTokenUri: https://accounts.google.com/o/oauth2/token
+    userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+    clientAuthenticationScheme: form
+    scope: email, profile
+  resource:
+    userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
 spring:
  profiles:
    active: local
@@ -36,8 +46,8 @@ spring:
  rabbitmq:
    host: localhost
    port: 5672
-   username: test
-   password: test
+   username: guest
+   password: guest
 logging:
   file: logs/dev_app.log
   pattern:
@@ -46,3 +56,4 @@ logging:
     org.springframework.web: INFO
     guru.springframework.controllers: INFO
     org.hibernate: INFO
+
