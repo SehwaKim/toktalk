@@ -5,5 +5,5 @@ import com.chat.toktalk.security.LoginUserInfo;
 import javax.mail.MessagingException;
 
 public interface SendMailService {
-    public void sendEmail(String content,LoginUserInfo loginUserInfo) throws MessagingException;
+    public void sendPasswordToGuestEmail(String content,String email) throws MessagingException;
 }
