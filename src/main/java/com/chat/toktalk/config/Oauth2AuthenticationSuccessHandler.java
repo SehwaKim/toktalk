@@ -23,14 +23,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,9 +55,11 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
     @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
+
         GoogleUser googleUser = getGoogleUser(authentication);
         User user = userRepository.getOauthUser(googleUser.getEmail());
         if(user != null){
+            logger.info("우리고객님, 로그인 정보 변환");
             List<GrantedAuthority> list = new ArrayList<>();
             for(UserRole role : user.getRoles()){
                 list.add(new SimpleGrantedAuthority("ROLE_"+role.getRoleName()));
@@ -75,6 +73,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             response.sendRedirect("/");
         }
         else{//구글 연동정보가 없음
+            logger.info("구글 연동 원하는 고객님");
             String alreadyLoginId = (String)request.getAttribute("alreadyLoginId");
             user = userRepository.findUserByEmail(alreadyLoginId);
             if(alreadyLoginId != null){
@@ -89,6 +88,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 accountLogout(request,response,authentication);
                 response.sendRedirect("/");
             }else {
+                logger.info("회원가입 필요 고객님.");
                 String password ="TEMPORARY_PASSWORD";
 
                 UserOauthInfo userOauthInfo = googleUser.toUserOauthInfoEntity();
