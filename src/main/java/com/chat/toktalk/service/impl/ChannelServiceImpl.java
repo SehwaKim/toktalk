@@ -41,7 +41,15 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Channel addChannel(Channel channel) {
-        return channelRepository.save(channel);
+        Channel saved = channelRepository.save(channel);
+
+        List<ChannelUser> channelUsers = channelUserRepository.findAllByChannelId(saved.getId());
+        for(ChannelUser channelUser : channelUsers){
+            channelUser.setFirstReadId(1L);
+            channelUserRepository.saveAndFlush(channelUser);
+        }
+
+        return saved;
     }
 
 }

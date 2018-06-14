@@ -216,7 +216,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleChatMessage(WebSocketSession session, HashMap<String, Object> map) {
-        Long channelId = new Long((String)map.get("channelId"));
+        Long channelId = new Long(map.get("channelId").toString());
         String message = (String) map.get("text");
 
         Map<String, Object> attributes = session.getAttributes();

@@ -152,13 +152,14 @@ function createChannel() {
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
-            freshChannelList(data);
+            // freshChannelList(data);
+            addNewChannel(data);
             $('.pop-layer').hide();
             $('#name').val("");
             $('#purpose').val("");
             $('#invite').val("");
-            var lastIdx = data.length-1;
-            switchChannel(data[lastIdx].id);
+            // var lastIdx = data.length-1;
+            switchChannel(data.id);
         }
     });
 }
@@ -178,9 +179,21 @@ function freshChannelList(data) {
     }
 }
 
+function addNewChannel(data) {
+    var $div = $('<div></div>').appendTo($("#channelList"));
+    var $a = $('<a></a>')
+        .attr('href', 'javascript:void(0);')
+        .attr('id', data.id)
+        .attr('onclick', 'switchChannel(this.id)')
+        .attr('style', 'text-align:left;')
+        .addClass('btn btn-light btn-block').appendTo($div);
+    $('<span></span>').text(data.name).appendTo($a);
+    $('<span></span>').attr('style', 'badge badge-pill badge-danger unread').appendTo($a);
+}
+
 function markAsUnread(data) {
     var arr = data.unreadMessages;
-    for(key in arr){
+    for(var key in arr){
         $('#'+arr[key].channelId).find('.unread').text(arr[key].unreadCnt);
     }
 }

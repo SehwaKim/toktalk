@@ -32,7 +32,7 @@ public class ChannelApiController {
 
     /* 새 채널 생성 */
     @PostMapping
-    public Set<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
+    public ResponseEntity<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
         if(loginUserInfo != null){
             User user = userService.getUserByEmail(loginUserInfo.getUsername());
 
@@ -48,7 +48,8 @@ public class ChannelApiController {
             channel = channelService.addChannel(channel);
             redisService.createMessageIdCounter(channel.getId());
 
-            return channelService.getChannelsByUser(loginUserInfo.getId());
+//            return channelService.getChannelsByUser(loginUserInfo.getId());
+            return new ResponseEntity<>(channel, HttpStatus.OK);
         }
 
         return null;

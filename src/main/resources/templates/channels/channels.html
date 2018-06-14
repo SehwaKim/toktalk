@@ -19,7 +19,6 @@
         <button type="button" class="btn btn-info" id="btn-create">새 채널 시작</button>
         <button type="button" class="btn btn-dark" onclick="location.href='/logout'">로그아웃</button>
         <button type="button" class="btn btn-info" onclick="location.href='/login/google'">구글 연동하기</button>
-        <button type="button" class="btn btn-secondary" id="btn-exit" onclick="exitChannel()" disabled>현재 채널 나가기</button>
     </div>
     <!-- popup start -->
     <div id="createChannel" class="pop-layer">
@@ -72,7 +71,12 @@
                     </div>
                     <div class="col">
                         <div id="1">
-                            <div>
+                            <div style="width: 60%">
+                                <div style="padding-bottom: 10px; text-align: right">
+                                    <div style="display: inline-block">
+                                        <button type="button" class="btn btn-secondary" id="btn-exit" onclick="exitChannel()" disabled>현재 채널 나가기</button>
+                                    </div>
+                                </div>
                                 <div>
                                     <textarea cols="100" rows="25" id="msgArea" readonly></textarea>
                                     <div id="fileUpload" class="dragAndDropDiv">Drag & Drop Files Here</div>

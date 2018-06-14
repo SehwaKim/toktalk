@@ -32,14 +32,6 @@ public class MessageServiceImpl implements MessageService {
         Message saved = messageRepository.save(message);
         redisService.increaseMessageIdByChannel(message.getChannelId());
 
-        if(saved.getId() == 1){
-            List<ChannelUser> channelUsers = channelUserRepository.findAllByChannelId(saved.getChannelId());
-            for(ChannelUser channelUser : channelUsers){
-                channelUser.setFirstReadId(saved.getId());
-                channelUserRepository.saveAndFlush(channelUser);
-            }
-        }
-
         if("system".equals(message.getType())){
             ExcludedMessage excludedMessage = new ExcludedMessage();
             excludedMessage.setType("system");
