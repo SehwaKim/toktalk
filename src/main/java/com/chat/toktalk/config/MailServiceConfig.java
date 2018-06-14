@@ -15,8 +15,8 @@ public class MailServiceConfig {
         sender.setDefaultEncoding("UTF-8");
         sender.setHost("smtp.gmail.com");
         sender.setPort(587);
-        sender.setUsername("noriming2@gmail.com");
-        sender.setPassword("$984choi"); //app의 패스워드이다.
+        sender.setUsername("gmail계정입력필요");
+        sender.setPassword("password 입력필요"); //app의 패스워드이다.
 
         Properties properties = sender.getJavaMailProperties();
         properties.setProperty("mail.transport.protocol", "smtp");
