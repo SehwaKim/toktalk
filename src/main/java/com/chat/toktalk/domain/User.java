@@ -1,21 +1,27 @@
 package com.chat.toktalk.domain;
 
-import lombok.Getter;
-import lombok.Setter;
 
+import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "user")
+
+
 @Getter
 @Setter
+@Table(name = "user")
 public class User implements Serializable {
     public User() {
         this.regdate = LocalDateTime.now();
+    }
+
+    @Builder
+    public User(String email, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
     }
 
     @Id
@@ -35,6 +41,9 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserRole> roles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserOauthInfo> oauthInfos = new ArrayList<>();
+
     public void addChanneUser(ChannelUser channelUser){
         channelUsers.add(channelUser);
         if(channelUser.getUser() != this){
@@ -46,6 +55,12 @@ public class User implements Serializable {
         this.roles.add(role);
         if(role.getUser()!=this){
             role.setUser(this);
+        }
+    }
+    public void addUserOauthInfo(UserOauthInfo oauthInfo){
+        oauthInfos.add(oauthInfo);
+        if(oauthInfo.getUser() != this){
+            oauthInfo.setUser(this);
         }
     }
 }
