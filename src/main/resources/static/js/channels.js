@@ -206,6 +206,8 @@ function exitChannel() {
         return false;
     }
     sock.send(JSON.stringify({'type' : 'exit_channel', 'channelId' : current}));
-    switchChannel(0);
-
+    $('#'+current).remove();
+    $('#msgArea').val('');
+    $("#btn-exit").attr('disabled', true);
+    current = 0;
 }
