@@ -1,5 +1,6 @@
 package com.chat.toktalk.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ public class UserRole implements Serializable {
     @Column(name = "role_name")
     private String roleName;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id")
     User user;

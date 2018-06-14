@@ -81,11 +81,24 @@ function switchChannel(channelId) {
     if(channelId == current){
         return false;
     }
-    $('#'+current).removeClass('active');
-    current = channelId;
-    sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
-    //active
-    $('#'+channelId).addClass('active');
+    $.ajax({
+        url: '/api/channels/'+channelId,
+        method: 'get',
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+            if(data){
+                if (!window.confirm("채널에 입장하시겠습니까?")) {
+                    return false;
+                }
+            }
+            $('#'+current).removeClass('active');
+            current = channelId;
+            sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
+            //active
+            $('#'+channelId).addClass('active');
+        }
+    });
 }
 
 function sendMsg(channelId) {

@@ -1,5 +1,7 @@
 package com.chat.toktalk.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,10 +24,12 @@ public class ChannelUser implements Serializable {
 
     @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @ManyToOne(targetEntity = Channel.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
+    @JsonBackReference
     private Channel channel;
 
     @Column(name = "last_read_id") // 마지막으로 읽은 메세지 id

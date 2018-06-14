@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/")
@@ -21,10 +23,10 @@ public class ChannelController {
     /* 채널 목록 가져오기 (로그인 후 메인) */
     @GetMapping
     public String channels(ModelMap modelMap, LoginUserInfo loginUserInfo){
-        List<Channel> channels = new ArrayList<>();
+        Set<Channel> channels = new HashSet<>();
 
-        if(loginUserInfo != null){
-            channels = channelService.getChannels(loginUserInfo.getId());
+        if(loginUserInfo != null) {
+            channels = channelService.getChannelsByUser(loginUserInfo.getId());
         }
 
         modelMap.addAttribute("list", channels);
