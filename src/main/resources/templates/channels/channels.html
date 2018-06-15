@@ -6,6 +6,7 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.0/css/bootstrap.min.css}"/>
     <link rel="stylesheet" href="/css/popup.css"/>
     <link rel="stylesheet" href="/css/file.css"/>
+    <link rel="stylesheet" href="/css/channels.css"/>
     <script th:src="@{/webjars/sockjs-client/1.0.2/sockjs.js}"></script>
     <script th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/4.1.0/js/bootstrap.min.js}"></script>
@@ -15,11 +16,13 @@
 </head>
 <body>
 <div>
-    <div style="margin: 20px">
-        <button type="button" class="btn btn-info" id="btn-create">새 채널 시작</button>
-        <button type="button" class="btn btn-dark" onclick="location.href='/logout'">로그아웃</button>
-        <button type="button" id ="google" class="btn btn-info" onclick="location.href='/login/google'">구글 연동하기</button>
-    </div>
+    <nav>
+        <div style="margin-left: 15px; margin-top: 15px">
+            <button type="button" class="btn btn-warning menu" id="btn-create"><b>New Channel</b></button>
+            <button type="button" class="btn btn-dark menu" onclick="location.href='/logout'">Logout</button>
+            <button type="button" id = "google" class="btn btn-dark menu" onclick="location.href='/login/google'">Google Sign-in</button>
+        </div>
+    </nav>
     <!-- popup start -->
     <div id="createChannel" class="pop-layer">
             <div class="text-center mb-4">
@@ -63,31 +66,39 @@
             <div class="col">
                 <div class="row">
                     <div class="col-2" id="channelList">
-                        <div th:if="${not #lists.isEmpty(list)}" th:each="channel : ${list}">
-                            <a href="javascript:void(0);" class="btn btn-light btn-block" th:attrappend="id=${channel.getId()}" onclick="switchChannel(this.id)" style="text-align:left;">
-                                <span th:text="${channel.name}"></span><span style="float: right" class="badge badge-pill badge-danger unread"></span>
-                            </a>
+                        <div style="padding-top: 40px">
+                            <div th:if="${not #lists.isEmpty(list)}" th:each="channel : ${list}">
+                                <a href="javascript:void(0);" class="btn btn-dark btn-block channel" th:attrappend="id=${channel.getId()}" onclick="switchChannel(this.id)" style="text-align:left;">
+                                    <span class="name" th:text="${channel.name}"></span><span style="float: right" class="badge badge-pill badge-light unread"></span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="col">
-                        <div id="1">
-                            <div style="width: 60%">
+                        <div>
+                            <div style="width: 100%;">
                                 <div style="padding-bottom: 10px; text-align: right">
                                     <div style="display: inline-block">
-                                        <button type="button" class="btn btn-secondary" id="btn-exit" onclick="exitChannel()" disabled>현재 채널 나가기</button>
+                                        <button type="button" class="btn btn-dark btn-sm menu" id="btn-exit" onclick="exitChannel()" disabled><small>Leave this channel</small></button>
                                     </div>
                                 </div>
-                                <div>
-                                    <textarea cols="100" rows="25" id="msgArea" readonly></textarea>
-                                    <div id="fileUpload" class="dragAndDropDiv">Drag & Drop Files Here</div>
+                                <div id="msgDiv">
+                                    <textarea rows="23" id="msgArea" readonly></textarea>
+                                    <!--<div id="fileUpload" class="dragAndDropDiv">Drag & Drop Files Here</div>-->
                                 </div>
-                                <div>
-                                    <small><span id="typingAlarm"></span></small>
-                                </div>
-                                <div>
-                                    <input type="text" size="90" id="chatInput" />
-                                    <button type="button" class="btn btn-dark btn-sm" onclick="sendMsg(current)">전송</button>
-                                    <button type="button" class="btn btn-dark btn-sm" onclick="downFile(current)">다운로드</button>
+                                <div class="footer">
+                                    <div>
+                                        <div style="padding-bottom: 5px; color: #e3e3e3">
+                                            <small><span id="typingAlarm"></span></small>
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <input type="text" id="chatInput" />
+                                            <div class="input-group-append">
+                                                <button class="btn btn-dark" type="button" onclick="sendMsg(current)">Send</button>
+                                            </div>
+                                        </div>
+                                        <!--&lt;!&ndash;<button type="button" class="btn btn-dark btn-sm" onclick="downFile(current)">다운로드</button>&ndash;&gt;-->
+                                    </div>
                                 </div>
                             </div>
                         </div>

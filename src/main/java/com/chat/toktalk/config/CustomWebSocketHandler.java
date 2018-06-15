@@ -163,7 +163,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long activeChannelId = redisService.getActiveChannelInfo(session);
         if(activeChannelId != null){
             ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
-            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+//            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+            alreadyUser.setLastReadId(messageService.getLastIdByChannel(activeChannelId));
             channelUserService.updateChannelUser(alreadyUser);
         }
 
@@ -248,7 +249,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long activeChannelId = redisService.getActiveChannelInfo(session);
         if(activeChannelId != null){
             ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, userId);
-            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+//            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+            alreadyUser.setLastReadId(messageService.getLastIdByChannel(activeChannelId));
             channelUserService.updateChannelUser(alreadyUser);
         }
 
