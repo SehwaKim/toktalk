@@ -144,7 +144,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long channelId = redisService.getActiveChannelInfo(session);
         String nickname = (String) session.getAttributes().get("nickname");
         Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
-        String typingAlarm = nickname+"님이 뭔가를 입력 중 입니다";
+        String typingAlarm = nickname+" is typing";
         messageSender.sendMessage(new SocketMessage(channelId, userId, typingAlarm));
     }
 
