@@ -205,7 +205,8 @@ function addNewChannel(data) {
     $('<span></span>').attr('style', 'badge badge-pill badge-light unread').appendTo($a);
 
     var input_box = document.getElementById("chatInput");
-    var placeholder = "Message To "+data.name;
+    var channelName = data.name.toString();
+    var placeholder = "Message To "+channelName;
     input_box.placeholder = placeholder;
 }
 
