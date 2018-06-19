@@ -1,6 +1,7 @@
 package com.chat.toktalk.config;
 
 import com.chat.toktalk.amqp.MessageSender;
+import com.chat.toktalk.domain.Channel;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
@@ -130,7 +131,18 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             handleChatMessage(session, map);
         }else if("exit_channel".equals(type)){
             exitChannel(session, map);
+        }else if("invite_member".equals(type)){
+            inviteMember(map);
         }
+    }
+
+    private void inviteMember(HashMap<String, Object> map) {
+        Long channelId = Long.parseLong(map.get("channelId").toString());
+        Channel channel = channelService.getChannel(channelId);
+        Long invitedUserId = Long.parseLong(map.get("userId").toString());
+        String nickname = userService.getUserById(invitedUserId).getNickname();
+        joinChannel(nickname, invitedUserId, channelId);
+        messageSender.sendMessage(new SocketMessage(invitedUserId, channel));
     }
 
     private void exitChannel(WebSocketSession session, HashMap<String, Object> map) {
@@ -196,24 +208,27 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // 새롭게 채널에 합류한 유저
         }else{
-            logger.info("new channel user: "+username);
-            ChannelUser channelUser = new ChannelUser();
-            channelUserService.addChannelUser(channelUser, userId, channelId);
-
-            // 입장메세지
-            String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";
-            Message messageNew = new Message();
-            messageNew.setType("system");
-            messageNew.setChannelId(channelId);
-            messageNew.setText(systemMsg);
-            Message saved = messageService.addMessage(messageNew);
-
-            // firstReadId 업데이트
-            channelUser.setFirstReadId(saved.getId());
-            channelUserService.updateChannelUser(channelUser);
-
-            messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
+            joinChannel(nickname, userId, channelId);
         }
+    }
+
+    private void joinChannel(String nickname, Long userId, Long channelId) {
+        ChannelUser channelUser = new ChannelUser();
+        channelUserService.addChannelUser(channelUser, userId, channelId);
+
+        // 입장메세지
+        String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";
+        Message messageNew = new Message();
+        messageNew.setType("system");
+        messageNew.setChannelId(channelId);
+        messageNew.setText(systemMsg);
+        Message saved = messageService.addMessage(messageNew);
+
+        // firstReadId 업데이트
+        channelUser.setFirstReadId(saved.getId());
+        channelUserService.updateChannelUser(channelUser);
+
+        messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
     }
 
     private void handleChatMessage(WebSocketSession session, HashMap<String, Object> map) {

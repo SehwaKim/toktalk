@@ -16,7 +16,7 @@ $(document).ready(function () {
 
         if('chat' == data.type) {
             if (data.notification) {
-                notifyUnread(data);
+                notifyUnread(data.channelId);
             } else {
                 $("#typingAlarm").text('');
                 clearTimeout(timer1);
@@ -42,6 +42,9 @@ $(document).ready(function () {
             markAsRead(data.channelId);
         }else if('upload_file' == data.type){
             showMessage(data);
+        }else if('channel_joined' == data.type){
+            addNewChannel(data.channel);
+            notifyUnread(data.channel.id);
         }
     };
 
@@ -105,6 +108,7 @@ function switchChannel(channelId) {
             sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
             //active
             $('#'+channelId).addClass('active');
+            $("#btn-invite").attr('disabled', false);
             $("#btn-exit").attr('disabled', false);
             var channelName = $('#'+channelId).find('.name').text();
             var input_box = document.getElementById("chatInput");
@@ -178,21 +182,6 @@ function createChannel() {
     });
 }
 
-function freshChannelList(data) {
-    $("#channelList").empty();
-    for(var key in data){
-        var $div = $('<div></div>').appendTo($("#channelList"));
-        var $a = $('<a></a>')
-                    .attr('href', 'javascript:void(0);')
-                    .attr('id', data[key].id)
-                    .attr('onclick', 'switchChannel(this)')
-                    .attr('style', 'text-align:left;')
-                    .addClass('btn btn-dark btn-block channel').appendTo($div);
-        $('<span></span>').text(data[key].name).appendTo($a);
-        $('<span></span>').attr('style', 'badge badge-pill badge-light unread').appendTo($a);
-    }
-}
-
 function addNewChannel(data) {
     var $div = $('<div></div>').appendTo($("#channelList"));
     var $a = $('<a></a>')
@@ -221,13 +210,13 @@ function markAsRead(channelId) {
     $('#'+channelId).find('.unread').text('');
 }
 
-function notifyUnread(data) {
-    var cnt = $('#'+data.channelId).find('.unread').text();
+function notifyUnread(channelId) {
+    var cnt = $('#'+channelId).find('.unread').text();
     if(typeof cnt === "undefined" || cnt == ''){
         console.log(cnt);
         cnt = 0;
     }
-    $('#'+data.channelId).find('.unread').text(++cnt);
+    $('#'+channelId).find('.unread').text(++cnt);
 }
 
 window.onload = function() {
@@ -260,6 +249,15 @@ function exitChannel() {
         .appendTo($('#msgDiv'));
 
     $("#btn-exit").attr('disabled', true);
+    $("#btn-invite").attr('disabled', true);
     current = 0;
     $('#chatInput').attr('placeholder', '');
+}
+
+function inviteMember() {
+    if(current == 0){
+        return false;
+    }
+    // test3 판다만 초대하기 (다수일경우 for문)
+    sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : current, 'userId' : 3}))
 }
