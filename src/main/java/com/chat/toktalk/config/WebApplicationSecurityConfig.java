@@ -1,6 +1,8 @@
 package com.chat.toktalk.config;
 
 import com.chat.toktalk.filter.AlreadyLoginCheckFilter;
+import com.chat.toktalk.security.TokTalkUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,8 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final Filter filter;
 
 
+    @Autowired
+    TokTalkUserDetailsService tokTalkUserDetailsService;
     public WebApplicationSecurityConfig(Filter googleFilter) {
         this.filter = googleFilter;
     }
@@ -46,6 +50,7 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                         .usernameParameter("email")
                         .passwordParameter("password")
                         .successHandler(userAuthenticationSuccessHandler())
+                //.and().rememberMe().rememberMeParameter("remember-me")
               //  .failureHandler(new UserAuthenticationFailureHandler())
                 .and()
                     .csrf().disable()
