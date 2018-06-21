@@ -170,13 +170,12 @@ function createChannel() {
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
-            // freshChannelList(data);
+            inviteMember(data.id, $("#invitedId").val()); // 멤버 초대하기 - 지금은 1명만 가능...
             addNewChannel(data);
             $('.pop-layer').hide();
             $('#name').val("");
             $('#purpose').val("");
-            $('#invite').val("");
-            // var lastIdx = data.length-1;
+            $('#invitedId').val("");
             switchChannel(data.id);
         }
     });
@@ -255,10 +254,24 @@ function exitChannel() {
 }
 
 function inviteMember() {
-    if(current == 0){
-        return false;
+    var a = arguments; // 모든 함수는 생성되면서 arguments 라는 내장 매개변수를 얻게된다. 전달된 인자를 값으로 가짐. 자바스크립트는 메소드 오버로딩이 안되서 이렇게 함.
+
+    switch (a.length) {
+        case 0: // 이미 생성된 채널에서 초대
+            if(current == 0){
+                return false;
+            }
+            // 임시로 test3(판다)만 초대하기로 구현해놓음 (다수일경우 for문)
+            // 유저 검색시 얻은 userId, nickname 을 넘겨주기
+            sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : current, 'userId' : 3, 'nickname' : '판다'}));
+            break;
+
+        case 2: // 채널 최초 생성시 초대
+            var channelId = a[0];
+            var visitedId = a[1];
+            if(visitedId != ""){
+                sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : channelId, 'userId' : visitedId}));
+            }
+            break;
     }
-    // 임시로 test3(판다)만 초대하기로 구현해놓음 (다수일경우 for문)
-    // 유저 검색시 얻은 userId, nickname 을 넘겨주기
-    sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : current, 'userId' : 3, 'nickname' : '판다'}));
 }

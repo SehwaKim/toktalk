@@ -36,30 +36,12 @@ public class ChannelApiController {
         if(loginUserInfo != null){
             User user = userService.getUserByEmail(loginUserInfo.getUsername());
 
+            ChannelUser channelCreator = new ChannelUser();
+            channelCreator.setUser(user);
+            channelCreator.setIsOperator(true);
+
             Channel channel = new Channel();
-
-            ChannelUser channelUser = new ChannelUser();
-            channelUser.setUser(user);
-            channelUser.setIsOperator(true);
-            channel.addChanneUser(channelUser);
-
-            // 초대된 유저
-            Long invitedId = channelForm.getInvite();
-            /*if(invitedId != null){
-                for(Long id : invitedId){
-                    System.out.println("id : "+id);
-                    ChannelUser invitedUser = new ChannelUser();
-                    channelUser.setUser(userService.getUserById(id));
-                    channelUser.setIsOperator(false);
-                    channel.addChanneUser(invitedUser);
-                }
-            }*/
-
-            ChannelUser invitedUser = new ChannelUser();
-            channelUser.setUser(userService.getUserById(invitedId));
-            channelUser.setIsOperator(false);
-            channel.addChanneUser(invitedUser);
-
+            channel.addChanneUser(channelCreator);
             channel.setName(channelForm.getName());
             if("private".equals(channelForm.getType())){
                 channel.setType("public");
@@ -70,7 +52,6 @@ public class ChannelApiController {
             channel = channelService.addChannel(channel);
             redisService.createMessageIdCounter(channel.getId());
 
-//            return channelService.getChannelsByUser(loginUserInfo.getId());
             return new ResponseEntity<>(channel, HttpStatus.OK);
         }
 

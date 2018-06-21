@@ -7,5 +7,4 @@ public class ChannelForm {
     private String name;
     private String type;
     private String purpose;
-    private Long invite;
 }

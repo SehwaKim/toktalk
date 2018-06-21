@@ -139,8 +139,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long channelId = Long.parseLong(map.get("channelId").toString());
         Channel channel = channelService.getChannel(channelId);
         Long invitedUserId = Long.parseLong(map.get("userId").toString());
-        String nickname = map.get("nickname").toString();
-        joinChannel(nickname, invitedUserId, channelId);
+        if(map.get("nickname") != null){
+            addNewChannelUser(map.get("nickname").toString(), invitedUserId, channelId);
+        }else {
+            addNewChannelUser(null, invitedUserId, channelId);
+        }
         messageSender.sendMessage(new SocketMessage(invitedUserId, channel));
     }
 
@@ -207,27 +210,29 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // 새롭게 채널에 합류한 유저
         }else{
-            joinChannel(nickname, userId, channelId);
+            addNewChannelUser(nickname, userId, channelId);
         }
     }
 
-    private void joinChannel(String nickname, Long userId, Long channelId) {
+    private void addNewChannelUser(String nickname, Long userId, Long channelId) {
         ChannelUser channelUser = new ChannelUser();
         channelUserService.addChannelUser(channelUser, userId, channelId);
 
-        // 입장메세지
-        String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";
-        Message messageNew = new Message();
-        messageNew.setType("system");
-        messageNew.setChannelId(channelId);
-        messageNew.setText(systemMsg);
-        Message saved = messageService.addMessage(messageNew);
+        // 입장메세지 (채널 최초 생성 시 초대된 멤버는 입장메세지 X)
+        if(nickname != null){
+            String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";
+            Message messageNew = new Message();
+            messageNew.setType("system");
+            messageNew.setChannelId(channelId);
+            messageNew.setText(systemMsg);
+            Message saved = messageService.addMessage(messageNew);
 
-        // firstReadId 업데이트
-        channelUser.setFirstReadId(saved.getId());
-        channelUserService.updateChannelUser(channelUser);
+            // firstReadId 업데이트
+            channelUser.setFirstReadId(saved.getId());
+            channelUserService.updateChannelUser(channelUser);
 
-        messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
+            messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
+        }
     }
 
     private void handleChatMessage(WebSocketSession session, HashMap<String, Object> map) {
