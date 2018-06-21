@@ -258,6 +258,7 @@ function inviteMember() {
     if(current == 0){
         return false;
     }
-    // test3 판다만 초대하기 (다수일경우 for문)
-    sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : current, 'userId' : 3}))
+    // 임시로 test3(판다)만 초대하기로 구현해놓음 (다수일경우 for문)
+    // 유저 검색시 얻은 userId, nickname 을 넘겨주기
+    sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : current, 'userId' : 3, 'nickname' : '판다'}));
 }

@@ -6,11 +6,8 @@ import com.chat.toktalk.repository.ChannelRepository;
 import com.chat.toktalk.repository.ChannelUserRepository;
 import com.chat.toktalk.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +33,8 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public Channel getChannel(Long channelId) {
-        return channelRepository.getOne(channelId);
+//        return channelRepository.getOne(channelId); // TODO 왜 안되는가?
+        return channelRepository.findById(channelId).get();
     }
 
     @Override

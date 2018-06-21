@@ -7,7 +7,6 @@ import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.dto.UnreadMessageInfo;
-import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.*;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,10 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.ArrayList;
@@ -140,7 +139,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long channelId = Long.parseLong(map.get("channelId").toString());
         Channel channel = channelService.getChannel(channelId);
         Long invitedUserId = Long.parseLong(map.get("userId").toString());
-        String nickname = userService.getUserById(invitedUserId).getNickname();
+        String nickname = map.get("nickname").toString();
         joinChannel(nickname, invitedUserId, channelId);
         messageSender.sendMessage(new SocketMessage(invitedUserId, channel));
     }
