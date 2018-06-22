@@ -21,4 +21,9 @@ public class UserServiceImpl implements UserService {
     public void addUser(User user) {
         userRepository.save(user);
     }
+
+    @Override
+    public User getUserById(Long invitedUserId) {
+        return userRepository.getOne(invitedUserId);
+    }
 }

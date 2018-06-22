@@ -36,19 +36,22 @@ public class ChannelApiController {
         if(loginUserInfo != null){
             User user = userService.getUserByEmail(loginUserInfo.getUsername());
 
-            ChannelUser channelUser = new ChannelUser();
-            channelUser.setUser(user);
-            channelUser.setIsOperator(true);
+            ChannelUser channelCreator = new ChannelUser();
+            channelCreator.setUser(user);
+            channelCreator.setIsOperator(true);
 
             Channel channel = new Channel();
-            channel.addChanneUser(channelUser);
+            channel.addChanneUser(channelCreator);
             channel.setName(channelForm.getName());
-            channel.setType("public");
+            if("private".equals(channelForm.getType())){
+                channel.setType("public");
+            }else {
+                channel.setType("private");
+            }
 
             channel = channelService.addChannel(channel);
             redisService.createMessageIdCounter(channel.getId());
 
-//            return channelService.getChannelsByUser(loginUserInfo.getId());
             return new ResponseEntity<>(channel, HttpStatus.OK);
         }
 
