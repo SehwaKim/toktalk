@@ -15,19 +15,12 @@ import java.util.Date;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "persistent_Login")
-public class PersistentLogin {
+@Table(name = "persistent_logins")
+public class PersistentLogins {
 
-    public PersistentLogin(String series, String username, String token, Date lastUsed) {
-        this.series = series;
-        this.username = username;
-        this.token = token;
-        this.lastUsed = lastUsed;
-    }
-
+    private String username;
     @Id
     private String series;
-    private String username;
     private String token;
     @Column(name="last_used")
     private Date lastUsed;
