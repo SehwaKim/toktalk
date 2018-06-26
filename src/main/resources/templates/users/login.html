@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
@@ -14,6 +15,12 @@
         <label for="password">password</label>
         <input type="password" id="password" name="password" size="20">
         <button type="submit">로그인</button>
+
+        <p>
+            <label for="remember-me">Remember-me</label>
+            <input type="checkbox" id="remember-me" name="remember-me" size="20">
+        </p>
+
     </form>
 
     <div class="container unauthenticated">
