@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+
+</head>
+<body>
+<div>
+    <h3>Hello , </h3>
+    <p>
+    <form method="post" th:action="@{/users/signup}" action="#">
+        <label for="name">name</label>
+        <input type="text" id="name" name="name" size="20">
+        <label for="email">email</label>
+        <input type="text" id="email" name="email" size="20">
+        <label for="password">password</label>
+        <input type="password" id="password" name="password" size="20">
+
+        <button type="submit">Sign-Up</button>
+    </form>
+    </p>
+</div>
+</body>
+</html>
