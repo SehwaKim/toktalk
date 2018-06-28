@@ -42,7 +42,7 @@ public class User implements Serializable {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<UserRole> roles = new ArrayList<>();
+    private List<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserOauthInfo> oauthInfos = new ArrayList<>();
@@ -54,7 +54,7 @@ public class User implements Serializable {
         }
     }
 
-    public void addUserRole(UserRole role){
+    public void addUserRole(Role role){
         this.roles.add(role);
         if(role.getUser()!=this){
             role.setUser(this);
@@ -66,4 +66,6 @@ public class User implements Serializable {
             oauthInfo.setUser(this);
         }
     }
+
+
 }

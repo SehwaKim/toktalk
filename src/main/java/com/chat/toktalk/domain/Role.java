@@ -11,14 +11,15 @@ import java.io.Serializable;
 @Table(name = "user_roles")
 @Getter
 @Setter
-public class UserRole implements Serializable {
+public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // 회원, Admin
-    @Column(name = "role_name")
-    private String roleName;
+    @Column(name = "role_state")
+    @Enumerated(value = EnumType.STRING)
+    private RoleState roleState;
 
     @JsonBackReference
     @ManyToOne
