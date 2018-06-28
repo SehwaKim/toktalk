@@ -1,8 +1,9 @@
 package com.chat.toktalk.config;
 
+import com.chat.toktalk.domain.RoleState;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.domain.UserOauthInfo;
-import com.chat.toktalk.domain.UserRole;
+import com.chat.toktalk.domain.Role;
 import com.chat.toktalk.dto.GoogleUser;
 import com.chat.toktalk.repository.UserRepository;
 import com.chat.toktalk.security.LoginUserInfo;
@@ -11,7 +12,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -63,8 +63,8 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         User user = userRepository.getOauthUser(googleUser.getEmail());
         if(user != null){
             List<GrantedAuthority> list = new ArrayList<>();
-            for(UserRole role : user.getRoles()){
-                list.add(new SimpleGrantedAuthority("ROLE_"+role.getRoleName()));
+            for(Role role : user.getRoles()){
+                list.add(new SimpleGrantedAuthority("ROLE_"+role.getRoleState()));
             }
 
             LoginUserInfo loginUserInfo = new LoginUserInfo(user.getEmail(),user.getPassword(), list,user.getId(),user.getNickname());
@@ -98,8 +98,8 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 PasswordEncoder passwordEncoder = getCustomDelegatingPasswordEncoder("bcrypt");
                 newComer.setPassword(passwordEncoder.encode(password));
 
-                UserRole role = new UserRole();
-                role.setRoleName("USER");
+                Role role = new Role();
+                role.setRoleState(RoleState.USER);
                 newComer.addUserRole(role);
                 newComer.setRegdate(LocalDateTime.now());
                 userRepository.save(newComer);
