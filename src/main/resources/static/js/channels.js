@@ -16,7 +16,7 @@ $(document).ready(function () {
 
         if('chat' == data.type) {
             if (data.notification) {
-                notifyUnread(data);
+                notifyUnread(data.channelId);
             } else {
                 $("#typingAlarm").text('');
                 clearTimeout(timer1);
@@ -42,6 +42,9 @@ $(document).ready(function () {
             markAsRead(data.channelId);
         }else if('upload_file' == data.type){
             showMessage(data);
+        }else if('channel_joined' == data.type){
+            addNewChannel(data.channel);
+            notifyUnread(data.channel.id);
         }
     };
 
@@ -105,6 +108,7 @@ function switchChannel(channelId) {
             sock.send(JSON.stringify({'type' : 'switch', 'channelId' : channelId}));
             //active
             $('#'+channelId).addClass('active');
+            $("#btn-invite").attr('disabled', false);
             $("#btn-exit").attr('disabled', false);
             var channelName = $('#'+channelId).find('.name').text();
             var input_box = document.getElementById("chatInput");
@@ -166,31 +170,15 @@ function createChannel() {
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
-            // freshChannelList(data);
+            inviteMember(data.id, $("#invitedId").val()); // 멤버 초대하기 - 지금은 1명만 가능...
             addNewChannel(data);
             $('.pop-layer').hide();
             $('#name').val("");
             $('#purpose').val("");
-            $('#invite').val("");
-            // var lastIdx = data.length-1;
+            $('#invitedId').val("");
             switchChannel(data.id);
         }
     });
-}
-
-function freshChannelList(data) {
-    $("#channelList").empty();
-    for(var key in data){
-        var $div = $('<div></div>').appendTo($("#channelList"));
-        var $a = $('<a></a>')
-                    .attr('href', 'javascript:void(0);')
-                    .attr('id', data[key].id)
-                    .attr('onclick', 'switchChannel(this)')
-                    .attr('style', 'text-align:left;')
-                    .addClass('btn btn-dark btn-block channel').appendTo($div);
-        $('<span></span>').text(data[key].name).appendTo($a);
-        $('<span></span>').attr('style', 'badge badge-pill badge-light unread').appendTo($a);
-    }
 }
 
 function addNewChannel(data) {
@@ -221,13 +209,13 @@ function markAsRead(channelId) {
     $('#'+channelId).find('.unread').text('');
 }
 
-function notifyUnread(data) {
-    var cnt = $('#'+data.channelId).find('.unread').text();
+function notifyUnread(channelId) {
+    var cnt = $('#'+channelId).find('.unread').text();
     if(typeof cnt === "undefined" || cnt == ''){
         console.log(cnt);
         cnt = 0;
     }
-    $('#'+data.channelId).find('.unread').text(++cnt);
+    $('#'+channelId).find('.unread').text(++cnt);
 }
 
 window.onload = function() {
@@ -260,6 +248,30 @@ function exitChannel() {
         .appendTo($('#msgDiv'));
 
     $("#btn-exit").attr('disabled', true);
+    $("#btn-invite").attr('disabled', true);
     current = 0;
     $('#chatInput').attr('placeholder', '');
+}
+
+function inviteMember() {
+    var a = arguments; // 모든 함수는 생성되면서 arguments 라는 내장 매개변수를 얻게된다. 전달된 인자를 값으로 가짐. 자바스크립트는 메소드 오버로딩이 안되서 이렇게 함.
+
+    switch (a.length) {
+        case 0: // 이미 생성된 채널에서 초대
+            if(current == 0){
+                return false;
+            }
+            // 임시로 test3(판다)만 초대하기로 구현해놓음 (다수일경우 for문)
+            // 유저 검색시 얻은 userId, nickname 을 넘겨주기
+            sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : current, 'userId' : 3, 'nickname' : '판다'}));
+            break;
+
+        case 2: // 채널 최초 생성시 초대
+            var channelId = a[0];
+            var visitedId = a[1];
+            if(visitedId != ""){
+                sock.send(JSON.stringify({'type' : 'invite_member', 'channelId' : channelId, 'userId' : visitedId}));
+            }
+            break;
+    }
 }

@@ -1,5 +1,6 @@
 package com.chat.toktalk.dto;
 
+import com.chat.toktalk.domain.Channel;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.UploadFile;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class SocketMessage implements Serializable {
     private List<Message> messages;
     private List<UnreadMessageInfo> unreadMessages;
     private UploadFile uploadFile;
+    private Channel channel;
 
     public SocketMessage() {
     }
@@ -71,5 +73,11 @@ public class SocketMessage implements Serializable {
         this.nickname = nickname;
         this.uploadFile = uploadFile;
         this.notification = false;
+    }
+
+    public SocketMessage(Long userId, Channel channel){
+        this.type = "channel_joined";
+        this.channel = channel;
+        this.userId = userId;
     }
 }

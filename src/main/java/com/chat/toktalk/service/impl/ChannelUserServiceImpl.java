@@ -29,6 +29,7 @@ public class ChannelUserServiceImpl implements ChannelUserService {
     public void addChannelUser(ChannelUser channelUser, Long userId, Long channelId) {
         channelUser.setUser(userRepository.getOne(userId));
         channelUser.setChannel(channelRepository.getOne(channelId));
+        channelUser.setFirstReadId(1L);
         channelUserRepository.save(channelUser);
     }
 

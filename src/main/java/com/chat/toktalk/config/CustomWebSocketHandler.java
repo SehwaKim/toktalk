@@ -1,12 +1,12 @@
 package com.chat.toktalk.config;
 
 import com.chat.toktalk.amqp.MessageSender;
+import com.chat.toktalk.domain.Channel;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.dto.UnreadMessageInfo;
-import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.*;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -14,10 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.ArrayList;
@@ -130,7 +130,21 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             handleChatMessage(session, map);
         }else if("exit_channel".equals(type)){
             exitChannel(session, map);
+        }else if("invite_member".equals(type)){
+            inviteMember(map);
         }
+    }
+
+    private void inviteMember(HashMap<String, Object> map) {
+        Long channelId = Long.parseLong(map.get("channelId").toString());
+        Channel channel = channelService.getChannel(channelId);
+        Long invitedUserId = Long.parseLong(map.get("userId").toString());
+        if(map.get("nickname") != null){
+            addNewChannelUser(map.get("nickname").toString(), invitedUserId, channelId);
+        }else {
+            addNewChannelUser(null, invitedUserId, channelId);
+        }
+        messageSender.sendMessage(new SocketMessage(invitedUserId, channel));
     }
 
     private void exitChannel(WebSocketSession session, HashMap<String, Object> map) {
@@ -196,11 +210,16 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // 새롭게 채널에 합류한 유저
         }else{
-            logger.info("new channel user: "+username);
-            ChannelUser channelUser = new ChannelUser();
-            channelUserService.addChannelUser(channelUser, userId, channelId);
+            addNewChannelUser(nickname, userId, channelId);
+        }
+    }
 
-            // 입장메세지
+    private void addNewChannelUser(String nickname, Long userId, Long channelId) {
+        ChannelUser channelUser = new ChannelUser();
+        channelUserService.addChannelUser(channelUser, userId, channelId);
+
+        // 입장메세지 (채널 최초 생성 시 초대된 멤버는 입장메세지 X)
+        if(nickname != null){
             String systemMsg = "[알림] \"" + nickname + "\" 님이 입장하셨습니다.";
             Message messageNew = new Message();
             messageNew.setType("system");

@@ -42,6 +42,11 @@ public class UserServiceImpl implements UserService {
 
         //TODO
         //회원상태 설정 필요
+  }
+
+    @Override
+    public User getUserById(Long invitedUserId) {
+        return userRepository.getOne(invitedUserId);
 
     }
 }
