@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+
+</head>
+<body>
+<div>
+    <h3>Hello , </h3>
+    <p>
+
+    <form method="post" th:action="@{/users/join}" th:object="${user}" action="#">
+        <div>
+            <label for="nickname">nickname</label>
+            <input type="text" id="nickname" name="nickname" size="20" th:field="*{nickname}">
+            <small th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"/>
+        </div>
+        <div>
+            <label for="email">email</label>
+            <input type="email" id="email" name="email" size="20" th:field="*{email}">
+            <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"/>
+        </div>
+        <div>
+            <label for="password">password</label>
+            <input type="password" id="password" name="password" size="20" th:field="*{password}">
+            <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"/>
+        </div>
+        <button type="submit">Sign-Up</button>
+    </form>
+    </p>
+</div>
+</body>
+</html>
