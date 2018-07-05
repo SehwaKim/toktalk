@@ -3,6 +3,7 @@ package com.chat.toktalk.service.impl;
 import com.chat.toktalk.domain.Role;
 import com.chat.toktalk.domain.RoleState;
 import com.chat.toktalk.domain.User;
+import com.chat.toktalk.domain.UserStatus;
 import com.chat.toktalk.repository.UserRepository;
 import com.chat.toktalk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,17 @@ public class UserServiceImpl implements UserService {
         Role role = new Role();
         role.setRoleState(RoleState.USER);
         user.addUserRole(role);
+        user.setUserStatus(UserStatus.NORMAL);
         userRepository.save(user);
 
-        //TODO
-        //회원상태 설정 필요
-  }
+    }
+
+    @Override
+    public void deleteUser(String email) {
+        User user = userRepository.findUserByEmail(email);
+        user.setUserStatus(UserStatus.DELETE);
+
+    }
 
     @Override
     public User getUserById(Long invitedUserId) {

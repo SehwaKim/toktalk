@@ -1,8 +1,10 @@
 package com.chat.toktalk.controller;
 
 import com.chat.toktalk.domain.User;
+import com.chat.toktalk.dto.PasswordForm;
 import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.UserService;
+import com.chat.toktalk.validator.PasswordValidator;
 import com.chat.toktalk.validator.UserValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+
 @Log4j2
 @Controller
 @RequestMapping("/users")
@@ -20,6 +24,14 @@ public class UserController {
 
     @Autowired
     UserValidator userValidator;
+
+    @Autowired
+    PasswordValidator passwordValidator;
+
+    @GetMapping("/")
+    public String userAccount(){
+        return "my-account";
+    }
 
     @GetMapping(path = "/login")
     public String login() { return "users/login"; }
@@ -66,12 +78,20 @@ public class UserController {
 
         return null;
     }
+    @GetMapping("/delete")
+    public String deleteUserAccountForm(PasswordForm passwordForm, Model model){
+        model.addAttribute("user",passwordForm);
+        return "users/delete_form";
+    }
 
-    public String cancleUserAccount(){
-        //회원탈퇴기능
-            //회원가입상태,탈퇴상태구분
-            //실제 탈퇴시키는 것이 아님.
-            //탈퇴날짜추가.
-        return null;
+    @PostMapping("/delete")
+    public String cancleUserAccount(LoginUserInfo loginUserInfo, @ModelAttribute(name = "user") PasswordForm passwordForm, BindingResult bindingResult) {
+        passwordForm.setEmail(loginUserInfo.getEmail());
+        passwordValidator.validate(passwordForm, bindingResult);
+        if (bindingResult.hasErrors()) {
+            return "users/delete_form";
+        }
+        userService.deleteUser(loginUserInfo.getEmail());
+        return "redirect:/users/login";
     }
 }

@@ -3,7 +3,6 @@ package com.chat.toktalk.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -33,8 +32,16 @@ public class User implements Serializable {
     private String nickname;
     // private UploadFile uploadFile; TODO 1:1 인데 어떻게 하지
     private LocalDateTime regdate;
+
     @Column(name = "last_seen_at")
     private LocalDateTime lastSeenAt;
+
+    @Column(name = "delete_date")
+    private LocalDateTime deleteDate;
+
+    @Column(name = "user_status")
+    @Enumerated(value = EnumType.STRING)
+    private UserStatus userStatus; //탈퇴 or 활성
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
