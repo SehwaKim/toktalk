@@ -21,7 +21,6 @@ public class UserValidator implements Validator {
     public boolean supports(Class<?> aClass) {
         return User.class.equals(aClass);
     }
-
     @Override
     public void validate(Object object, Errors errors) {
         User user = (User)object;
