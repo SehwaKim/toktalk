@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" 기xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>회원가입</title>
@@ -10,7 +10,7 @@
     <h3>Hello , </h3>
     <p>
 
-    <form method="post" th:action="@{/users/join}" th:object="${user}" action="#">
+    <form method="post" th:action="@{/identity/register}" th:object="${user}" action="#">
         <div>
             <label for="nickname">nickname</label>
             <input type="text" id="nickname" name="nickname" size="20" th:field="*{nickname}">
