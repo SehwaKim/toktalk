@@ -9,6 +9,9 @@
 <body>
 <div>
     <h3>로그인</h3>
+    <div th:if="${param.resetSuccess}">
+        <span>비밀번호 변경이 완료 되었습니다. 다시 로그인 해주세요.</span>
+    </div>
     <form method="post" th:action="@{/users/login}" action="#">
         <label for="email">email</label>
         <input type="text" id="email" name="email" size="20">
