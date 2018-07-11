@@ -28,11 +28,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addUser(User user) {
-        userRepository.save(user);
-    }
-
-    @Override
     public void registerUser(User user) {
         //role설정
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -45,7 +40,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void updateUserData(User user){
+
+
+    }
+
+    @Override
     public void deleteUser(String email) {
+        //TODO
+        //데이터 유지 필요 없다고 판단되면 데이터 삭제로 변경.
+        //데이터는 일정기간 유지시키는게 맞다고 필요하다면
+        //차라리 백업으로 구현해버리는게 어떨까..
+        //백업된 데이터는 3개월정도 보관 ---> 배치프로그램이 일괄삭제시킴.
+        //TODO
+        //삭제되어야 될 데이터 (Oauth2 인증정보, 친구 목록, 상대방 쪽 친구목록 , 채팅방 세션 DB)
         User user = userRepository.findUserByEmail(email);
         user.setUserStatus(UserStatus.DELETE);
 
