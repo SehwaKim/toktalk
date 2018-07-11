@@ -1,20 +1,18 @@
 package com.chat.toktalk.service.smtp;
 
-import com.chat.toktalk.security.LoginUserInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
 
+
+@Log4j2
 @Service
 public class SendMailServiceImpl implements SendMailService {
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     JavaMailSender javaMailSender;
     @Override
@@ -24,7 +22,18 @@ public class SendMailServiceImpl implements SendMailService {
         message.setText(content,"UTF-8","HTML");
         message.setFrom("noriming2@gmail.com");//보내는사람
         message.setRecipients(Message.RecipientType.TO,email);//받는사람
-        logger.info("받는사람 : " + email);
+        log.info("받는사람 : " + email);
         javaMailSender.send(message);
+    }
+
+    @Override
+    public void sendPasswordResetURLToUserEmail(String content,String email,String subject) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        message.setSubject(subject);
+        message.setText(content,"UTF-8","HTML");
+        message.setFrom("noriming2@gamil.com");
+        message.setRecipients(Message.RecipientType.TO,email);//받는 사람
+        javaMailSender.send(message);
+
     }
 }
