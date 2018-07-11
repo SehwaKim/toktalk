@@ -46,52 +46,34 @@ public class UserController {
             returnValue = "not_empty";
         }
         return returnValue;
+
+        //TODO
+        //Oauth2 컨트롤러로 이동
     }
 
-    @GetMapping("/join")
-    public String signUpForm(User user, Model model){
-        model.addAttribute("user",user);
-        return "users/join";
-    }
-
-    @PostMapping("/join")
-    public String signUp(User user, BindingResult bindingResult){
-        userValidator.validate(user,bindingResult);
-        if(bindingResult.hasErrors()){
-            return "users/join";
-        }
-        userService.registerUser(user);
-        return "redirect:/";
-    }
-
-    public String findPassword(){
-
-        //uuid로 임시비밀번호 만들기
-        //임시비밀번호를 DB에 저장 시키기
-        //이메일로 비밀번호 보내기.
-
-        return null;
-    }
 
     public String disConnectSocial(){
 
+        //TODO
+        //Oauth2 컨트롤러로 이동
 
         return null;
     }
+
     @GetMapping("/delete")
     public String deleteUserAccountForm(PasswordForm passwordForm, Model model){
-        model.addAttribute("user",passwordForm);
+       // model.addAttribute("user",passwordForm);
         return "users/delete_form";
     }
 
     @PostMapping("/delete")
-    public String cancleUserAccount(LoginUserInfo loginUserInfo, @ModelAttribute(name = "user") PasswordForm passwordForm, BindingResult bindingResult) {
-        passwordForm.setEmail(loginUserInfo.getEmail());
-        passwordValidator.validate(passwordForm, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return "users/delete_form";
-        }
-        userService.deleteUser(loginUserInfo.getEmail());
+    public String deleteUserAccount(LoginUserInfo loginUserInfo, @ModelAttribute(name = "user") PasswordForm passwordForm, BindingResult bindingResult) {
+//        passwordForm.setEmail(loginUserInfo.getEmail());
+//        passwordValidator.validate(passwordForm, bindingResult);
+//        if (bindingResult.hasErrors()) {
+//            return "users/delete_form";
+//        }
+//        userService.deleteUser(loginUserInfo.getEmail());
         return "redirect:/users/login";
     }
 }
