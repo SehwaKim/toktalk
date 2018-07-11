@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+<h3>탈퇴할꺼야 ? 비번 입력해 </h3>
+<p>
+
+<form method="post" th:action="@{/users/delete}" th:object="${user}" action="#">
+        <label for="password">password</label>
+        <input type="password" id="password" name="password" size="20" th:field="*{password}">
+        <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"/>
+    </div>
+    <button type="submit">Sign-Up</button>
+</form>
+</p>
+</body>
