@@ -1,5 +1,5 @@
 insert into user (id, email, password, nickname, regdate ,user_status) VALUES (1, 'test', '{bcrypt}$2a$10$qS48/8nM2fSagy1di.whF.tutE/VZ9/wwOkGBcm.Ty8mOKLfwpv/G', '아이스베어', now(),'NORMAL');
-insert into user (id, email, password, nickname, regdate ,user_status) VALUES (2, 'test2', '{bcrypt}$2a$10$qS48/8nM2fSagy1di.whF.tutE/VZ9/wwOkGBcm.Ty8mOKLfwpv/G', '갈색곰', now(),'NORMAL');
+insert into user (id, email, password, nickname, regdate ,user_status) VALUES (2, 'piakatie@naver.com', '{bcrypt}$2a$10$qS48/8nM2fSagy1di.whF.tutE/VZ9/wwOkGBcm.Ty8mOKLfwpv/G', '갈색곰', now(),'NORMAL');
 insert into user (id, email, password, nickname, regdate ,user_status) VALUES (3, 'test3', '{bcrypt}$2a$10$qS48/8nM2fSagy1di.whF.tutE/VZ9/wwOkGBcm.Ty8mOKLfwpv/G', '판다', now(),'NORMAL');
 insert into user (id, email, password, nickname, regdate ,delete_date ,user_status) VALUES (4, 'bee@naver.com', '{bcrypt}$2a$10$qS48/8nM2fSagy1di.whF.tutE/VZ9/wwOkGBcm.Ty8mOKLfwpv/G', '땡벌', now(),now(),'DELETE');
 

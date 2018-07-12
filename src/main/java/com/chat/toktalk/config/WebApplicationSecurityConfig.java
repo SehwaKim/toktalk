@@ -51,6 +51,7 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/users/login")
                 .and().authorizeRequests()
+                .antMatchers("/identity/**").permitAll()
                 .antMatchers("/users/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/api/**").permitAll()
