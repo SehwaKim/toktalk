@@ -46,8 +46,10 @@ public class FindPasswordController {
     public EmailForm emailForm(){
         return new EmailForm();
     }
+
     @ModelAttribute("resetForm")
     public PasswordForm passwordForm(){return new PasswordForm();}
+
     @GetMapping("/forgot")
     public String displayForgotPasswordPage(){
         return "users/forgot-password";
@@ -96,7 +98,7 @@ public class FindPasswordController {
     }
 
     @PostMapping("/reset")
-    public String handlePasswordReset(@ModelAttribute(name = "resetForm") PasswordForm form,BindingResult bindingResult,RedirectAttributes redirectAttributes){
+    public String processPasswordReset(@ModelAttribute(name = "resetForm") PasswordForm form,BindingResult bindingResult,RedirectAttributes redirectAttributes){
 
 
         passwordValidator.validate(form,bindingResult);

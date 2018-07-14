@@ -14,9 +14,6 @@ import org.springframework.validation.Validator;
 public class PasswordValidator implements Validator {
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Override

@@ -3,6 +3,7 @@ package com.chat.toktalk.controller;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.dto.PasswordForm;
 import com.chat.toktalk.security.LoginUserInfo;
+import com.chat.toktalk.service.PasswordService;
 import com.chat.toktalk.service.UserService;
 import com.chat.toktalk.validator.PasswordValidator;
 import com.chat.toktalk.validator.UserValidator;
@@ -27,6 +28,14 @@ public class UserController {
 
     @Autowired
     PasswordValidator passwordValidator;
+
+    @Autowired
+    PasswordService passwordService;
+
+    @ModelAttribute("form")
+    public PasswordForm passwordForm(){
+        return new PasswordForm();
+    }
 
     @GetMapping("/")
     public String userAccount(){
@@ -59,10 +68,25 @@ public class UserController {
 
         return null;
     }
+    @GetMapping("/password/change")
+    public String displaychangePasswordPage(){
+        return "users/change_password";
+    }
+
+    @PostMapping("/password/change")
+    public String processchangePassword(LoginUserInfo loginUserInfo,PasswordForm form, BindingResult bindingResult){
+        passwordValidator.validate(form,bindingResult);
+        if(bindingResult.hasErrors()){
+            return "users/change_password";
+        }
+        passwordService.savePassword(loginUserInfo,form.getPassword());
+
+        return "redirect:/users/password/change?success";
+    }
 
     @GetMapping("/delete")
     public String deleteUserAccountForm(PasswordForm passwordForm, Model model){
-       // model.addAttribute("user",passwordForm);
+        model.addAttribute("user",passwordForm);
         return "users/delete_form";
     }
 
