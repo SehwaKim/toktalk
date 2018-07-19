@@ -5,6 +5,7 @@ var timer1;
 var timer2;
 
 $(document).ready(function () {
+
     sock = new SockJS('/sock');
 
     sock.onopen = function () {
@@ -17,10 +18,12 @@ $(document).ready(function () {
         if('chat' == data.type) {
             if (data.notification) {
                 notifyUnread(data.channelId);
+
             } else {
                 $("#typingAlarm").text('');
                 clearTimeout(timer1);
                 showMessage(data);
+
             }
         }else if('messageList' == data.type){
             if(data.messages != null){
@@ -67,6 +70,22 @@ $(document).ready(function () {
         typingAlarm();
     });
 });
+
+function notificationf() {
+    if (!Notification) {
+        alert('Desctop not supported');
+        return;
+    }
+    if (Notification.permission !== "granted")
+        Notification.requestPermission();
+    else {
+        var notification = new Notification('title', {
+            icon: 'icon.png',
+            body: 'message11'
+        });
+
+    }
+}
 
 function typingAlarm() {
     // if($("#chatInput").val().length > 0){
