@@ -3,8 +3,10 @@ var current = 0;
 var in5Sec = false;
 var timer1;
 var timer2;
+var notifchannel
 
 $(document).ready(function () {
+
     sock = new SockJS('/sock');
 
     sock.onopen = function () {
@@ -17,10 +19,12 @@ $(document).ready(function () {
         if('chat' == data.type) {
             if (data.notification) {
                 notifyUnread(data.channelId);
+                notificationf(data.channelId);
             } else {
                 $("#typingAlarm").text('');
                 clearTimeout(timer1);
                 showMessage(data);
+
             }
         }else if('messageList' == data.type){
             if(data.messages != null){
@@ -44,7 +48,7 @@ $(document).ready(function () {
             showMessage(data);
         }else if('channel_joined' == data.type){
             addNewChannel(data.channel);
-            notifyUnread(data.channel.id);
+            notifyUnread(data);
         }
     };
 
@@ -67,6 +71,24 @@ $(document).ready(function () {
         typingAlarm();
     });
 });
+
+function notificationf(channelId) {
+    var channelName = $('#'+channelId).find('.name').text();
+    var cnt = $('#'+channelId).find('.unread').text();
+    if (!Notification) {
+        alert('Desctop not supported');
+        return;
+    }
+    if (Notification.permission !== "granted")
+        Notification.requestPermission();
+    else {
+        var notification = new Notification(channelName+" 방으로부터", {
+            icon: 'icon.png',
+            body: cnt+'개의 새로운 메시지가 있습니다.'
+        });
+
+    }
+}
 
 function typingAlarm() {
     // if($("#chatInput").val().length > 0){
@@ -230,6 +252,7 @@ window.onload = function() {
         }
     });
 }
+
 function exitChannel() {
     if(current == 0){
         return false;
