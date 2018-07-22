@@ -124,15 +124,20 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         if("pong".equals(type)) {
             return;
-        }else if("typing".equals(type)){
+        }
+        if ("typing".equals(type)) {
             alertTyping(session);
-        }else if("switch".equals(type)){
+        }
+        if ("switch".equals(type)) {
             switchChannel(session, map);
-        }else if("chat".equals(type)){
+        }
+        if ("chat".equals(type)) {
             handleChatMessage(session, map);
-        }else if("exit_channel".equals(type)){
+        }
+        if ("exit_channel".equals(type)) {
             exitChannel(session, map);
-        }else if("invite_member".equals(type)){
+        }
+        if ("invite_member".equals(type)) {
             inviteMember(map);
         }
     }

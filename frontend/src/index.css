@@ -100,14 +100,6 @@ body {
     border: 2px solid darkgray;
 }
 
-.inputbox {
-    margin: 3px;
-    padding: 7px 5px 7px 5px;
-    font-size: 15px;
-    width: 80%;
-    border: 0px;
-}
-
 input:focus {
     outline: none;
 }

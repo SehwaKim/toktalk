@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Link} from 'react-router-dom';
 import Sidebar from './Sidebar';
-import WebSocket from "./SockJS";
+import ChatArea from './ChatArea';
+import MessageArea from './MessageArea';
+import WebSocket from "./WebSocket";
 
 class Header extends React.Component {
     render() {
@@ -90,53 +92,6 @@ class Divider extends React.Component {
     }
 }
 
-class ChatArea extends React.Component {
-    render() {
-        return (
-            <div className="chat-area">
-                <ChatContent {...this.props}/>
-                <ChatContent {...this.props}/>
-                <ChatContent {...this.props}/>
-                <ChatContent {...this.props}/>
-                <ChatContent {...this.props}/>
-                <ChatContent {...this.props}/>
-                <ChatContent {...this.props}/>
-            </div>
-        );
-    }
-}
-
-class ChatContent extends React.Component {
-    render() {
-        return (
-            <div className="chat-content">
-                <span className="time">{this.props.time}</span>
-                <span className="content">{this.props.content}</span>
-            </div>
-        );
-    }
-}
-
-class MessageArea extends React.Component {
-    render() {
-        return (
-            <div className="message-area">
-                <MessageBox/>
-            </div>
-        );
-    }
-}
-
-class MessageBox extends React.Component {
-    render() {
-        return (
-            <div className="message-box">
-                <input type="text" className="inputbox"/>
-            </div>
-        );
-    }
-}
-
 class Footer extends React.Component {
     render() {
         return (
@@ -148,16 +103,53 @@ class Footer extends React.Component {
 }
 
 class Root extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            chatAreas: [],
+            chatAreaRefs: []
+        };
+        this.addItem = this.addItem.bind(this);
+        this.sendMessage = this.sendMessage.bind(this);
+        this.printMessage = this.printMessage.bind(this);
+    }
+
+    addItem(cId) {
+        let reference;
+        this.setState((prevState) => {
+            return {
+                chatAreas: prevState.chatAreas.concat(<ChatArea key={Date.now() + cId} cId={cId}
+                                                                ref={chatArea => reference = chatArea}/>)
+            }
+        });
+        this.setState((prevState) => {
+            return {
+                chatAreaRefs: prevState.chatAreaRefs.concat(reference)
+            }
+        });
+    }
+
+    sendMessage(cId, text) {
+        this.sock.sendChatMsg(cId, text);
+    }
+
+    printMessage(message) {
+        for (let ref of this.state.chatAreaRefs) {
+            if (ref.props.cId == message.channelId) {
+                ref.addItem(message);
+            }
+        }
+    }
     render() {
         return (
             <div>
-                <Sidebar {...this.props}/>
+                <Sidebar addChatArea={this.addItem}/>
                 <Header name="general"/>
                 <Divider/>
-                <ChatArea {...this.props}/>
-                <MessageArea/>
+                {this.state.chatAreas}
+                <MessageArea sendMessage={this.sendMessage}/>
                 <Footer/>
-                <WebSocket/>
+                <WebSocket ref={sock => this.sock = sock} printMessage={this.printMessage}/>
             </div>
         );
     }
@@ -167,7 +159,7 @@ class App extends Component {
     render() {
         return (
             <Router>
-                <Root content="안녕하세요" time="10:10 PM"/>
+                <Root/>
             </Router>
         );
     }

@@ -169,7 +169,6 @@ class ChannelList extends React.Component {
         };
         this.addItem = this.addItem.bind(this);
     }
-
     addItem(e) {
         /*if (this._inputElement.value !== "") {
             var newItem = {
@@ -188,7 +187,6 @@ class ChannelList extends React.Component {
 
         e.preventDefault();
     }
-
     componentDidMount() {
         $.ajax({
             url: '/api/channels',
@@ -196,13 +194,13 @@ class ChannelList extends React.Component {
         }).done(json => {
             var channels = [];
             for (let channel of json) {
-                channels.push(<ChannelItem key={Date.now()} name={channel.name}/>);
+                channels.push(<ChannelItem key={Date.now() + channel.id} name={channel.name} id={channel.id}/>);
+                this.props.addChatArea(channel.id);
             }
             ;
             this.setState({items: channels});
         });
     }
-
     render() {
         return (
             <div className="list channels">
@@ -213,6 +211,9 @@ class ChannelList extends React.Component {
 }
 
 class ChannelItem extends React.Component {
+    constructor(props) {
+        super(props);
+    }
     render() {
         return (
             <a href="#">{this.props.name}</a>
@@ -316,7 +317,7 @@ class Sidebar extends React.Component {
                 <Profile path="woman.png"/>
                 <QuickSwitcher/>
                 <GroupTag/>
-                <ChannelList/>
+                <ChannelList {...this.props}/>
                 <DmTag/>
                 <DmList {...this.props}/>
             </div>

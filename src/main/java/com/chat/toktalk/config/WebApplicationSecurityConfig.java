@@ -50,7 +50,7 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/identity/**").permitAll()
                 .antMatchers("/users/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/api/**").permitAll()
+//                .antMatchers("/api/**").permitAll()
                 .anyRequest().hasAnyRole("ADMIN", "USER")
                 .and().headers().frameOptions().disable()
                 .and().formLogin()

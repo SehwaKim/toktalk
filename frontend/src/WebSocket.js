@@ -5,18 +5,26 @@ class WebSocket extends React.Component {
     constructor() {
         super();
         this.state = {
-            messages: []
+            currentId: 1
         };
+        this.sendChatMsg = this.sendChatMsg.bind(this);
     }
-
     componentDidMount() {
         this.connection = new SockJS('http://localhost:9090/sock');
-        this.connection.onheartbeat = () => this.connection.send(JSON.stringify({'type': 'pong'}));
+        this.connection.onheartbeat = e => {
+            this.connection.send(JSON.stringify({'type': 'pong'}));
+            e.preventDefault();
+        };
         this.connection.onmessage = e => {
-            const type = e.data.type;
-
+            var data;
+            try {
+                data = JSON.parse(e.data);
+            } catch (ex) {
+                data = e.data;
+            }
+            const type = data.type;
             if ('chat' == type) {
-
+                this.props.printMessage(data);
             }
 
             if ('messageList' == type) {
@@ -48,12 +56,17 @@ class WebSocket extends React.Component {
             }
 
             this.setState({
-                messages: this.state.messages.concat([e.data])
+                // messages: this.state.messages.concat([e.data])
             });
-            console.log(this.state.messages);
+            e.preventDefault();
         }
     }
 
+    sendChatMsg(cId, text) {
+        if (!(text == "")) {
+            this.connection.send(JSON.stringify({'type': 'chat', 'channelId': cId, 'text': text}));
+        }
+    }
     render() {
         return (null);
     }
