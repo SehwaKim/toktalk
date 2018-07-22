@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface ChannelService {
-    public Set<Channel> getChannelsByUser(Long userId);
+    public List<Channel> getChannelsByUser(Long userId);
 
     public Channel getChannel(Long channelId);
 

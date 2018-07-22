@@ -58,6 +58,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
+
+        session.sendMessage(new TextMessage("hi"));
         
         logger.info("새로운 웹소켓 세션 id : " + session.getId());
         Long userId = (Long) attributes.get("userId");

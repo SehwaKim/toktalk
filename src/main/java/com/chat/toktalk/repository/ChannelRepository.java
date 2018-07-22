@@ -9,5 +9,5 @@ import java.util.Set;
 
 public interface ChannelRepository extends JpaRepository<Channel, Long> {
     @Query("select c from Channel c where c.type = 'public'")
-    Set<Channel> findAllPublicChannels();
+    List<Channel> findAllPublicChannels();
 }

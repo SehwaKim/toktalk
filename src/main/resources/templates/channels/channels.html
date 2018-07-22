@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Channels</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.0/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" href="/css/popup.css"/>
-    <link rel="stylesheet" href="/css/file.css"/>
-    <link rel="stylesheet" href="/css/channels.css"/>
-    <script th:src="@{/webjars/sockjs-client/1.0.2/sockjs.js}"></script>
-    <script th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>
-    <script th:src="@{/webjars/bootstrap/4.1.0/js/bootstrap.min.js}"></script>
-    <script src="/js/channels.js"></script>
-    <script src="/js/popup.js"></script>
-    <script src="/js/file.js"></script>
+    <link href="/public/static/css/main.fcb3c79f.css" rel="stylesheet"/>
+    <!--<link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.0/css/bootstrap.min.css}"/>-->
+    <!--<script th:src="@{/webjars/sockjs-client/1.0.2/sockjs.js}"></script>-->
+    <!--<script th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>-->
+    <!--<script th:src="@{/webjars/bootstrap/4.1.0/js/bootstrap.min.js}"></script>-->
+    <!--<script src="/js/channels.js"></script>-->
+    <!--<script src="/js/popup.js"></script>-->
+    <!--<script src="/js/file.js"></script>-->
     <script src="/js/notification.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -21,100 +19,7 @@
 </script>
 </head>
 <body>
-<div>
-
-    <nav>
-        <div style="margin-left: 15px; margin-top: 15px">
-            <button type="button" class="btn btn-warning menu" id="btn-create"><b>새 채널</b></button>
-            <button type="button" class="btn btn-dark menu" onclick="location.href='/logout'">로그아웃</button>
-            <button type="button" id = "google" class="btn btn-dark menu" onclick="location.href='/login/google'">Google 연동</button>
-        </div>
-    </nav>
-    <!-- popup start -->
-    <div id="createChannel" class="pop-layer">
-            <div class="text-center mb-4">
-                <!--content //-->
-                <div style="padding-top: 50px; padding-bottom: 50px; padding-right: 100px">
-                    <!--<button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close">-->
-                        <!--<span aria-hidden="true"><h1>&times;</h1></span>-->
-                    <!--</button>-->
-                </div>
-                <div style="width: 70%; display: inline-block;">
-                    <h2 class="h2 mb-3 font-weight-normal">새로운 채널 시작</h2>
-                </div>
-                <hr>
-                <div style="width: 40%; display: inline-block;">
-                    <form id="creatForm">
-                        <div class="form-label-group" style="padding-bottom: 20px">
-                            <label for="name" style="float: left"><b>채널 이름</b></label>
-                            <input type="text" id="name" name="name" class="form-control form-control-lg" required autofocus>
-                        </div>
-                        <div class="form-label-group" style="padding-bottom: 20px">
-                            <label for="purpose" style="float: left"><b>목적</b> (선택)</label>
-                            <input type="text" id="purpose" name="purpose" class="form-control form-control-lg">
-                        </div>
-                        <div class="form-label-group" style="padding-bottom: 20px">
-                            <label for="invitedId" style="float: left"><b>초대하기</b> (선택)</label>
-                            <input type="text" id="invitedId" name="invitedId" class="form-control form-control-lg">
-                        </div>
-                        <div style="padding-top: 20px">
-                            <button type="button" class="btn btn-success btn-lg btn-start" onclick="createChannel()" disabled>시작하기</button>
-                            <button type="button" class="btn btn-light btn-lg btn-close">취소</button>
-                        </div>
-                    </form>
-                </div>
-                <!--// content-->
-            </div>
-    </div>
-    <!-- popup end -->
-    <hr>
-    <div class="container-fluid">
-        <div class="row justify-content-md-center">
-            <div class="col">
-                <div class="row">
-                    <div class="col-2" id="channelList">
-                        <div style="padding-top: 40px">
-                            <div th:if="${not #lists.isEmpty(list)}" th:each="channel : ${list}">
-                                <a href="javascript:void(0);" class="btn btn-dark btn-block channel" th:attrappend="id=${channel.getId()}" onclick="switchChannel(this.id)" style="text-align:left;">
-                                    <span class="name" th:text="${channel.name}"></span><span style="float: right" class="badge badge-pill badge-light unread"></span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div>
-                            <div style="width: 100%;">
-                                <div style="padding-bottom: 10px; text-align: right">
-                                    <div style="display: inline-block">
-                                        <button type="button" class="btn btn-dark btn-sm menu" id="btn-invite" onclick="inviteMember();setTimeout(notificationf,10)" disabled><small>초대하기</small></button>
-                                        <button type="button" class="btn btn-dark btn-sm menu" id="btn-exit" onclick="exitChannel()" disabled><small>이 채널 나가기</small></button>
-                                    </div>
-                                </div>
-                                <div id="msgDiv">
-                                    <textarea rows="23" id="msgArea" readonly></textarea>
-                                    <!--<div id="fileUpload" class="dragAndDropDiv">Drag & Drop Files Here</div>-->
-                                </div>
-                                <div class="footer">
-                                    <div>
-                                        <div style="padding-top:5px;; color: #e3e3e3">
-                                            <small><i><b><span id="typingAlarm"></span></b></i></small>
-                                        </div>
-                                        <div class="input-group mb-3">
-                                            <input type="text" id="chatInput" />
-                                            <div class="input-group-append">
-                                                <button class="btn btn-dark" type="button" onclick="sendMsg(current)">전송</button>
-                                            </div>
-                                        </div>
-                                        <!--&lt;!&ndash;<button type="button" class="btn btn-dark btn-sm" onclick="downFile(current)">다운로드</button>&ndash;&gt;-->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="root"></div>
+<script type="text/javascript" src="/public/static/js/main.ed6e4807.js"></script>
 </body>
 </html>

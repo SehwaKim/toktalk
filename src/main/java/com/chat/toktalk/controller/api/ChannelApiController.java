@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +31,15 @@ public class ChannelApiController {
     @Autowired
     RedisService redisService;
 
-    /* 새 채널 생성 */
+    @GetMapping
+    public ResponseEntity<List<Channel>> channels(LoginUserInfo loginUserInfo) {
+        if (loginUserInfo != null) {
+            List<Channel> channels = channelService.getChannelsByUser(loginUserInfo.getId());
+            return new ResponseEntity<>(channels, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PostMapping
     public ResponseEntity<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
         if(loginUserInfo != null){

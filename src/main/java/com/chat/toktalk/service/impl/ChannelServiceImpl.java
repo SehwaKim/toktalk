@@ -8,8 +8,10 @@ import com.chat.toktalk.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @Service
 public class ChannelServiceImpl implements ChannelService {
@@ -20,34 +22,28 @@ public class ChannelServiceImpl implements ChannelService {
     ChannelUserRepository channelUserRepository;
 
     @Override
-    public Set<Channel> getChannelsByUser(Long userId) {
+    public List<Channel> getChannelsByUser(Long userId) {
         List<ChannelUser> channelUsers = channelUserRepository.findAllByUserId(userId);
-        Set<Channel> channels = channelRepository.findAllPublicChannels();
-        for(ChannelUser channelUser : channelUsers){
-            channels.add(channelUser.getChannel());
-        }
-
-//        return new ArrayList<>(channels);
+        List<Channel> channels = new ArrayList<>(channelUsers.size());
+        channelUsers.stream().forEach(channelUser -> channels.add(channelUser.getChannel()));
         return channels;
     }
 
     @Override
     public Channel getChannel(Long channelId) {
-//        return channelRepository.getOne(channelId); // TODO 왜 안되는가?
         return channelRepository.findById(channelId).get();
     }
 
     @Override
     public Channel addChannel(Channel channel) {
-        Channel saved = channelRepository.save(channel);
+        Channel newChannel = channelRepository.save(channel);
 
-        List<ChannelUser> channelUsers = channelUserRepository.findAllByChannelId(saved.getId());
-        for(ChannelUser channelUser : channelUsers){
+        List<ChannelUser> usersOfNewChannel = channelUserRepository.findAllByChannelId(newChannel.getId());
+        usersOfNewChannel.stream().forEach(channelUser -> {
             channelUser.setFirstReadId(1L);
             channelUserRepository.saveAndFlush(channelUser);
-        }
+        });
 
-        return saved;
+        return newChannel;
     }
-
 }
