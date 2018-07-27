@@ -1,7 +1,13 @@
 import React from 'react';
 import {Route, HashRouter} from "react-router-dom";
+
+import Profile from './sidebar/Profile';
+import GroupTag from './sidebar/GroupTag';
+import ChannelList from './sidebar/ChannelList';
+import DmTag from './sidebar/DmTag';
+import DmList from './sidebar/DmList';
+import QuickSwitcher from './sidebar/QuickSwitcher';
 import Header from './header/Header';
-import Sidebar from './sidebar/Sidebar';
 import ChatArea from './chat/ChatArea';
 import InputArea from './input/InputArea';
 import Footer from './footer/Footer';
@@ -34,6 +40,7 @@ class App extends React.Component {
         this.sendMessage = this.sendMessage.bind(this);
         this.printMessage = this.printMessage.bind(this);
         this.switchChannel = this.switchChannel.bind(this);
+        this.markAsUnread = this.markAsUnread.bind(this);
     }
 
     addItem(cId) {
@@ -57,23 +64,37 @@ class App extends React.Component {
             };
         });
         this.input.box.switchChannel(cId);
+        this.sock.switchChannel(cId);
     }
 
     printMessage(message) {
         this.chatAreas.get(message.channelId).addItem(message);
     }
 
+    markAsUnread(cId) {
+        this.channels.itemRefs.get(cId).increaseUnread();
+    }
+
     render() {
         return (
             <HashRouter>
                 <div>
-                    <Sidebar addChatArea={this.addItem} switchChannel={this.switchChannel}/>
+                    <div className="sidebar">
+                        <Profile path="woman.png"/>
+                        <QuickSwitcher/>
+                        <GroupTag/>
+                        <ChannelList ref={channels => this.channels = channels} addChatArea={this.addItem}
+                                     switchChannel={this.switchChannel}/>
+                        <DmTag/>
+                        <DmList {...this.props}/>
+                    </div>
                     <Header name="general"/>
                     <Divider/>
                     {this.state.routes}
                     <InputArea ref={input => this.input = input} sendMessage={this.sendMessage}/>
                     <Footer/>
-                    <WebSocket ref={sock => this.sock = sock} printMessage={this.printMessage}/>
+                    <WebSocket ref={sock => this.sock = sock} printMessage={this.printMessage}
+                               markAsUnread={this.markAsUnread}/>
                 </div>
             </HashRouter>
         );

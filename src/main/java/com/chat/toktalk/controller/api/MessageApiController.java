@@ -6,6 +6,7 @@ import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.UploadFile;
 import com.chat.toktalk.dto.SendType;
 import com.chat.toktalk.dto.SocketMessage;
+import com.chat.toktalk.dto.UnreadMessageInfo;
 import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.MessageService;
@@ -50,6 +51,18 @@ public class MessageApiController {
             if (channelUser != null) {
                 List<Message> messages = messageService.getMessagesByChannelUser(channelId, channelUser.getFirstReadId());
                 return new ResponseEntity<>(messages, HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping(path = "/unread")
+    public ResponseEntity<UnreadMessageInfo> unread(Long channelId, LoginUserInfo loginUserInfo) {
+        ChannelUser channelUser = channelUserService.getChannelUser(channelId, loginUserInfo.getId());
+        if (channelUser != null) {
+            Long unread = messageService.countUnreadMessageByChannelUser(channelUser);
+            if (unread != null) {
+                return new ResponseEntity<>(new UnreadMessageInfo(channelId, unread), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

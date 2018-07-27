@@ -70,19 +70,22 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         redisService.addWebSocketSessionByUser(userId, session);
 
         // 채널별로 읽지 않은 메세지 수 구해서 뿌려주기
-        List<UnreadMessageInfo> unreadMessages = new ArrayList<>();
-        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
-        for(ChannelUser channelUser : channelUsers){
-            Long cnt = messageService.countUnreadMessageByChannelUser(channelUser);
-            if(cnt != null){
-                unreadMessages.add(new UnreadMessageInfo(channelUser.getChannel().getId(), cnt));
-            }
-        }
-        SocketMessage socketMessage = new SocketMessage(SendType.UNREAD);
-        socketMessage.setUnreadMessages(unreadMessages);
-        String jsonStr = objectMapper.writeValueAsString(socketMessage);
-        logger.info(jsonStr);
-        session.sendMessage(new TextMessage(jsonStr));
+//        List<UnreadMessageInfo> unreadMessages = new ArrayList<>();
+//
+//        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
+//
+//        for(ChannelUser channelUser : channelUsers){
+//            Long cnt = messageService.countUnreadnew UnreadMessageInfo(channelId, unread)MessageByChannelUser(channelUser);
+//            if(cnt != null){
+//                unreadMessages.add(new UnreadMessageInfo(channelUser.getChannel().getId(), cnt));
+//            }
+//        }
+//
+//        SocketMessage socketMessage = new SocketMessage(SendType.UNREAD);
+//        socketMessage.setUnreadMessages(unreadMessages);
+//        String jsonStr = objectMapper.writeValueAsString(socketMessage);
+//        logger.info(jsonStr);
+//        session.sendMessage(new TextMessage(jsonStr));
     }
 
     @Override

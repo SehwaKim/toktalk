@@ -11,9 +11,11 @@ insert into user_roles(id, role_state, user_id) VALUES (5, 'USER', 4);
 
 insert into channel(id, name, type, regdate) VALUES (1, 'general', 'public', now());
 insert into channel(id, name, type, regdate) VALUES (2, '알고리즘스터디', 'public', now());
+insert into channel(id, name, type, regdate) VALUES (3, '아무말이나 하는 방', 'public', now());
 
-insert into channel_user(id, user_id, channel_id, first_read_id, regdate) VALUES (1, 1, 1, 1, now());
-insert into channel_user(id, user_id, channel_id, first_read_id, regdate) VALUES (2, 1, 2, 1, now());
+insert into channel_user(id, user_id, channel_id, first_read_id, regdate, last_read_id) VALUES (1, 1, 1, 1, now(), 1);
+insert into channel_user(id, user_id, channel_id, first_read_id, regdate, last_read_id) VALUES (2, 1, 2, 1, now(), 1);
+insert into channel_user(id, user_id, channel_id, first_read_id, regdate) VALUES (3, 1, 3, 1, now());
 
 insert into messages(id,text,user_id,nickname,channel_id,regdate) values (1,'안뇽',1,'아이스베어',1,now());
 insert into messages(id,text,user_id,nickname,channel_id,regdate) values (2,'안뇽',1,'아이스베어',1,now());

@@ -173,3 +173,22 @@ input:focus {
     r: 5;
     fill: #5dae8b;
 }
+
+.badge {
+    display: inline-block;
+    min-width: 13px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #777;
+    border-radius: 10px;
+}
+
+.badge:empty {
+    display: none;
+}

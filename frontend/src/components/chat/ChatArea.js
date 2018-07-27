@@ -27,6 +27,9 @@ class ChatArea extends React.Component {
     }
 
     addItem(message) {
+        if ('SYSTEM' == message.type) {
+
+        }
         this.setState((prevState) => {
             return {
                 items: prevState.items.concat(<ChatContent key={Date.now() + message.id} {...message}/>)

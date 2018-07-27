@@ -10,6 +10,7 @@ class ChannelList extends React.Component {
         this.state = {
             items: []
         };
+        this.itemRefs = new Map();
         this.addItem = this.addItem.bind(this);
     }
 
@@ -40,7 +41,8 @@ class ChannelList extends React.Component {
             var channels = [];
             for (let channel of json) {
                 channels.push(<ChannelItem switchChannel={this.props.switchChannel} key={Date.now() + channel.id}
-                                           name={channel.name} id={channel.id}/>);
+                                           name={channel.name} id={channel.id}
+                                           ref={(el => this.itemRefs.set(channel.id, el))}/>);
                 this.props.addChatArea(channel.id);
             }
             ;
@@ -60,16 +62,54 @@ class ChannelList extends React.Component {
 class ChannelItem extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            unread: ''
+        };
         this.switch = this.switch.bind(this);
+        this.increaseUnread = this.increaseUnread.bind(this);
+    }
+
+    componentDidMount() {
+        $.ajax({
+            url: '/api/messages/unread',
+            method: 'GET',
+            data: {channelId: this.props.id}
+        }).done(json => {
+            if (json != null) {
+                this.setState({unread: json.unreadCnt});
+            }
+        });
+    }
+
+    increaseUnread() {
+        let current = this.state.unread;
+        if ('' == current) {
+            current = 0;
+        }
+        this.setState({unread: current + 1});
     }
 
     switch(e) {
+        this.setState({unread: ''});
         this.props.switchChannel(this.props.id);
     }
 
     render() {
+        var divStyle = {
+            textAlign: 'right',
+            paddingRight: '10px'
+        };
         return (
-            <NavLink exact to={'/' + this.props.id} onClick={(e) => this.switch(e)}>{this.props.name}</NavLink>
+            <NavLink exact to={'/' + this.props.id} onClick={(e) => this.switch(e)}>
+                <div className="row">
+                    <div className="column">
+                        {this.props.name}
+                    </div>
+                    <div style={divStyle} className="column">
+                        <span className="badge">{this.state.unread}</span>
+                    </div>
+                </div>
+            </NavLink>
         );
     }
 }
