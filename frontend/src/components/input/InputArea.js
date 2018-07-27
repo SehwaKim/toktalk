@@ -1,28 +1,37 @@
 import React from "react";
 
-class MessageArea extends React.Component {
+class InputArea extends React.Component {
     render() {
         return (
             <div className="message-area">
-                <MessageBox {...this.props}/>
+                <InputBox {...this.props} ref={box => this.box = box}/>
             </div>
         );
     }
 }
 
-class MessageBox extends React.Component {
+class InputBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            cId: 1
+            cId: 0
         };
         this.sendMessage = this.sendMessage.bind(this);
+        this.switchChannel = this.switchChannel.bind(this);
     }
 
     sendMessage(e) {
         this.props.sendMessage(this.state.cId, this._inputElement.value);
         this._inputElement.value = "";
         e.preventDefault();
+    }
+
+    switchChannel(cId) {
+        this.setState(() => {
+            return {
+                cId: cId
+            };
+        });
     }
 
     render() {
@@ -44,4 +53,4 @@ class MessageBox extends React.Component {
     }
 }
 
-export default MessageArea;
+export default InputArea;

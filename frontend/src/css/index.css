@@ -24,11 +24,11 @@ body {
     display: block;
 }
 
-.sidebar a:hover {
+.sidebar a:hover:not(.active) {
     background-color: #003d72
 }
 
-.sidebar a:active {
+.active {
     color: #f1f1f1;
     background-color: #5dae8b;
 }

@@ -23,35 +23,35 @@ class WebSocket extends React.Component {
                 data = e.data;
             }
             const type = data.type;
-            if ('chat' == type) {
+            if ('CHAT' == type) {
                 this.props.printMessage(data);
             }
 
-            if ('messageList' == type) {
+            if ('MESSAGES' == type) {
 
             }
 
-            if ('unread' == type) {
+            if ('UNREAD' == type) {
 
             }
 
-            if ('system' == type) {
+            if ('SYSTEM' == type) {
 
             }
 
-            if ('typing' == type) {
+            if ('TYPING' == type) {
 
             }
 
-            if ('channel_mark' == type) {
+            if ('CHANNEL_MARK' == type) {
 
             }
 
-            if ('upload_file' == type) {
+            if ('UPLOAD_FILE' == type) {
 
             }
 
-            if ('channel_joined' == type) {
+            if ('CHANNEL_JOINED' == type) {
 
             }
 

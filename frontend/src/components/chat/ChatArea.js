@@ -4,6 +4,7 @@ import $ from "jquery";
 class ChatArea extends React.Component {
     constructor(props) {
         super(props);
+        this.self = React.createRef();
         this.state = {
             items: []
         };
@@ -31,12 +32,11 @@ class ChatArea extends React.Component {
                 items: prevState.items.concat(<ChatContent key={Date.now() + message.id} {...message}/>)
             };
         });
-        console.log(this.state.items);
     }
 
     render() {
         return (
-            <div className="chat-area">
+            <div className="chat-area" ref={this.self}>
                 {this.state.items}
             </div>
         );
