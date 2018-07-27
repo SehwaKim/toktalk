@@ -4,6 +4,7 @@ import com.chat.toktalk.amqp.MessageSender;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.UploadFile;
+import com.chat.toktalk.dto.SendType;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.ChannelUserService;
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping(value = "/api/messages", produces = "application/json; charset=utf8")
 public class MessageApiController {
 
     @Autowired
@@ -114,7 +115,10 @@ public class MessageApiController {
                 message.setRegdate(LocalDateTime.now());
                 messageService.addMessage(message);
 
-                SocketMessage socketMessage = new SocketMessage(channelId,nickname,uploadFile);
+                SocketMessage socketMessage = new SocketMessage(SendType.UPLOAD_FILE);
+                socketMessage.setChannelId(channelId);
+                socketMessage.setNickname(nickname);
+                socketMessage.setUploadFile(uploadFile);
                 messageSender.sendMessage(socketMessage);
                 // json test
                 String strJson = objectMapper.writeValueAsString(uploadFile);

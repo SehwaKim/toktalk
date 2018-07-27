@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/channels")
+@RequestMapping(value = "/api/channels", produces = "application/json; charset=utf8")
 public class ChannelApiController {
     @Autowired
     ChannelService channelService;

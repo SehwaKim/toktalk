@@ -1,6 +1,7 @@
 package com.chat.toktalk.amqp;
 
 import com.chat.toktalk.config.RabbitConfig;
+import com.chat.toktalk.dto.SendType;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.service.RedisService;
 import com.chat.toktalk.websocket.SessionManager;
@@ -25,7 +26,7 @@ public class MessageListener{
     @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
     public void receiveAndBroadcastMessage(SocketMessage socketMessage){
 
-        if("channel_mark".equals(socketMessage.getType()) || "channel_joined".equals(socketMessage.getType())){
+        if (SendType.CHANNEL_MARK == socketMessage.getType() || SendType.CHANNEL_JOINED == socketMessage.getType()) {
             toIndividual(socketMessage);
             return;
         }
@@ -34,12 +35,12 @@ public class MessageListener{
         Map<Long, Set<WebSocketSession>> sessions = sessionManager.getWebSocketSessionsByChannelId(channelId);
 
         if(sessions != null){
-            if("typing".equals(socketMessage.getType())) {
+            if (SendType.TYPING == socketMessage.getType()) {
                 sessions.remove(socketMessage.getUserId());
             }
 
             for(Long userId : sessions.keySet()){
-                if("chat".equals(socketMessage.getType()) || "upload_file".equals(socketMessage.getType()) ){
+                if (SendType.CHAT == socketMessage.getType() || SendType.UPLOAD_FILE == socketMessage.getType()) {
                     Boolean isChannelInSight = redisService.isChannelInSight(userId, channelId);
 
                     if (isChannelInSight) {

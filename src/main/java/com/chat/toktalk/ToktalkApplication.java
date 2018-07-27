@@ -17,8 +17,6 @@ import java.util.List;
 @EnableRedisHttpSession
 @SpringBootApplication
 public class ToktalkApplication implements WebMvcConfigurer {
-
-
 	public static void main(String[] args) {
 		SpringApplication.run(ToktalkApplication.class, args);
 	}
