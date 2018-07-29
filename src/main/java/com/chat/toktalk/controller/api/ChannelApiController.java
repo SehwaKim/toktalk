@@ -53,9 +53,9 @@ public class ChannelApiController {
             channel.addChanneUser(channelCreator);
             channel.setName(channelForm.getName());
             if("private".equals(channelForm.getType())){
-                channel.setType("public");
-            }else {
                 channel.setType("private");
+            } else {
+                channel.setType("public");
             }
 
             channel = channelService.addChannel(channel);

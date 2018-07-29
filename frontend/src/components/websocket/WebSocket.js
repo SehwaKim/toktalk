@@ -2,8 +2,8 @@ import React from 'react';
 import SockJS from 'sockjs-client';
 
 class WebSocket extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             currentId: 1
         };

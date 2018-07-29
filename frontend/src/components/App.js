@@ -12,6 +12,7 @@ import ChatArea from './chat/ChatArea';
 import InputArea from './input/InputArea';
 import Footer from './footer/Footer';
 import WebSocket from './websocket/WebSocket';
+import NewChannelPopup from './popup/NewChannelPopup';
 
 class Divider extends React.Component {
     render() {
@@ -33,7 +34,8 @@ class App extends React.Component {
         super(props);
         this.state = {
             routes: [],
-            current: 0
+            current: 0,
+            showNewChannelPopup: false
         };
         this.chatAreas = new Map();
         this.addItem = this.addItem.bind(this);
@@ -41,6 +43,14 @@ class App extends React.Component {
         this.printMessage = this.printMessage.bind(this);
         this.switchChannel = this.switchChannel.bind(this);
         this.markAsUnread = this.markAsUnread.bind(this);
+    }
+
+    togglePopup() {
+        this.setState((prevState) => {
+            return {
+                showNewChannelPopup: !prevState.showNewChannelPopup
+            }
+        });
     }
 
     addItem(cId) {
@@ -57,7 +67,7 @@ class App extends React.Component {
         this.sock.sendChatMsg(cId, text);
     }
 
-    switchChannel(cId) {
+    switchChannel(cId, title) {
         this.setState(() => {
             return {
                 current: cId
@@ -65,6 +75,7 @@ class App extends React.Component {
         });
         this.input.box.switchChannel(cId);
         this.sock.switchChannel(cId);
+        this.head.switchChannel(title);
     }
 
     printMessage(message) {
@@ -75,6 +86,10 @@ class App extends React.Component {
         this.channels.itemRefs.get(cId).increaseUnread();
     }
 
+    addNewChannel(channel) {
+        this.channels.addNewChannel(channel);
+    }
+
     render() {
         return (
             <HashRouter>
@@ -82,19 +97,25 @@ class App extends React.Component {
                     <div className="sidebar">
                         <Profile path="woman.png"/>
                         <QuickSwitcher/>
-                        <GroupTag/>
+                        <GroupTag togglePopup={this.togglePopup.bind(this)}/>
                         <ChannelList ref={channels => this.channels = channels} addChatArea={this.addItem}
                                      switchChannel={this.switchChannel}/>
                         <DmTag/>
                         <DmList {...this.props}/>
                     </div>
-                    <Header name="general"/>
+                    <Header ref={head => this.head = head}/>
                     <Divider/>
                     {this.state.routes}
                     <InputArea ref={input => this.input = input} sendMessage={this.sendMessage}/>
                     <Footer/>
                     <WebSocket ref={sock => this.sock = sock} printMessage={this.printMessage}
                                markAsUnread={this.markAsUnread}/>
+                    {this.state.showNewChannelPopup ?
+                        <NewChannelPopup
+                            togglePopup={this.togglePopup.bind(this)} addNewChannel={this.addNewChannel.bind(this)}
+                        />
+                        : null
+                    }
                 </div>
             </HashRouter>
         );

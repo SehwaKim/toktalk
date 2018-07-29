@@ -11,26 +11,19 @@ class ChannelList extends React.Component {
             items: []
         };
         this.itemRefs = new Map();
-        this.addItem = this.addItem.bind(this);
+        this.addNewChannel = this.addNewChannel.bind(this);
     }
 
-    addItem(e) {
-        /*if (this._inputElement.value !== "") {
-            var newItem = {
-                text: this._inputElement.value,
-                key: Date.now()
+    addNewChannel(channel) {
+        this.setState((prevState) => {
+            return {
+                items: prevState.items.concat(<ChannelItem switchChannel={this.props.switchChannel}
+                                                           key={Date.now() + channel.id}
+                                                           name={channel.name} id={channel.id}
+                                                           ref={(el => this.itemRefs.set(channel.id, el))}/>)
             };
-
-            this.setState((prevState) => {
-                return {
-                    items: prevState.items.concat(newItem)
-                };
-            });
-
-            this._inputElement.value = "";
-        }*/
-
-        e.preventDefault();
+        });
+        this.props.addChatArea(channel.id);
     }
 
     componentDidMount() {
@@ -91,7 +84,7 @@ class ChannelItem extends React.Component {
 
     switch(e) {
         this.setState({unread: ''});
-        this.props.switchChannel(this.props.id);
+        this.props.switchChannel(this.props.id, this.props.name);
     }
 
     render() {

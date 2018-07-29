@@ -1,6 +1,10 @@
 import React from "react";
 
 class GroupTag extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         var buttonStyle = {
             backgroundColor: 'Transparent',
@@ -33,7 +37,7 @@ class GroupTag extends React.Component {
                     <button style={buttonStyle}><b>그룹 대화</b></button>
                 </div>
                 <div style={innerDivStyle_2}>
-                    <button style={buttonStyle}>
+                    <button style={buttonStyle} onClick={this.props.togglePopup}>
                         <svg className="i-ban" viewBox="0 0 32 32" width="14" height="14" fill="none"
                              stroke="currentcolor"
                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2">

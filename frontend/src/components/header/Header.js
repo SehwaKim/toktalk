@@ -1,6 +1,22 @@
 import React from "react";
 
 class Header extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            title: ''
+        }
+        this.switchChannel = this.switchChannel.bind(this);
+    };
+
+    switchChannel(title) {
+        this.setState(() => {
+            return {
+                title: title
+            };
+        });
+    }
+
     render() {
         var buttonStyle = {
             backgroundColor: 'Transparent',
@@ -45,7 +61,7 @@ class Header extends React.Component {
             <div className="header" style={divStyle}>
                 <div style={innerDivStyle_1}>
                     <div>
-                        <button style={{...buttonStyle, ...titleStyle}}>{this.props.name}</button>
+                        <button style={{...buttonStyle, ...titleStyle}}>{this.state.title}</button>
                     </div>
                     <div>
                         {/*<button style={Object.assign(buttonStyle, textStyle)}>
