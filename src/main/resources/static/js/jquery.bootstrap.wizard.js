@@ -1,19 +1,9 @@
-/*!
- * jQuery twitter bootstrap wizard plugin
- * Examples and documentation at: http://github.com/VinceG/twitter-bootstrap-wizard
- * version 1.0
- * Requires jQuery v1.3.2 or later
- * Supports Bootstrap 2.2.x, 2.3.x, 3.0
- * Dual licensed under the MIT and GPL licenses:
- * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
- * Authors: Vadim Vincent Gabriel (http://vadimg.com), Jason Gill (www.gilluminate.com)
- */
+
 ;(function($) {
 var bootstrapWizardCreate = function(element, options) {
 	var element = $(element);
 	var obj = this;
-	
+
 	// selector skips any 'li' elements that do not contain a child with a tab data-toggle
 	var baseItemSelector = 'li:has([data-toggle="tab"])';
 
@@ -21,7 +11,7 @@ var bootstrapWizardCreate = function(element, options) {
 	var $settings = $.extend({}, $.fn.bootstrapWizard.defaults, options);
 	var $activeTab = null;
 	var $navigation = null;
-	
+
 	this.rebindClick = function(selector, fn)
 	{
 		selector.unbind('click', fn).bind('click', fn);
@@ -177,7 +167,7 @@ var bootstrapWizardCreate = function(element, options) {
 		// Remove menu item
 		$item.remove();
 	};
-	
+
 	var innerTabClick = function (e) {
 		// Get the index of the clicked tab
 		var clickedIndex = $navigation.find(baseItemSelector).index($(e.currentTarget).parent(baseItemSelector));
@@ -185,7 +175,7 @@ var bootstrapWizardCreate = function(element, options) {
 			return false;
 		}
 	};
-	
+
 	var innerTabShown = function (e) {  // use shown instead of show to help prevent double firing
 		$element = $(e.target).parent();
 		var nextTab = $navigation.find(baseItemSelector).index($element);
@@ -202,21 +192,21 @@ var bootstrapWizardCreate = function(element, options) {
 		$activeTab = $element; // activated tab
 		obj.fixNavigationButtons();
 	};
-	
+
 	this.resetWizard = function() {
-		
+
 		// remove the existing handlers
 		$('a[data-toggle="tab"]', $navigation).off('click', innerTabClick);
 		$('a[data-toggle="tab"]', $navigation).off('shown shown.bs.tab', innerTabShown);
-		
+
 		// reset elements based on current state of the DOM
 		$navigation = element.find('ul:first', element);
 		$activeTab = $navigation.find(baseItemSelector + '.active', element);
-		
+
 		// re-add handlers
 		$('a[data-toggle="tab"]', $navigation).on('click', innerTabClick);
 		$('a[data-toggle="tab"]', $navigation).on('shown shown.bs.tab', innerTabShown);
-		
+
 		obj.fixNavigationButtons();
 	};
 
@@ -277,7 +267,7 @@ $.fn.bootstrapWizard.defaults = {
 	onPrevious:       null,
 	onLast:           null,
 	onFirst:          null,
-	onTabChange:      null, 
+	onTabChange:      null,
 	onTabClick:       null,
 	onTabShow:        null
 };

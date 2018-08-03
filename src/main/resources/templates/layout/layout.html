@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'/>
+        <meta name="viewport" content="width=device-width"/>
+
+        <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.0/css/bootstrap.min.css}"/>
+        <!-- Custom styles for this template -->
+        <link href="/css/gsdk-bootstrap-wizard.css" rel="stylesheet"/>
+        <link href="/css/user.css" rel="stylesheet"/>
+        <!--     Fonts and icons     -->
+        <link href="http://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="image-container set-full-height" style="background-image: url('/images/enterprise-hero.jpg')">
+            <div class="container layer">
+                <div class="col">
+                    <div class="wizard-card">
+                        <nav th:replace="/fragments/nav :: nav">
+                            <p>default nav</p>
+                        </nav>
+                        <div id="content" layout:fragment="content">
+                            <p>default contant</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <footer th:replace="/fragments/footer :: footer">
+                <p>default footer</p>
+            </footer>
+        </div>
+    </body>
+</html>

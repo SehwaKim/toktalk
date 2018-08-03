@@ -517,7 +517,7 @@ jQuery.extend({
 	},
 
 	// data: string of html
-	// context (optional): If specified, the fragment will be created in this context, defaults to document
+	// context (optional): If specified, the fragments will be created in this context, defaults to document
 	// keepScripts (optional): If true, will include scripts passed in the html string
 	parseHTML: function( data, context, keepScripts ) {
 		if ( !data || typeof data !== "string" ) {
@@ -1807,7 +1807,7 @@ Sizzle.matchesSelector = function( elem, expr ) {
 			// IE 9's matchesSelector returns false on disconnected nodes
 			if ( ret || support.disconnectedMatch ||
 					// As well, disconnected nodes are said to be in a document
-					// fragment in IE 9
+					// fragments in IE 9
 					elem.document && elem.document.nodeType !== 11 ) {
 				return ret;
 			}
@@ -6178,7 +6178,7 @@ jQuery.fn.extend({
 
 	replaceWith: function() {
 		var
-			// Snapshot the DOM in case .domManip sweeps something relevant into its fragment
+			// Snapshot the DOM in case .domManip sweeps something relevant into its fragments
 			args = jQuery.map( this, function( elem ) {
 				return [ elem.nextSibling, elem.parentNode ];
 			}),
@@ -6245,7 +6245,7 @@ jQuery.fn.extend({
 				scripts = jQuery.map( getAll( fragment, "script" ), disableScript );
 				hasScripts = scripts.length;
 
-				// Use the original fragment for the last item instead of the first because it can end up
+				// Use the original fragments for the last item instead of the first because it can end up
 				// being emptied incorrectly in certain situations (#8070).
 				for ( ; i < l; i++ ) {
 					node = fragment;
@@ -6539,7 +6539,7 @@ jQuery.extend({
 			tmp, tag, tbody, wrap,
 			l = elems.length,
 
-			// Ensure a safe fragment
+			// Ensure a safe fragments
 			safe = createSafeFragment( context ),
 
 			nodes = [],
@@ -6615,7 +6615,7 @@ jQuery.extend({
 			}
 		}
 
-		// Fix #11356: Clear elements from fragment
+		// Fix #11356: Clear elements from fragments
 		if ( tmp ) {
 			safe.removeChild( tmp );
 		}
@@ -6637,7 +6637,7 @@ jQuery.extend({
 
 			contains = jQuery.contains( elem.ownerDocument, elem );
 
-			// Append to fragment
+			// Append to fragments
 			tmp = getAll( safe.appendChild( elem ), "script" );
 
 			// Preserve script evaluation history

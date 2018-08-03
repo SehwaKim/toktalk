@@ -1,16 +1,27 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Channels</title>
-</head>
+<!doctype html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+
 <body>
-<nav>
-    <ul>
-        <li>
-            <a th:href="@{/users/delete}">회원탈퇴</a>
-        </li>
-    </ul>
-</nav>
+<div layout:fragment="content" class="content">
+    <form method="post" th:action="@{/users/}" th:object="${detailsForm}">
+        <div>
+            <div>
+                <div class="form-group">
+                    <label for="nickname">닉네임</label>
+                    <input type="text" name="nickname" id="nickname" th:field="*{nickname}">
+                    <small th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"/>
+                </div>
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="text" name="email" id="email" class="form-control-plaintext" th:field="*{email}" readonly>
+                </div>
+            </div>
+            <div>
+                <input type="submit" class="btn btn-fill btn-warning" value="수정하기">
+            </div>
+        </div>
+    </form>
+</div>
 </body>
 </html>

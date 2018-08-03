@@ -25,7 +25,7 @@ public class EmailValidator implements Validator {
     @Override
     public void validate(Object object, Errors errors) {
         EmailForm form =(EmailForm) object;
-        User user = userService.getUserByEmail(form.getEmail());
+        User user = userService.findUserByEmail(form.getEmail());
 
         if(user == null){
             errors.rejectValue("email","required","이메일에 해당하는 사용자를 찾을 수 없습니다.");

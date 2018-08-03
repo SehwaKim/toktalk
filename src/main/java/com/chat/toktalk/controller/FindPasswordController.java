@@ -62,10 +62,10 @@ public class FindPasswordController {
         if(bindingResult.hasErrors()){
             return "users/forgot-password";
         }
-        User user = userService.getUserByEmail(form.getEmail());
+        User user = userService.findUserByEmail(form.getEmail());
         PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(UUID.randomUUID().toString());
-        resetToken.setExpiryDate(3);//테스트라서 3분
+        resetToken.setExpiryDate(30);
         resetToken.setUser(user);
 
         passwordService.savePasswordResetToken(resetToken);
@@ -78,7 +78,7 @@ public class FindPasswordController {
 
         sendMailService.sendPasswordResetURLToUserEmail(content,form.getEmail(),subject);
 
-        return "redirect:/identity/password/sent?success";
+        return "redirect:/identity/password/sent?success=true";
     }
 
     @GetMapping("/reset")
@@ -94,7 +94,7 @@ public class FindPasswordController {
         }else{
             model.addAttribute("token",resetToken.getToken());
         }
-        return "users/reset_password";
+        return "reset-password";
     }
 
     @PostMapping("/reset")
@@ -119,6 +119,6 @@ public class FindPasswordController {
 
     @GetMapping("/sent")
     public String displaySendSuccessPage(){
-        return "users/password_token_success";
+        return "token-success";
     }
 }

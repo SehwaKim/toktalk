@@ -7,10 +7,12 @@ import com.chat.toktalk.domain.UserStatus;
 import com.chat.toktalk.repository.UserRepository;
 import com.chat.toktalk.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -18,23 +20,23 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Override
-    public User getUserByEmail(String email) {
+    public User findUserByEmail(String email) {
 
         return userRepository.findUsersByEmail(email);
     }
 
     @Override
-    public void registerUser(User user) {
-        //role설정
+    public void registerUser(User user,UserStatus userStatus) {
+        passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role role = new Role();
         role.setRoleState(RoleState.USER);
         user.addUserRole(role);
-        user.setUserStatus(UserStatus.NORMAL);
+        user.setRegdate(LocalDateTime.now());
+        user.setUserStatus(userStatus);
         userRepository.save(user);
 
     }
@@ -62,6 +64,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long invitedUserId) {
         return userRepository.getOne(invitedUserId);
+
+    }
+
+
+    @Override
+    public User findOauthUserByEmail(String email){
+        return userRepository.findOauthUserByEmail(email);
 
     }
 }

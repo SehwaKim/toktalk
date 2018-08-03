@@ -12,7 +12,7 @@ import org.springframework.validation.Validator;
 
 @Log4j2
 @Component
-public class UserValidator implements Validator {
+public class RegisterValidator implements Validator {
 
     @Autowired
     UserService userService;
@@ -24,10 +24,10 @@ public class UserValidator implements Validator {
     @Override
     public void validate(Object object, Errors errors) {
         User user = (User)object;
-        User existingUser = userService.getUserByEmail(user.getEmail());
+        User existingUser = userService.findUserByEmail(user.getEmail());
 
-        if(user.getNickname().length() < 2 || user.getNickname().length() > 8){
-            errors.rejectValue("nickname","required","2이상 8이하의 글자를 입력 해주세요");
+        if(user.getNickname().length() <= 2 || user.getNickname().length() > 15){
+            errors.rejectValue("nickname","required","2이상 15 이하의 글자를 입력 해주세요");
         }
 
         if(existingUser != null && !UserStatus.DELETE.equals(existingUser.getUserStatus())){
