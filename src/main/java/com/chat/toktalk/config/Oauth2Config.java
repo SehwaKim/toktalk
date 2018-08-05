@@ -21,13 +21,13 @@ import javax.servlet.Filter;
 @EnableOAuth2Client
 public class Oauth2Config {
 
-    @Autowired
-    @Qualifier("oauth2ClientContext")
-    private OAuth2ClientContext oAuth2ClientContext;
-
+//    @Autowired
+//    @Qualifier("oauth2ClientContext")
+    private final OAuth2ClientContext oAuth2ClientContext;
     private final Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
 
-    public Oauth2Config(Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
+    public Oauth2Config(OAuth2ClientContext oAuth2ClientContext, Oauth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
+        this.oAuth2ClientContext = oAuth2ClientContext;
         this.oauth2AuthenticationSuccessHandler = oauth2AuthenticationSuccessHandler;
     }
 
@@ -35,8 +35,8 @@ public class Oauth2Config {
     @Bean
     public Filter googleFilter(){
         OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter("/login/google");
-        filter.setRestTemplate(new OAuth2RestTemplate(googleClient(),oAuth2ClientContext));//OAuth2ProtectedResourceDetails,OAuth2ClientContext
-        filter.setTokenServices(new UserInfoTokenServices(googleResource().getUserInfoUri(),googleClient().getClientId()));//String userInfoEndpointUrl, String clientId
+        filter.setRestTemplate(new OAuth2RestTemplate(googleClient(),oAuth2ClientContext));
+        filter.setTokenServices(new UserInfoTokenServices(googleResource().getUserInfoUri(),googleClient().getClientId()));
         filter.setAuthenticationSuccessHandler(oauth2AuthenticationSuccessHandler);
 
         return filter;

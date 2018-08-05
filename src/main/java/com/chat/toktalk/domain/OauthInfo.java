@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "user_oauth_info")
+@Table(name = "oauth_info")
 public class OauthInfo implements Serializable {
 
     @Id
