@@ -1,25 +1,25 @@
 <!doctype html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/nav-layout">
 
 <body>
 <div layout:fragment="content" class="content">
     <form method="post" th:action="@{/users/}" th:object="${detailsForm}">
-        <div>
-            <div>
-                <div class="form-group">
-                    <label for="nickname">닉네임</label>
-                    <input type="text" name="nickname" id="nickname" th:field="*{nickname}">
+        <div class="offset-2 margin-top-16">
+            <div class="form-group row">
+                <label for="email" class="col-sm-2 col-form-label">이메일</label>
+                <div class="col-sm-6">
+                    <input type="text" readonly class="form-control-plaintext" id="email" th:field="*{email}">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="nickname" class="col-sm-2 col-form-label">닉네임</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="nickname" th:field="*{nickname}">
                     <small th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"/>
                 </div>
-                <div class="form-group">
-                    <label for="email">이메일</label>
-                    <input type="text" name="email" id="email" class="form-control-plaintext" th:field="*{email}" readonly>
-                </div>
             </div>
-            <div>
-                <input type="submit" class="btn btn-fill btn-warning" value="수정하기">
-            </div>
+            <input type="submit" class="btn btn-fill btn-dark btn-account col-sm-3" value="수정하기">
         </div>
     </form>
 </div>

@@ -2,21 +2,54 @@ nav {
     width: 150px;
     float: left;
     display: inline;
-    /*position: static;*/
+}
+
+body {
+    background-color: #d5d5d5;
 }
 
 .content{
+
     display: inline;
-    /*position:relative;*/
+    float: right;
+    width: 80%;
+    min-height: 500px;
+
 }
 
+.plane-content{
+    min-height: 300px;
+    min-width: 500px;
+}
+
+
+.margin-top-16{
+    margin-top: 16%;
+}
+.input-layout{
+    display: inline;
+}
+
+.btn-account{
+    border-radius: 0px;
+    margin-left: 25%;
+    margin-top: 5%;
+}
 
 .wizard-card {
-    min-height: 500px;
+    height: 500px;
     background-color: #FFFFFF;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+
 }
+
+.plane-card {
+    min-height: 300px;
+    min-width: 500px;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
 .layer{
     position:absolute;
     top:0;right:0;bottom:0;left:0;
@@ -39,6 +72,7 @@ nav {
     -ms-box-align:center;
 }
 
+/**SideBar..*/
 
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
@@ -58,19 +92,26 @@ a:focus {
     transition: all 0.3s;
 }
 
+.alert-box{
+    width: 30%;
+    text-align: center;
+    margin-left: 35%;
+    border-radius: 0px;
+    background-color:#444444;
+    color:#FFFFFF;
+}
 
 #sidebar {
     width: 20%;
     min-height: 500px;
-    border-radius: 10px;
-    background: #7386D5;
-    color: #fff !important;
+    background: #444444;
+    color: #fff
 }
 
 #sidebar .sidebar-header {
-    border-radius: 10px;
+
     padding: 20px;
-    background: #6d7fcc;
+    background: black;
 }
 
 #sidebar ul.components {
@@ -90,37 +131,122 @@ a:focus {
 }
 
 #sidebar ul li a:hover {
-    color: #7386D5;
+    color: #444444;
     background: #fff;
 }
 
-#sidebar ul li.active>a,
-a[aria-expanded="true"] {
-    color: #fff;
-    background: #6d7fcc;
+.social-box {
+    margin: 8% auto;
+}
+
+.social-card{
+    height: 80px;
+    background-color: #FFFFFF;
 }
 
 
-ul ul a {
-    font-size: 0.9em !important;
-    padding-left: 30px !important;
-    background: #6d7fcc;
+.social-btn-non{
+
+    margin-top: 18px;
+    margin-right: 18px;
+    background-color: #d5d5d5;
+    color: white;
+    border-radius: 0px;
 }
 
-/*@media (max-width: 768px) {*/
-    /*#sidebar {*/
-        /*margin-left: -250px;*/
-    /*}*/
-    /*#sidebar.active {*/
-        /*margin-left: 0;*/
-    /*}*/
-    /*#content {*/
-        /*width: 100%;*/
-    /*}*/
-    /*#content.active {*/
-        /*width: calc(100% - 250px);*/
-    /*}*/
-    /*#sidebarCollapse span {*/
-        /*display: none;*/
-    /*}*/
-/*}*/
+.social-icon{
+
+    background-color: #d5d5d5;
+    color: #FFFFFF;
+    font-size: 30px;
+    text-align: center;
+    height: 80px;
+    width: 80px;
+    padding: 5%;
+}
+
+.social-icon-google{
+
+    background-color:red;
+    color: #FFFFFF;
+    font-size: 30px;
+    text-align: center;
+    height: 80px;
+    width: 80px;
+    padding: 5%;
+}
+
+.btn-google{
+    margin-top: 18px;
+    margin-right: 18px;
+    background-color: red;
+    color: white;
+    border-radius: 0px;
+}
+
+.btn-google:hover{
+    margin-top: 18px;
+    margin-right: 18px;
+    background-color: white;
+    color: red;
+    border-radius: 0px;
+}
+
+.btn-outline-google{
+    margin-top: 18px;
+    margin-right: 18px;
+    background-color: white;
+    color: red;
+    border-radius: 0px;
+    border: 1px solid red;
+}
+.btn-outline-google:hover{
+    margin-top: 18px;
+    margin-right: 18px;
+    background-color: red;
+    color: white;
+    border-radius: 0px;
+}
+
+.btn-send{
+    margin-top : 25px;
+    margin-left: 65px;
+    border-radius: 0px;
+}
+
+.form-send{
+    width: 500px;
+    min-height: 300px;
+    margin-top: 28px;
+    margin-left: 65px;
+    position: absolute;
+}
+
+
+.find-password-notice{
+    margin-top: 25px;
+    font-family: dotum,sans-serif;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #666;
+}
+
+.radius-0{
+    border-radius: 0px;
+}
+
+.register-btn{
+    margin-left: 85px;
+    margin-top: 38px;
+}
+
+.alert-yes{
+    background-color: black;
+    color: white;
+    border-radius: 0px;
+}
+.alert-no{
+    background-color: red;
+    color: white;
+    border-radius: 0px;
+}

@@ -1,41 +1,62 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>로그인</title>
+    <link href="/css/login.css" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.0/css/bootstrap.css}"/>
 
+    <script th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/popper.js/1.14.1/umd/popper.js}" src=""></script>
+    <script th:src="@{/webjars/bootstrap/4.1.0/js/bootstrap.js}" src=""></script>
+    <script th:src="@{/webjars/bootbox/4.4.0/bootbox.js}" src=""></script>
 </head>
 <body>
-<div>
-    <h3>로그인</h3>
-    <div th:if="${param.resetSuccess}">
-        <span>비밀번호 변경이 완료 되었습니다. 다시 로그인 해주세요.</span>
+<header>
+    <div th:if ="${param.notice}" class="alert alert-box alert-dismissible fade show" role="alert">
+        <span th:text="${param.notice}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    <div th:if="${param.existUser}">
-        <span>이미 계정이 있습니다.아래에 로그인하여 소셜 프로필을 연결하십시오.</span>
+    <div th:if ="${param.error}" class="alert alert-box alert-dismissible fade show" role="alert">
+        <span>로그인 정보가 올바르지 않습니다.</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    <div th:if="${param.registerSuccess}">
-        <span>가입이 완료되었습니다. 소셜 버튼을 통해 로그인 해주세요.</span>
-    </div>
-    <div th:if="${param.connectOauth}">
-        <span>소셜 연결이 완료되었습니다. 다시 로그인 해주세요.</span>
-    </div>
-    <form method="post" th:action="@{/users/login}" action="#">
-        <label for="email">email</label>
-        <input type="text" id="email" name="email" size="20" th:value="${param.oauthEmail}">
-        <label for="password">password</label>
-        <input type="password" id="password" name="password" size="20">
-        <button type="submit">로그인</button>
-        <p>
-            <label for="remember-me">Remember-me</label>
-            <input type="checkbox" id="remember-me" name="remember-me" size="20">
-        </p>
-    </form>
-    <div class="container unauthenticated">
-        <div>
-            With Google: <a href="/login/google">click here</a>
+</header>
+<div class="container layer col">
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2 description">
+            <h1 class="h1-text"><strong class="strong-text">Toktalk</strong> SPA Messenger Service</h1>
+            <div>
+                <p>
+                    This is toktalk service This is toktalk service This is toktalk service This is toktalk service This is toktalk service.
+                    Download service!
+                </p>
+            </div>
         </div>
+    </div>
+    <div class="login-card">
+        <form class="form-signin" method="post" th:action="@{/users/login}">
+            <input type="email" id="email" name ="email" class="form-control" placeholder="이메일주소" th:value="${param.oauthEmail}" required autofocus>
+
+            <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호" required>
+
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" id="remember-me" name="remember-me"> <small>로그인기억</small>
+                </label>
+            </div>
+            <div class="text-center mb-1">
+            <input type="submit" class="btn btn-fill btn-login col-5" value="로그인"/>
+            <input type="button" class="btn btn-fill btn-google col-5" onclick="
+                   location.href='/login/google'" value="구글로그인"/>
+            </div>
+            <div class="text-center">
+                <small><a href="/identity/register">회원가입</a> 또는 <a href="/identity/password/forgot">패스워드 찾기</a></small>
+            </div>
+        </form>
     </div>
 </div>
 </body>
