@@ -13,9 +13,11 @@ import org.springframework.validation.Validator;
 @Log4j2
 @Component
 public class EmailValidator implements Validator {
+    private final UserService userService;
 
-    @Autowired
-    UserService userService;
+    public EmailValidator(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -29,11 +31,12 @@ public class EmailValidator implements Validator {
 
         if(user == null){
             errors.rejectValue("email","required","이메일에 해당하는 사용자를 찾을 수 없습니다.");
-        }
+        }else{
 
-        if(UserStatus.DELETE.equals(user.getUserStatus())){
-            errors.rejectValue("email","required","탈퇴한 사용자 입니다.");
-        }
+            if(UserStatus.DELETE.equals(user.getUserStatus())){
+                errors.rejectValue("email","required","탈퇴한 사용자 입니다.");
+            }
 
+        }
     }
 }

@@ -19,8 +19,8 @@ public class UserDetailsValidator implements Validator {
     public void validate(Object object, Errors errors) {
         UserDetailsForm detailsForm = (UserDetailsForm)object;
 
-        if(detailsForm.getNickname().length() <= 2 || detailsForm.getNickname().length() > 15){
-            errors.rejectValue("nickname","required","2이상 15 이하의 글자를 입력 해주세요");
+        if(detailsForm.getNickname().length() <= 2 || detailsForm.getNickname().length() > 8){
+            errors.rejectValue("nickname","required","2이상 8 이하의 글자를 입력 해주세요");
         }
     }
 }

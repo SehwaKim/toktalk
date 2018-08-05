@@ -1,9 +1,8 @@
 package com.chat.toktalk.validator;
 
 import com.chat.toktalk.dto.PasswordForm;
-import com.chat.toktalk.service.UserService;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,8 +12,7 @@ import org.springframework.validation.Validator;
 @Component
 public class PasswordValidator implements Validator {
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -26,7 +24,7 @@ public class PasswordValidator implements Validator {
         PasswordForm passwordForm = (PasswordForm) object;
         passwordForm.setConfirmPassword(passwordEncoder.encode(passwordForm.getConfirmPassword()));
         if(!passwordEncoder.matches(passwordForm.getPassword(),passwordForm.getConfirmPassword())){
-            errors.rejectValue("password",null,"두 비밀번호가 일치하지 않습니다.");
+            errors.rejectValue("confirmPassword","required","두 비밀번호가 일치하지 않습니다.");
 
         }
 
