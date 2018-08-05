@@ -5,7 +5,6 @@ import com.chat.toktalk.domain.UserStatus;
 import com.chat.toktalk.service.UserService;
 import com.chat.toktalk.validator.RegisterValidator;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,11 +16,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/identity")
 public class RegisterController {
-    @Autowired
-    UserService userService;
 
-    @Autowired
-    RegisterValidator registerValidator;
+    private final UserService userService;
+    private final RegisterValidator registerValidator;
+
+    public RegisterController(UserService userService, RegisterValidator registerValidator) {
+        this.userService = userService;
+        this.registerValidator = registerValidator;
+    }
+
+
 
     @GetMapping("/register")
     public String displayRegistrationPage(User user, Model model) {
@@ -37,6 +41,7 @@ public class RegisterController {
         }
 
         userService.registerUser(user,UserStatus.NORMAL);
+
         return "redirect:/";
     }
 
