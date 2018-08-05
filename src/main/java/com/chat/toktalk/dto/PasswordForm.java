@@ -14,6 +14,6 @@ public class PasswordForm implements Serializable{
     private String password;
     @NotEmpty
     private String confirmPassword;
-    @NotEmpty
+
     private String token;
 }
