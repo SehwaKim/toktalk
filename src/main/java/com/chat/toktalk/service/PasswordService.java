@@ -2,6 +2,7 @@ package com.chat.toktalk.service;
 
 
 import com.chat.toktalk.domain.PasswordResetToken;
+import com.chat.toktalk.domain.User;
 import com.chat.toktalk.security.LoginUserInfo;
 
 public interface PasswordService {
@@ -12,6 +13,6 @@ public interface PasswordService {
 
     void deletepasswordResetToken(PasswordResetToken passwordResetToken);
 
-    void savePassword(LoginUserInfo loginUserInfo, String password);
+    void savePassword(User user, String password);
 
 }

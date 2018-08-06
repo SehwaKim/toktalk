@@ -21,17 +21,18 @@ import javax.sql.DataSource;
 
 @Configuration
 public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final Filter filter;
 
-    public WebApplicationSecurityConfig(Filter googleFilter) {
+    private final Filter filter;
+    private final TokTalkUserDetailsService tokTalkUserDetailsService;
+    private final DataSource dataSource;
+
+    public WebApplicationSecurityConfig(Filter googleFilter, DataSource dataSource, TokTalkUserDetailsService tokTalkUserDetailsService) {
         this.filter = googleFilter;
+        this.dataSource = dataSource;
+        this.tokTalkUserDetailsService = tokTalkUserDetailsService;
     }
 
-    @Autowired
-    DataSource dataSource;
 
-    @Autowired
-    TokTalkUserDetailsService tokTalkUserDetailsService;
 
 
     @Override
@@ -47,7 +48,8 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/users/login")
                 .and().authorizeRequests()
                 .antMatchers("/identity/**").permitAll()
-                .antMatchers("/users/**").permitAll()
+                .antMatchers("/users/login").permitAll()
+                .antMatchers("/users/**").authenticated()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().hasAnyRole("ADMIN", "USER")
@@ -79,10 +81,5 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
         tokenRepository.setDataSource(dataSource);
         return tokenRepository;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

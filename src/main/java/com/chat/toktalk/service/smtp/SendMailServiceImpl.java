@@ -12,18 +12,10 @@ import javax.mail.internet.MimeMessage;
 @Log4j2
 @Service
 public class SendMailServiceImpl implements SendMailService {
+    private final JavaMailSender javaMailSender;
 
-    @Autowired
-    JavaMailSender javaMailSender;
-    @Override
-    public void sendPasswordToGuestEmail(String content, String email) throws MessagingException {
-        MimeMessage message = javaMailSender.createMimeMessage();
-        message.setSubject("[toktalk] 임시비밀번호 발급 안내 입니다.");
-        message.setText(content,"UTF-8","HTML");
-        message.setFrom("noriming2@gmail.com");//보내는사람
-        message.setRecipients(Message.RecipientType.TO,email);//받는사람
-        log.info("받는사람 : " + email);
-        javaMailSender.send(message);
+    public SendMailServiceImpl(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
     }
 
     @Override

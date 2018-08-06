@@ -167,7 +167,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         String username = attributes.get("username").toString();
         String nickname = attributes.get("nickname").toString();
         Long userId = Long.parseLong(attributes.get("userId").toString());
-        User user = userService.getUserByEmail(username);
+        User user = userService.findUserByEmail(username);
 
         Long channelId = Long.parseLong(map.get("channelId").toString());
 

@@ -1,34 +1,45 @@
-<!DOCTYPE html>
-<html lang="ko" 기xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>회원가입</title>
+<!doctype html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
 
-</head>
 <body>
-<div>
-    <h3>Hello , </h3>
-    <p>
+<div class="plane-content" style="height: 400px"  layout:fragment="content">
+    <form method="post" th:action="@{/identity/register}" th:object="${user}">
+        <div class="col pt-5 ml-3">
+            <div class="col mt-4 ml-5">
+                <div class="row form-group">
+                    <label for="nickname" class="col-form-label mr-3">닉네임</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" id="nickname" th:field="*{nickname}">
+                        <small class="text-danger" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"/>
+                    </div>
 
-    <form method="post" th:action="@{/identity/register}" th:object="${user}" action="#">
-        <div>
-            <label for="nickname">nickname</label>
-            <input type="text" id="nickname" name="nickname" size="20" th:field="*{nickname}">
-            <small th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"/>
+                </div>
+                <div class="row form-group">
+                    <label for="email" class="col-form-label mr-3">이메일</label>
+                    <div class="col-sm-7">
+                        <input type="email" class="form-control" id="email" th:field="*{email}">
+                        <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"/>
+                    </div>
+
+                </div>
+                <div class="row form-group">
+                    <label for="password" class="col-form-label">비밀번호</label>
+                    <div class="col-sm-7">
+                        <input type="password" class="form-control" id="password" th:field="*{password}">
+                        <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"/>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row register-btn">
+                <input type="button" class="btn btn-fill btn-dark col-md-4 mr-2 radius-0" onclick="
+                   location.href='/login'" value="로그인">
+                <input type="submit" class="btn btn-fill btn-dark col-md-4 radius-0" value="가입하기">
+            </div>
         </div>
-        <div>
-            <label for="email">email</label>
-            <input type="email" id="email" name="email" size="20" th:field="*{email}">
-            <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"/>
-        </div>
-        <div>
-            <label for="password">password</label>
-            <input type="password" id="password" name="password" size="20" th:field="*{password}">
-            <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"/>
-        </div>
-        <button type="submit">Sign-Up</button>
     </form>
-    </p>
 </div>
 </body>
 </html>
+

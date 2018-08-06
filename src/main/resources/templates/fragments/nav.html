@@ -1,0 +1,21 @@
+<nav layout:fragment="nav" id="sidebar">
+    <div class="sidebar-header">
+        <h3><b>Toktalk</b><br/>개인정보</h3>
+    </div>
+
+    <ul class="list-unstyled components">
+        <p class="p-name" th:text="${#authentication.principal.nickname}+'님'"></p>
+        <li>
+            <a th:href="@{/users/}">기본정보</a>
+        </li>
+        <li>
+            <a th:href="@{/users/password}">비밀번호변경</a>
+        </li>
+        <li>
+            <a th:href="@{/users/oauth}">SNS연결</a>
+        </li>
+        <li>
+            <a href="/logout">로그아웃</a>
+        </li>
+    </ul>
+</nav>
