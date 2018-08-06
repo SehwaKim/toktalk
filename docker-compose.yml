@@ -1,0 +1,58 @@
+version: '3'
+services:
+#  mysql:
+#   container_name: some-mysql
+#   image: mysql/mysql-server:5.7
+#   environment:
+#    MYSQL_DATABASE: test
+#    MYSQL_ROOT_PASSWORD: hellokoding
+#    MYSQL_ROOT_HOST: '%'
+#   ports:
+#   - "3306:3306"
+#   restart: always
+
+  toktalk:
+    restart: always
+    image: docker.sys/toktalk
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    restart: always
+    volumes:
+    - /upload:/tmp
+    ports:
+    - "9090:8080"
+    depends_on:
+      - rabbitmq
+      - redis
+    links:
+      - rabbitmq
+      - redis
+
+  rabbitmq:
+   image: rabbitmq:3-management
+   environment:
+     - RABBITMQ_DEFAULT_USER=admin
+     - RABBITMQ_DEFAULT_PASS=sys1235
+   restart: unless-stopped
+   ports:
+     - 5672:5672
+     - 15672:15672
+
+  redis:
+   image: redis
+   restart: unless-stopped
+   ports:
+     - 6379:6379
+
+  nginx:
+   image: nginx:1.13
+   restart: always
+   ports:
+   - 80:80
+   - 443:443
+   volumes:
+   - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+   depends_on:
+    - toktalk
+   links:
+    - toktalk

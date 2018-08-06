@@ -13,9 +13,16 @@
     <script src="/js/channels.js"></script>
     <script src="/js/popup.js"></script>
     <script src="/js/file.js"></script>
+    <script src="/js/notification.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Notification.requestPermission();
+    });
+</script>
 </head>
 <body>
 <div>
+
     <nav>
         <div style="margin-left: 15px; margin-top: 15px">
             <button type="button" class="btn btn-warning menu" id="btn-create"><b>새 채널</b></button>
@@ -79,7 +86,7 @@
                             <div style="width: 100%;">
                                 <div style="padding-bottom: 10px; text-align: right">
                                     <div style="display: inline-block">
-                                        <button type="button" class="btn btn-dark btn-sm menu" id="btn-invite" onclick="inviteMember()" disabled><small>초대하기</small></button>
+                                        <button type="button" class="btn btn-dark btn-sm menu" id="btn-invite" onclick="inviteMember();setTimeout(notificationf,10)" disabled><small>초대하기</small></button>
                                         <button type="button" class="btn btn-dark btn-sm menu" id="btn-exit" onclick="exitChannel()" disabled><small>이 채널 나가기</small></button>
                                     </div>
                                 </div>
