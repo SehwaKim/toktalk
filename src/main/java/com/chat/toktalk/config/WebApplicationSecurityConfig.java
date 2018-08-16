@@ -32,9 +32,6 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         this.tokTalkUserDetailsService = tokTalkUserDetailsService;
     }
 
-
-
-
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()

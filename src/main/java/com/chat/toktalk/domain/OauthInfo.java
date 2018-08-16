@@ -1,5 +1,6 @@
 package com.chat.toktalk.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class OauthInfo implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="user_id")
+    @JsonBackReference
     User user;
 
     @Builder

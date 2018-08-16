@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
     private final OauthRepository oauthRepository;
     private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -28,13 +27,8 @@ public class UserServiceImpl implements UserService {
         this.oauthRepository = oauthRepository;
     }
 
-
-
-
-
     @Override
     public User findUserByEmail(String email) {
-
         return userRepository.findUsersByEmail(email);
     }
 
