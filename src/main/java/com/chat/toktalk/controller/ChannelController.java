@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ChannelController {
     @GetMapping
     public String channels() {
-        return "channels/channels";
+//        return "channels/channels";
+        return "public/index";
     }
 }

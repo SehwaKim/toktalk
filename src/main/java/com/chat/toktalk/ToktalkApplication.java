@@ -39,7 +39,7 @@ public class ToktalkApplication implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/public/static/**")
-                .addResourceLocations("classpath:/public/static/");
+		registry.addResourceHandler("/static/**")
+				.addResourceLocations("classpath:/templates/public/static/");
     }
 }

@@ -84,7 +84,7 @@ class ChatContent extends React.Component {
             <div className="chat-content">
                 <div className="row">
                     <div style={divStyle} className="column avatar">
-                        <Avatar style={avatarStyle} path="woman.png"/>
+                        <Avatar style={avatarStyle} path="/images/woman.png"/>
                     </div>
                     <div className="column">
                         <div>

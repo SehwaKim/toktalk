@@ -95,7 +95,7 @@ class App extends React.Component {
             <HashRouter>
                 <div>
                     <div className="sidebar">
-                        <Profile path="woman.png"/>
+                        <Profile path="/images/woman.png"/>
                         <QuickSwitcher/>
                         <GroupTag togglePopup={this.togglePopup.bind(this)}/>
                         <ChannelList ref={channels => this.channels = channels} addChatArea={this.addItem}
