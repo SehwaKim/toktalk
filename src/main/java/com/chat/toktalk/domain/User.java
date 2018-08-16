@@ -69,7 +69,7 @@ public class User implements Serializable {
         }
     }
 
-    public void addUserOauthInfo(OauthInfo oauthInfo) {
+    public void addUserOauthInfo(OauthInfo oauthInfo){
         oauthInfos.add(oauthInfo);
         if(oauthInfo.getUser() != this){
             oauthInfo.setUser(this);

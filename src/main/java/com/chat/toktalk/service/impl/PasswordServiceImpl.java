@@ -4,24 +4,23 @@ import com.chat.toktalk.domain.PasswordResetToken;
 import com.chat.toktalk.domain.User;
 import com.chat.toktalk.repository.PasswordResetTokenRepository;
 import com.chat.toktalk.repository.UserRepository;
-import com.chat.toktalk.security.LoginUserInfo;
 import com.chat.toktalk.service.PasswordService;
-import com.chat.toktalk.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PasswordServiceImpl implements PasswordService {
-    @Autowired
-    UserRepository userRepository;
 
-    @Autowired
-    PasswordResetTokenRepository passwordResetTokenRepository;
+    private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    public PasswordServiceImpl(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository) {
+        this.userRepository = userRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+    }
 
     @Override
     @Transactional
@@ -43,8 +42,7 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     @Transactional
-    public void savePassword(LoginUserInfo loginUserInfo, String password){
-        User user = userRepository.findUserByEmail(loginUserInfo.getEmail());
+    public void savePassword(User user, String password){
         user.setPassword(passwordEncoder.encode(password));
     }
 }

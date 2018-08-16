@@ -24,15 +24,12 @@ import java.util.logging.Logger;
 @Setter
 public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public UserAuthenticationSuccessHandler() {
-
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
         response.sendRedirect("/");
     }
 

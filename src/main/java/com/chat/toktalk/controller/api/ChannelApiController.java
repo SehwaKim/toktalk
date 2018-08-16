@@ -43,7 +43,7 @@ public class ChannelApiController {
     @PostMapping
     public ResponseEntity<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
         if(loginUserInfo != null){
-            User user = userService.getUserByEmail(loginUserInfo.getUsername());
+            User user = userService.findUserByEmail(loginUserInfo.getUsername());
 
             ChannelUser channelCreator = new ChannelUser();
             channelCreator.setUser(user);

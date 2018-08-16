@@ -10,8 +10,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      User findUsersByEmail(String email);
      User findUserByEmail(String email);
 
-     @Query("SELECT oauth.user FROM UserOauthInfo oauth WHERE oauth.email = :email")
-     User getOauthUser(@Param("email")String email);
+     @Query("SELECT oauth.user FROM OauthInfo oauth WHERE oauth.email = :email")
+     User findOauthUserByEmail(@Param("email")String email);
 
 
 }

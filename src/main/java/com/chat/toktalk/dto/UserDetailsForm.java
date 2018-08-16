@@ -1,7 +1,7 @@
 package com.chat.toktalk.dto;
 
-
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
@@ -9,11 +9,11 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class PasswordForm implements Serializable{
+@NoArgsConstructor
+public class UserDetailsForm implements Serializable {
     @NotEmpty
-    private String password;
+    String nickname;
     @NotEmpty
-    private String confirmPassword;
+    String email;
 
-    private String token;
 }
