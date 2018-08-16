@@ -1,6 +1,5 @@
 package com.chat.toktalk.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +12,8 @@ import java.io.Serializable;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "user_oauth_info")
-public class UserOauthInfo implements Serializable {
+@Table(name = "oauth_info")
+public class OauthInfo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +24,12 @@ public class UserOauthInfo implements Serializable {
     String picture;
     String email;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name="user_id")
     User user;
 
     @Builder
-    public UserOauthInfo(String sub, String name, String picture, String email) {
+    public OauthInfo(String sub, String name, String picture, String email) {
         this.sub = sub;
         this.name = name;
         this.picture = picture;

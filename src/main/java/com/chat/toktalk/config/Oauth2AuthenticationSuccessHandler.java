@@ -2,7 +2,7 @@ package com.chat.toktalk.config;
 
 import com.chat.toktalk.domain.RoleState;
 import com.chat.toktalk.domain.User;
-import com.chat.toktalk.domain.UserOauthInfo;
+import com.chat.toktalk.domain.OauthInfo;
 import com.chat.toktalk.domain.Role;
 import com.chat.toktalk.dto.GoogleUser;
 import com.chat.toktalk.repository.UserRepository;
@@ -82,18 +82,18 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             String alreadyLoginId = (String)request.getAttribute("alreadyLoginId");
             user = userRepository.findUserByEmail(alreadyLoginId);
             if(alreadyLoginId != null){
-                UserOauthInfo userOauthInfo = googleUser.toUserOauthInfoEntity();
-                userOauthInfo.setAccessToken(getAccessToken(authentication));
-                user.addUserOauthInfo(userOauthInfo);
+                OauthInfo oauthInfo = googleUser.toUserOauthInfoEntity();
+                oauthInfo.setAccessToken(getAccessToken(authentication));
+                user.addUserOauthInfo(oauthInfo);
                 userRepository.save(user);
                 accountLogout(request,response,authentication);
                 response.sendRedirect("/");
             }else {
                 String password =getTemporaryPassword();
-                UserOauthInfo userOauthInfo = googleUser.toUserOauthInfoEntity();
-                userOauthInfo.setAccessToken(getAccessToken(authentication));
+                OauthInfo oauthInfo = googleUser.toUserOauthInfoEntity();
+                oauthInfo.setAccessToken(getAccessToken(authentication));
                 User newComer = googleUser.toUserEntity();
-                newComer.addUserOauthInfo(userOauthInfo);
+                newComer.addUserOauthInfo(oauthInfo);
 
                 PasswordEncoder passwordEncoder = getCustomDelegatingPasswordEncoder("bcrypt");
                 newComer.setPassword(passwordEncoder.encode(password));
