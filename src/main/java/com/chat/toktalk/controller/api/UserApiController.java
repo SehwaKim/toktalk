@@ -19,7 +19,7 @@ public class UserApiController {
     @GetMapping
     public ResponseEntity<User> user(LoginUserInfo loginUserInfo) {
         if (loginUserInfo != null) {
-            User user = userService.getUserByEmail(loginUserInfo.getEmail());
+            User user = userService.findUserByEmail(loginUserInfo.getEmail());
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
