@@ -3,7 +3,6 @@ var current = 0;
 var in5Sec = false;
 var timer1;
 var timer2;
-var notifchannel
 
 $(document).ready(function () {
 

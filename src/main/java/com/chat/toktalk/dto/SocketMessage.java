@@ -8,14 +8,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
 public class SocketMessage implements Serializable {
-
-    private String type;
+    private SendType type;
     private Long channelId;
     private Long userId;
     private String nickname;
@@ -25,48 +26,19 @@ public class SocketMessage implements Serializable {
     private List<UnreadMessageInfo> unreadMessages;
     private UploadFile uploadFile;
     private Channel channel;
+    private LocalDateTime date;
+    private String regdate;
 
     public SocketMessage() {
     }
 
-    public SocketMessage(Long channelId, List<Message> messages){
-        this.type = "messageList";
-        this.channelId = channelId;
-        this.messages = messages;
+    public SocketMessage(SendType type) {
+        this.type = type;
+        date = LocalDateTime.now();
+        regdate = date.format(DateTimeFormatter.ofPattern("a h:mm"));
     }
 
-    public SocketMessage(Long channelId, String text, String nickname) {
-        this.type = "chat";
-        this.channelId = channelId;
-        this.text = text;
-        this.nickname = nickname;
-        this.notification = false;
-    }
-
-    public SocketMessage(Long channelId, String systemMsg) {
-        this.type = "system";
-        this.channelId = channelId;
-        this.text = systemMsg;
-    }
-
-    public SocketMessage(Long channelId, Long userId) {
-        this.type = "channel_mark";
-        this.channelId = channelId;
-        this.userId = userId;
-    }
-
-    public SocketMessage(Long channelId, Long userId, String typingAlarm) {
-        this.type = "typing";
-        this.channelId = channelId;
-        this.userId = userId;
-        this.text = typingAlarm;
-    }
-
-    public SocketMessage(List<UnreadMessageInfo> unreadMessages){
-        this.type = "unread";
-        this.unreadMessages = unreadMessages;
-    }
-
+ /*
     public SocketMessage(Long channelId,String nickname, UploadFile uploadFile){
         this.type = "upload_file";
         this.channelId = channelId;
@@ -74,10 +46,5 @@ public class SocketMessage implements Serializable {
         this.uploadFile = uploadFile;
         this.notification = false;
     }
-
-    public SocketMessage(Long userId, Channel channel){
-        this.type = "channel_joined";
-        this.channel = channel;
-        this.userId = userId;
-    }
+*/
 }

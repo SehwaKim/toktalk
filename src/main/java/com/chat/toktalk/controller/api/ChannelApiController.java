@@ -12,11 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/channels")
+@RequestMapping(value = "/api/channels", produces = "application/json; charset=utf8")
 public class ChannelApiController {
     @Autowired
     ChannelService channelService;
@@ -30,7 +31,15 @@ public class ChannelApiController {
     @Autowired
     RedisService redisService;
 
-    /* 새 채널 생성 */
+    @GetMapping
+    public ResponseEntity<List<Channel>> channels(LoginUserInfo loginUserInfo) {
+        if (loginUserInfo != null) {
+            List<Channel> channels = channelService.getChannelsByUser(loginUserInfo.getId());
+            return new ResponseEntity<>(channels, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PostMapping
     public ResponseEntity<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
         if(loginUserInfo != null){
@@ -44,9 +53,9 @@ public class ChannelApiController {
             channel.addChanneUser(channelCreator);
             channel.setName(channelForm.getName());
             if("private".equals(channelForm.getType())){
-                channel.setType("public");
-            }else {
                 channel.setType("private");
+            } else {
+                channel.setType("public");
             }
 
             channel = channelService.addChannel(channel);

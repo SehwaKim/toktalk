@@ -1,0 +1,193 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+.sidebar {
+    height: 100%;
+    width: 290px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #004B8D;
+    overflow: hidden;
+    padding-top: 20px;
+}
+
+.sidebar a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: rgb(226, 232, 244);
+    display: block;
+}
+
+.sidebar a:hover:not(.active) {
+    background-color: #003d72
+}
+
+.active {
+    color: #f1f1f1;
+    background-color: #5dae8b;
+}
+
+.list {
+    padding-bottom: 25px;
+}
+
+.header {
+    overflow: hidden;
+    margin-left: 290px;
+    padding: 7px 10px;
+    position: fixed;
+    top: 0;
+    height: 50px;
+    width: 100%;
+}
+
+.footer {
+    overflow: hidden;
+    margin-left: 290px;
+    padding: 0px 10px;
+    height: 80px;
+    position: absolute;
+    width: calc(100vh);
+    bottom: 0;
+}
+
+.chat-area {
+    margin-left: 290px;
+    /*margin-top: 55px;*/
+    height: calc(100vh - 135px);
+    overflow: auto;
+}
+
+.chat-content {
+    padding: 4px 15px 4px;
+    font-size: 17px;
+}
+
+.chat-content:hover {
+    background-color: #f5f5f5;
+}
+
+.chat-content:hover .time {
+    color: rgb(104, 104, 104);
+}
+
+.time {
+    color: white;
+    font-size: 12px;
+}
+
+.message-area {
+    margin-left: 290px;
+    position: absolute;
+    bottom: 24px;
+    width: calc(100vw - 290px);
+
+}
+
+.message-box {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+    border-radius: 5px;
+    border: 2px solid darkgray;
+}
+
+input:focus {
+    outline: none;
+}
+
+.footer {
+    overflow: hidden;
+    margin-left: 290px;
+    padding-left: 20px;
+    position: fixed;
+    bottom: 0;
+    height: 24px;
+    width: 100%;
+    font-size: 12px;
+    font-weight: bold;
+    color: rgb(153, 153, 153);
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.img-avatar {
+    max-width: 90%;
+    border-radius: 50%;
+}
+
+.row {
+    display: table;
+    width: 100%;
+}
+
+.column {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.avatar {
+    width: 20%;
+}
+
+.name {
+    padding-left: 5px;
+    width: 68%;
+}
+
+.status {
+    width: 12%;
+}
+
+.icon {
+    height: 10px;
+    width: 10px;
+}
+
+.circle {
+    cx: 5;
+    cy: 5;
+    r: 5;
+    fill: #5dae8b;
+}
+
+.badge {
+    display: inline-block;
+    min-width: 13px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #777;
+    border-radius: 10px;
+}
+
+.badge:empty {
+    display: none;
+}

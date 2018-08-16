@@ -20,39 +20,33 @@ services:
     volumes:
     - /upload:/tmp
     ports:
-    - "9090:8080"
+    - 8080:8080
     depends_on:
       - rabbitmq
       - redis
-    links:
-      - rabbitmq
-      - redis
+    network_mode: host
 
   rabbitmq:
-   image: rabbitmq:3-management
-   environment:
-     - RABBITMQ_DEFAULT_USER=admin
-     - RABBITMQ_DEFAULT_PASS=sys1235
-   restart: unless-stopped
-   ports:
-     - 5672:5672
-     - 15672:15672
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=test
+      - RABBITMQ_DEFAULT_PASS=test
+    restart: unless-stopped
+    network_mode: host
 
   redis:
-   image: redis
-   restart: unless-stopped
-   ports:
-     - 6379:6379
+    image: redis
+    restart: unless-stopped
+    network_mode: host
 
   nginx:
-   image: nginx:1.13
-   restart: always
-   ports:
-   - 80:80
-   - 443:443
-   volumes:
-   - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-   depends_on:
-    - toktalk
-   links:
-    - toktalk
+    image: nginx:1.13
+    restart: always
+    ports:
+    - 80:80
+    - 443:443
+    volumes:
+    - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+     - toktalk
+    network_mode: host

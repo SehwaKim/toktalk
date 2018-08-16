@@ -17,8 +17,8 @@ public class GoogleUser implements Serializable {
     String email;
     String picture;
     String sub;
-
-    public OauthInfo toUserOauthInfoEntity(){
+  
+    public OauthInfo toUserOauthInfoEntity() {
         return OauthInfo.builder().email(email).name(name).sub(sub).picture(picture).build();
     }
     public User toUserEntity(){

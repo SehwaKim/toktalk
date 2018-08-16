@@ -40,7 +40,8 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .requestMatchers(new AntPathRequestMatcher("/**.html"))
-                .requestMatchers(new AntPathRequestMatcher("/static/**"));
+                .requestMatchers(new AntPathRequestMatcher("/static/**"))
+                .requestMatchers(new AntPathRequestMatcher("/public/**"));
     }
 
     @Override

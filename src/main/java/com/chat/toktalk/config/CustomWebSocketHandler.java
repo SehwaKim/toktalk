@@ -5,6 +5,7 @@ import com.chat.toktalk.domain.Channel;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.User;
+import com.chat.toktalk.dto.SendType;
 import com.chat.toktalk.dto.SocketMessage;
 import com.chat.toktalk.dto.UnreadMessageInfo;
 import com.chat.toktalk.service.*;
@@ -58,6 +59,8 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         Map<String, Object> attributes = session.getAttributes();
+
+        session.sendMessage(new TextMessage("hi"));
         
         logger.info("새로운 웹소켓 세션 id : " + session.getId());
         Long userId = (Long) attributes.get("userId");
@@ -67,51 +70,22 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         redisService.addWebSocketSessionByUser(userId, session);
 
         // 채널별로 읽지 않은 메세지 수 구해서 뿌려주기
-        List<UnreadMessageInfo> unreadMessages = new ArrayList<>();
-        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
-        for(ChannelUser channelUser : channelUsers){
-            Long cnt = messageService.countUnreadMessageByChannelUser(channelUser);
-            if(cnt != null){
-                unreadMessages.add(new UnreadMessageInfo(channelUser.getChannel().getId(), cnt));
-            }
-        }
-
-        String jsonStr = objectMapper.writeValueAsString(new SocketMessage(unreadMessages));
-        logger.info(jsonStr);
-        session.sendMessage(new TextMessage(jsonStr));
-
-        // online 되자마자 유저가 참여한 방정보 가져오기.
-        /*List<ChannelUser> channelUserList = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
-        for(int i=0; i<channelUserList.size(); i++) {
-            redisService.addChannelForUser(attributes.get("userId").toString()
-                                                                ,channelUserList.get(i).getChannel().getId());
-        }
-
-        System.out.println("참여한 방정보 : "+redisService.getChannels(attributes.get("userId").toString()));*/
-
-
-        /*Principal principal = session.getPrincipal();
-        String name = "";
-        if(principal != null){
-            name = principal.getName();
-            System.out.println("접속자 : " + name);
-        }*/
-
-        // 1번 방에 입장 했을 때.
-        /*redisService.addChannelUser(1L,principal.getName());
-        List<User> userList = new ArrayList<>();
-        userList = redisService.getUsers(1L);
-        System.out.println("1번방 참여한 사람 : " + userList);*/
-//        redisService.addChannelUser(1L,principal.getName());
-//        List<User> userList = new ArrayList<>();
-//        userList = redisService.getUsers(1L);
-//        System.out.println("1번방 참여한 사람 : " + userList);
-
-        // 접속하면 해당 웹소켓 아이디(key), 유저id(value) 저장.
-        /*redisService.addUserAtSocket(session.getId(),attributes.get("userId").toString());
-        for(int i=0; i<channelUserList.size(); i++) {
-            System.out.println(session.getId() + " WebSocket으로 참여한 사람 : "+attributes.get("userId"));
-        }*/
+//        List<UnreadMessageInfo> unreadMessages = new ArrayList<>();
+//
+//        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
+//
+//        for(ChannelUser channelUser : channelUsers){
+//            Long cnt = messageService.countUnreadnew UnreadMessageInfo(channelId, unread)MessageByChannelUser(channelUser);
+//            if(cnt != null){
+//                unreadMessages.add(new UnreadMessageInfo(channelUser.getChannel().getId(), cnt));
+//            }
+//        }
+//
+//        SocketMessage socketMessage = new SocketMessage(SendType.UNREAD);
+//        socketMessage.setUnreadMessages(unreadMessages);
+//        String jsonStr = objectMapper.writeValueAsString(socketMessage);
+//        logger.info(jsonStr);
+//        session.sendMessage(new TextMessage(jsonStr));
     }
 
     @Override
@@ -122,15 +96,20 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         if("pong".equals(type)) {
             return;
-        }else if("typing".equals(type)){
+        }
+        if ("typing".equals(type)) {
             alertTyping(session);
-        }else if("switch".equals(type)){
+        }
+        if ("switch".equals(type)) {
             switchChannel(session, map);
-        }else if("chat".equals(type)){
+        }
+        if ("chat".equals(type)) {
             handleChatMessage(session, map);
-        }else if("exit_channel".equals(type)){
+        }
+        if ("exit_channel".equals(type)) {
             exitChannel(session, map);
-        }else if("invite_member".equals(type)){
+        }
+        if ("invite_member".equals(type)) {
             inviteMember(map);
         }
     }
@@ -144,7 +123,10 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         }else {
             addNewChannelUser(null, invitedUserId, channelId);
         }
-        messageSender.sendMessage(new SocketMessage(invitedUserId, channel));
+        SocketMessage socketMessage = new SocketMessage(SendType.CHANNEL_JOINED);
+        socketMessage.setUserId(invitedUserId);
+        socketMessage.setChannel(channel);
+        messageSender.sendMessage(socketMessage);
     }
 
     private void exitChannel(WebSocketSession session, HashMap<String, Object> map) {
@@ -159,7 +141,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         String nickname = (String) session.getAttributes().get("nickname");
         Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
         String typingAlarm = nickname+" is typing";
-        messageSender.sendMessage(new SocketMessage(channelId, userId, typingAlarm));
+        SocketMessage socketMessage = new SocketMessage(SendType.TYPING);
+        socketMessage.setChannelId(channelId);
+        socketMessage.setUserId(userId);
+        socketMessage.setText(typingAlarm);
+        messageSender.sendMessage(socketMessage);
     }
 
     void switchChannel(WebSocketSession session, HashMap<String, Object> map) throws Exception {
@@ -200,12 +186,18 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             if(messages != null && messages.size() > 0){
                 alreadyUser.setLastReadId(messages.get(messages.size()-1).getId());
                 channelUserService.updateChannelUser(alreadyUser);
-                String jsonStr = new ObjectMapper().writeValueAsString(new SocketMessage(channelId, messages));
+                SocketMessage socketMessage = new SocketMessage(SendType.MESSAGES);
+                socketMessage.setChannelId(channelId);
+                socketMessage.setMessages(messages);
+                String jsonStr = new ObjectMapper().writeValueAsString(socketMessage);
                 session.sendMessage(new TextMessage(jsonStr));
             }
 
             // 이 유저가 가진 웹소켓세션에도 이 채널 unread mark 지우라고 해야함
-            messageSender.sendMessage(new SocketMessage(channelId, user.getId()));
+            SocketMessage socketMessage = new SocketMessage(SendType.CHANNEL_MARK);
+            socketMessage.setChannelId(channelId);
+            socketMessage.setUserId(user.getId());
+            messageSender.sendMessage(socketMessage);
 
 
         // 새롭게 채널에 합류한 유저
@@ -231,7 +223,10 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             channelUser.setFirstReadId(saved.getId());
             channelUserService.updateChannelUser(channelUser);
 
-            messageSender.sendMessage(new SocketMessage(channelId, systemMsg));
+            SocketMessage socketMessage = new SocketMessage(SendType.SYSTEM);
+            socketMessage.setChannelId(channelId);
+            socketMessage.setText(systemMsg);
+            messageSender.sendMessage(socketMessage);
         }
     }
 
@@ -252,7 +247,11 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         messageService.addMessage(messageNew);
 
         // 2. 메세지큐에 내보내기
-        messageSender.sendMessage(new SocketMessage(channelId, message, nickname));
+        SocketMessage socketMessage = new SocketMessage(SendType.CHAT);
+        socketMessage.setChannelId(channelId);
+        socketMessage.setText(message);
+        socketMessage.setNickname(nickname);
+        messageSender.sendMessage(socketMessage);
 
         // 3. 첨부파일 있으면 보내기
 

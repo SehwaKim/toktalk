@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -16,8 +17,6 @@ import java.util.List;
 @EnableRedisHttpSession
 @SpringBootApplication
 public class ToktalkApplication implements WebMvcConfigurer {
-
-
 	public static void main(String[] args) {
 		SpringApplication.run(ToktalkApplication.class, args);
 	}
@@ -36,5 +35,11 @@ public class ToktalkApplication implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new LoginUserInfoArgumentResolver());
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/public/static/**")
+                .addResourceLocations("classpath:/public/static/");
     }
 }
