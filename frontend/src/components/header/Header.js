@@ -4,7 +4,8 @@ class Header extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            title: ''
+            title: '',
+            cId: ''
         }
         this.switchChannel = this.switchChannel.bind(this);
     };
@@ -60,15 +61,11 @@ class Header extends React.Component {
         return (
             <div className="header" style={divStyle}>
                 <div style={innerDivStyle_1}>
-                    <div>
+                    <div className="dropdown">
                         <button style={{...buttonStyle, ...titleStyle}}>{this.state.title}</button>
-                    </div>
-                    <div>
-                        {/*<button style={Object.assign(buttonStyle, textStyle)}>
-                            <svg id="i-star" viewBox="0 0 32 32" width="15" height="15" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                <path d="M16 2 L20 12 30 12 22 19 25 30 16 23 7 30 10 19 2 12 12 12 Z" />
-                            </svg>
-                        </button>*/}
+                        <div className="dropdown-content">
+                            <button style={buttonStyle} onClick={this.props.togglePopup}>나가기</button>
+                        </div>
                     </div>
                 </div>
                 <div style={innerDivStyle_2}>

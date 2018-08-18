@@ -12,6 +12,9 @@ class WebSocket extends React.Component {
     componentDidMount() {
         var scheme = window.location.protocol;
         var path = scheme + '//' + window.location.host + "/sock";
+        if (window.location.host == 'localhost:3000') {
+            path = "http://localhost:8080/sock";
+        }
         this.connection = new SockJS(path);
         this.connection.onheartbeat = e => {
             this.connection.send(JSON.stringify({'type': 'pong'}));
