@@ -1,5 +1,6 @@
 package com.chat.toktalk.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "message")
+@Table(name = "messages")
 @Getter
 @Setter
 public class Message implements Serializable {
@@ -32,5 +33,6 @@ public class Message implements Serializable {
     @OneToOne(mappedBy = "message", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @LazyToOne(LazyToOneOption.NO_PROXY)
     private UploadFile uploadFile;
+    @JsonFormat(pattern = "a h:mm")
     private LocalDateTime regdate;
 }

@@ -1,11 +1,16 @@
 package com.chat.toktalk.service;
 
 import com.chat.toktalk.domain.User;
+import com.chat.toktalk.domain.UserStatus;
+import com.chat.toktalk.dto.UserDetailsForm;
 
 public interface UserService{
-    void registerUser(User user);
+    void registerUser(User user,UserStatus userStatus);
     void deleteUser(String email);
+    void updateNickName(UserDetailsForm detailsForm);
+    User findUserByEmail(String email);
+    User findOauthUserByEmail(String email);
     void updateUserData(User user);
-    User getUserByEmail(String email);
-    User getUserById(Long invitedUserId);
+    void disConnectSocial(User user);
+    void updatePassword(User user);
 }

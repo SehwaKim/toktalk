@@ -12,10 +12,12 @@ import org.springframework.validation.Validator;
 
 @Log4j2
 @Component
-public class UserValidator implements Validator {
+public class RegisterValidator implements Validator {
+    private final UserService userService;
 
-    @Autowired
-    UserService userService;
+    public RegisterValidator(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -24,18 +26,18 @@ public class UserValidator implements Validator {
     @Override
     public void validate(Object object, Errors errors) {
         User user = (User)object;
-        User existingUser = userService.getUserByEmail(user.getEmail());
+        User existingUser = userService.findUserByEmail(user.getEmail());
 
-        if(user.getNickname().length() < 2 || user.getNickname().length() > 8){
-            errors.rejectValue("nickname","required","2이상 8이하의 글자를 입력 해주세요");
+        if(user.getNickname().length() <= 2 || user.getNickname().length() > 8){
+            errors.rejectValue("nickname",null,"2이상 8 이하의 글자를 입력 해주세요");
         }
 
         if(existingUser != null && !UserStatus.DELETE.equals(existingUser.getUserStatus())){
-            errors.rejectValue("email","required","이미 존재하는 계정 입니다.");
+            errors.rejectValue("email",null,"이미 존재하는 계정 입니다.");
         }
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"email","required","필수 입력입니다.");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"password","required","필수 입력입니다.");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"email",null,"필수 입력입니다.");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"password",null,"필수 입력입니다.");
 
     }
 }

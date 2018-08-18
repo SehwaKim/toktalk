@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+
+<body>
+<div class="plane-content" layout:fragment="content">
+    <ul class="find-password-notice">
+        <li><strong th:text="${email}"></strong>으로 비밀번호 재설정 이메일을 보냈습니다.</li>
+        <li>새 비밀번호를 만들려면 <strong>이메일의 링크</strong>를 클릭하고 새 비밀번호를 입력하십시오.</li>
+        <li>이메일을 받지 못했습니까? 스팸 메일을 확인하거나 다시 보내기 버튼을 눌러 주세요.</li>
+    </ul>
+    <div class="col pt-5">
+        <div class="row-2 text-center">
+            <input type="button" class="btn btn-fill btn-dark col-md-4 mr-2" onclick="
+                   location.href='/users/login'" value="로그인 하기">
+            <input type="button" class="btn btn-fill btn-dark col-md-4"  onclick="
+                   location.href='/identity/password/forgot'" value="다시 보내기">
+        </div>
+    </div>
+</div>
+</body>
+</html>

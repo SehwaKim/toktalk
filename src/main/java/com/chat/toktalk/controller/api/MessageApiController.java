@@ -1,20 +1,23 @@
 package com.chat.toktalk.controller.api;
 
 import com.chat.toktalk.amqp.MessageSender;
+import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.domain.Message;
 import com.chat.toktalk.domain.UploadFile;
+import com.chat.toktalk.dto.SendType;
 import com.chat.toktalk.dto.SocketMessage;
+import com.chat.toktalk.dto.UnreadMessageInfo;
 import com.chat.toktalk.security.LoginUserInfo;
+import com.chat.toktalk.service.ChannelUserService;
 import com.chat.toktalk.service.MessageService;
 import com.chat.toktalk.service.UploadFileService;
 import com.chat.toktalk.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -23,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping(value = "/api/messages", produces = "application/json; charset=utf8")
 public class MessageApiController {
 
     @Autowired
@@ -33,10 +36,37 @@ public class MessageApiController {
     UserService userService;
 
     @Autowired
+    ChannelUserService channelUserService;
+
+    @Autowired
     MessageSender messageSender;
 
     @Autowired
     MessageService messageService;
+
+    @GetMapping
+    public ResponseEntity<List<Message>> messages(Long channelId, LoginUserInfo loginUserInfo) {
+        if (loginUserInfo != null) {
+            ChannelUser channelUser = channelUserService.getChannelUser(channelId, loginUserInfo.getId());
+            if (channelUser != null) {
+                List<Message> messages = messageService.getMessagesByChannelUser(channelId, channelUser.getFirstReadId());
+                return new ResponseEntity<>(messages, HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping(path = "/unread")
+    public ResponseEntity<UnreadMessageInfo> unread(Long channelId, LoginUserInfo loginUserInfo) {
+        ChannelUser channelUser = channelUserService.getChannelUser(channelId, loginUserInfo.getId());
+        if (channelUser != null) {
+            Long unread = messageService.countUnreadMessageByChannelUser(channelUser);
+            if (unread != null) {
+                return new ResponseEntity<>(new UnreadMessageInfo(channelId, unread), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
     @PostMapping(value = "/file") //ajax에서 호출하는 부분
     @ResponseBody
@@ -98,7 +128,10 @@ public class MessageApiController {
                 message.setRegdate(LocalDateTime.now());
                 messageService.addMessage(message);
 
-                SocketMessage socketMessage = new SocketMessage(channelId,nickname,uploadFile);
+                SocketMessage socketMessage = new SocketMessage(SendType.UPLOAD_FILE);
+                socketMessage.setChannelId(channelId);
+                socketMessage.setNickname(nickname);
+                socketMessage.setUploadFile(uploadFile);
                 messageSender.sendMessage(socketMessage);
                 // json test
                 String strJson = objectMapper.writeValueAsString(uploadFile);

@@ -12,8 +12,6 @@ public class UserAuthenticationFailureHandler implements AuthenticationFailureHa
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        //TODO
-        //로그인 실패시
-            //경로변경.
+
     }
 }
