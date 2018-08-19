@@ -1,13 +1,16 @@
 import React from "react";
+import LeaveChannelModal from '../popup/LeaveChannelModal';
 
 class Header extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             title: '',
-            cId: ''
+            cId: '',
+            showLeaveChannelModal: false
         }
         this.switchChannel = this.switchChannel.bind(this);
+        this.toggleLeaveChannelModal = this.toggleLeaveChannelModal.bind(this);
     };
 
     switchChannel(title) {
@@ -15,6 +18,14 @@ class Header extends React.Component {
             return {
                 title: title
             };
+        });
+    }
+
+    toggleLeaveChannelModal() {
+        this.setState((prevState) => {
+            return {
+                showLeaveChannelModal: !prevState.showLeaveChannelModal
+            }
         });
     }
 
@@ -64,7 +75,7 @@ class Header extends React.Component {
                     <div className="dropdown">
                         <button style={{...buttonStyle, ...titleStyle}}>{this.state.title}</button>
                         <div className="dropdown-content">
-                            <button style={buttonStyle} onClick={this.props.togglePopup}>나가기</button>
+                            <button style={buttonStyle} onClick={this.toggleLeaveChannelModal}>나가기</button>
                         </div>
                     </div>
                 </div>
@@ -80,6 +91,13 @@ class Header extends React.Component {
                         </button>
                     </div>
                 </div>
+                {this.state.showLeaveChannelModal ?
+                    <LeaveChannelModal
+                        togglePopup={this.toggleLeaveChannelModal} cId={this.state.cId}
+                        userId={this.props.userId}
+                    />
+                    : null
+                }
             </div>
         );
     }

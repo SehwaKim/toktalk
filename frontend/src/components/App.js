@@ -12,8 +12,6 @@ import ChatArea from './chat/ChatArea';
 import InputArea from './input/InputArea';
 import Footer from './footer/Footer';
 import WebSocket from './websocket/WebSocket';
-import NewChannelPopup from './popup/NewChannelPopup';
-import LeaveChannelModal from './popup/LeaveChannelModal';
 
 class Divider extends React.Component {
     render() {
@@ -36,9 +34,7 @@ class App extends React.Component {
         this.state = {
             routes: [],
             current: 0,
-            userId: 0,
-            showNewChannelPopup: false,
-            showLeaveChannelModal: false
+            userId: 0
         };
         this.chatAreas = new Map();
         this.addItem = this.addItem.bind(this);
@@ -52,22 +48,6 @@ class App extends React.Component {
         this.setState(() => {
             return {
                 userId: id
-            }
-        });
-    }
-
-    toggleNewChannelPopup() {
-        this.setState((prevState) => {
-            return {
-                showNewChannelPopup: !prevState.showNewChannelPopup
-            }
-        });
-    }
-
-    toggleLeaveChannelModal() {
-        this.setState((prevState) => {
-            return {
-                showLeaveChannelModal: !prevState.showLeaveChannelModal
             }
         });
     }
@@ -116,33 +96,19 @@ class App extends React.Component {
                     <div className="sidebar">
                         <Profile path="/images/woman.png" setUserId={this.setUserId.bind(this)}/>
                         <QuickSwitcher/>
-                        <GroupTag togglePopup={this.toggleNewChannelPopup.bind(this)}/>
+                        <GroupTag addNewChannel={this.addNewChannel.bind(this)}/>
                         <ChannelList ref={channels => this.channels = channels} addChatArea={this.addItem}
                                      switchChannel={this.switchChannel}/>
                         <DmTag/>
                         <DmList {...this.props}/>
                     </div>
-                    <Header ref={head => this.head = head} togglePopup={this.toggleLeaveChannelModal.bind(this)}/>
+                    <Header ref={head => this.head = head} userId={this.state.userId}/>
                     <Divider/>
                     {this.state.routes}
                     <InputArea ref={input => this.input = input} sendMessage={this.sendMessage}/>
                     <Footer/>
                     <WebSocket ref={sock => this.sock = sock} printMessage={this.printMessage}
                                markAsUnread={this.markAsUnread}/>
-                    {this.state.showNewChannelPopup ?
-                        <NewChannelPopup
-                            togglePopup={this.toggleNewChannelPopup.bind(this)}
-                            addNewChannel={this.addNewChannel.bind(this)}
-                        />
-                        : null
-                    }
-                    {this.state.showLeaveChannelModal ?
-                        <LeaveChannelModal
-                            togglePopup={this.toggleLeaveChannelModal.bind(this)} cId={this.state.current}
-                            userId={this.state.userId}
-                        />
-                        : null
-                    }
                 </div>
             </HashRouter>
         );
