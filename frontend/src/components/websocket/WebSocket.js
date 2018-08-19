@@ -67,7 +67,7 @@ class WebSocket extends React.Component {
     }
 
     sendChatMsg(cId, text) {
-        if (!(text == "")) {
+        if (!(text == "") && cId != 0) {
             this.connection.send(JSON.stringify({'type': 'chat', 'channelId': cId, 'text': text}));
         }
     }

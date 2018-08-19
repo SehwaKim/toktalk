@@ -106,9 +106,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         if ("chat".equals(type)) {
             handleChatMessage(session, map);
         }
-        if ("exit_channel".equals(type)) {
-            exitChannel(session, map);
-        }
         if ("invite_member".equals(type)) {
             inviteMember(map);
         }
@@ -127,13 +124,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         socketMessage.setUserId(invitedUserId);
         socketMessage.setChannel(channel);
         messageSender.sendMessage(socketMessage);
-    }
-
-    private void exitChannel(WebSocketSession session, HashMap<String, Object> map) {
-        Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
-        Long channelId = Long.parseLong(map.get("channelId").toString());
-        channelUserService.removeChannelUser(userId, channelId);
-        redisService.removeActiveChannelInfo(session);
     }
 
     private void alertTyping(WebSocketSession session) {
@@ -163,14 +153,21 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long activeChannelId = redisService.getActiveChannelInfo(session);
         if(activeChannelId != null){
             ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
-//            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
-            alreadyUser.setLastReadId(messageService.getLastIdByChannel(activeChannelId));
-            channelUserService.updateChannelUser(alreadyUser);
+            if (alreadyUser != null) {
+//                alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
+                alreadyUser.setLastReadId(messageService.getLastIdByChannel(activeChannelId));
+                channelUserService.updateChannelUser(alreadyUser);
+            }
         }
 
         /*
         *   active channel 바꾸기
         */
+        if (channelId == 0) { //0번채널로 바꾸라는 요청은 그냥 지우라는 의미
+            redisService.removeActiveChannelInfo(session);
+            return;
+        }
+
         String sessionId = session.getId();
         redisService.addActiveChannelInfo(sessionId, channelId);
 

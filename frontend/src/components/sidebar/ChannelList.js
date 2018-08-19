@@ -12,6 +12,7 @@ class ChannelList extends React.Component {
         };
         this.itemRefs = new Map();
         this.addNewChannel = this.addNewChannel.bind(this);
+        this.removeChannel = this.removeChannel.bind(this);
     }
 
     addNewChannel(channel) {
@@ -24,6 +25,14 @@ class ChannelList extends React.Component {
             };
         });
         this.props.addChatArea(channel.id);
+    }
+
+    removeChannel(cId) {
+        this.setState((prevState) => {
+            return {
+                items: prevState.items.filter(item => item.props.id != cId)
+            };
+        });
     }
 
     componentDidMount() {

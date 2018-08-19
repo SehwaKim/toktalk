@@ -15,7 +15,8 @@ class LeaveChannelModal extends React.Component {
             contentType: 'application/json',
             data: JSON.stringify({channelId: this.props.cId})
         }).done(json => {
-            // 해당 채널 컴포넌트 삭제
+            this.props.removeItem(this.props.cId);
+            this.props.switchChannel(0, '');
         });
     }
 

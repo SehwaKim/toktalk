@@ -62,6 +62,15 @@ class App extends React.Component {
         });
     }
 
+    removeItem(cId) {
+        this.setState((prevState) => {
+            return {
+                routes: prevState.routes.filter(item => item.props.cId != cId)
+            }
+        });
+        this.channels.removeChannel(cId);
+    }
+
     sendMessage(cId, text) {
         this.sock.sendChatMsg(cId, text);
     }
@@ -102,7 +111,8 @@ class App extends React.Component {
                         <DmTag/>
                         <DmList {...this.props}/>
                     </div>
-                    <Header ref={head => this.head = head} userId={this.state.userId}/>
+                    <Header ref={head => this.head = head} userId={this.state.userId} cId={this.state.current}
+                            removeItem={this.removeItem.bind(this)} switchChannel={this.switchChannel}/>
                     <Divider/>
                     {this.state.routes}
                     <InputArea ref={input => this.input = input} sendMessage={this.sendMessage}/>
