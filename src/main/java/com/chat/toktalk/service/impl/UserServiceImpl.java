@@ -21,16 +21,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final OauthRepository oauthRepository;
-    private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
+
 
     public UserServiceImpl(UserRepository userRepository, OauthRepository oauthRepository) {
         this.userRepository = userRepository;
         this.oauthRepository = oauthRepository;
+        this.passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-
-
-
-
 
     @Override
     public User findUserByEmail(String email) {
@@ -39,7 +37,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(User user,UserStatus userStatus) {
+    public User registerUser(User user,UserStatus userStatus) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role role = new Role();
         role.setRoleState(RoleState.USER);
@@ -47,15 +45,14 @@ public class UserServiceImpl implements UserService {
         user.setRegdate(LocalDateTime.now());
         user.setUserStatus(userStatus);
         userRepository.save(user);
+        return user;
 
     }
 
     @Override
-    public void updateNickName(UserDetailsForm detailsForm){
-        User user = userRepository.findUserByEmail(detailsForm.getEmail());
+    public User updateNickName(User user,UserDetailsForm detailsForm){
         user.setNickname(detailsForm.getNickname());
-
-
+        return user;
     }
 
     @Override
