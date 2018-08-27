@@ -27,7 +27,7 @@ public class Channel implements Serializable {
     private String name;
     private String url;
     private String data; // 메타데이터
-    private String type; // public or private
+    private ChannelType type;
 
     @JsonBackReference
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
