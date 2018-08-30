@@ -28,14 +28,14 @@
         <div class="container layer">
             <div class="col">
                 <div class="wizard-card">
-                    <nav th:replace="/fragments/nav :: nav">
+                    <nav th:replace="fragments/nav :: nav">
                         <p>default nav</p>
                     </nav>
                     <div id="content" layout:fragment="content">
                     </div>
                 </div>
             </div>
-            <footer th:replace="/fragments/footer :: footer">
+            <footer th:replace="fragments/footer :: footer">
                 <p>default footer</p>
             </footer>
         </div>
