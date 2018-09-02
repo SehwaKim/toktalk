@@ -54,7 +54,7 @@ class Profile extends React.Component {
             <div style={divStyle}>
                 <div>
                     <div style={innerDivStyle_1}>
-                        <img style={imgStyle} src={this.props.path} alt="Avatar"></img>
+                        <a href={"/users/"} target="_blank"><img style={imgStyle} src={this.props.path} alt="Avatar"></img></a>
                         <span>
                             <svg className="i-chevron-bottom" viewBox="0 0 32 32" width="10" height="10" fill="none"
                                  stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
