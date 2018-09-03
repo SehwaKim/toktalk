@@ -12,9 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/api/channels", produces = "application/json; charset=utf8")
@@ -50,12 +48,12 @@ public class ChannelApiController {
             channelCreator.setIsOperator(true);
 
             Channel channel = new Channel();
-            channel.addChanneUser(channelCreator);
+            channel.addChannelUser(channelCreator);
             channel.setName(channelForm.getName());
-            if("private".equals(channelForm.getType())){
-                channel.setType("private");
+            if ("direct".equals(channelForm.getType())) {
+                channel.setType(ChannelType.DIRECT);
             } else {
-                channel.setType("public");
+                channel.setType(ChannelType.PUBLIC);
             }
 
             channel = channelService.addChannel(channel);

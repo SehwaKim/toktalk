@@ -4,17 +4,16 @@ import com.chat.toktalk.domain.*;
 import com.chat.toktalk.repository.ChannelRepository;
 import com.chat.toktalk.repository.ChannelUserRepository;
 import com.chat.toktalk.repository.UserRepository;
-import net.bytebuddy.asm.Advice;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@DataJpaTest
 public class ChannelRepositoryTest {
 
     @Autowired
@@ -37,7 +36,7 @@ public class ChannelRepositoryTest {
 
     private User createAndSaveTestUser(String email) {
         Role role = new Role();
-        role.setRoleState(RoleState.TEST);
+        role.setRoleState(RoleState.USER);
 
         User testUser = new User();
         testUser.setEmail(email);

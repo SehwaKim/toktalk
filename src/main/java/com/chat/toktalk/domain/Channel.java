@@ -27,7 +27,15 @@ public class Channel implements Serializable {
     private String name;
     private String url;
     private String data; // 메타데이터
+
+    @Enumerated(value = EnumType.STRING)
     private ChannelType type;
+
+    @Column(name = "first_user_id")
+    private Long firstUserId;
+
+    @Column(name = "second_user_id")
+    private Long secondUserId;
 
     @JsonBackReference
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -36,7 +44,7 @@ public class Channel implements Serializable {
     private Boolean freeze;
     private LocalDateTime regdate;
 
-    public void addChanneUser(ChannelUser channelUser){
+    public void addChannelUser(ChannelUser channelUser) {
         channelUsers.add(channelUser);
         if(channelUser.getChannel() != this){
             channelUser.setChannel(this);
