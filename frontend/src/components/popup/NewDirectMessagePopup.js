@@ -18,12 +18,11 @@ class NewDirectMessagePopup extends React.Component {
 
     findFriendByEmail(e) {
         $.ajax({
-            url: '/api/users',
+            url: '/api/users/' + this._inputElement.value,
             method: 'GET',
-            contentType: 'application/json',
-            data: {email: this._inputElement.value}
+            contentType: 'application/json'
         }).done(json => {
-            if ("" == json) {
+            if (json === undefined) {
                 this.setState(() => {
                     return {
                         showNoResult: true,
@@ -50,9 +49,15 @@ class NewDirectMessagePopup extends React.Component {
             url: '/api/channelUsers/direct',
             method: 'POST',
             contentType: 'application/json',
-            data: {userId: this.props.userId, partnerEmail: this.state.email}
+            data: JSON.stringify({partnerEmail: this.state.email})
         }).done(json => {
+            console.log(json);
             // 웹소켓 메세지로 상대방한테도 알려야 함
+            if (json === undefined) {
+                // 이미 있는 방 - 그 방으로 이동
+            } else {
+                // 새로 방이 생성됨 - 컴포넌트 생성 후 그 방으로 이동
+            }
         });
     }
 
@@ -83,12 +88,12 @@ class NewDirectMessagePopup extends React.Component {
                     <div>
                         <form onSubmit={this.findFriendByEmail}>
                             <input ref={(a) => this._inputElement = a}
-                                   placeholder="이메일로 친구 검색" style={inputStyle}/>
+                                   placeholder="이름으로 대화 상대 검색" style={inputStyle}/>
                         </form>
                     </div>
                     {this.state.showNoResult ?
                         <div style={noFriendDiv}>
-                            <p>찾으시는 친구가 존재하지 않습니다.</p>
+                            <p>찾으시는 대화 상대가 존재하지 않습니다.</p>
                         </div>
                         : null
                     }
@@ -104,7 +109,7 @@ class NewDirectMessagePopup extends React.Component {
                             </div>
                             <div style={button}>
                                 <button className="btn btn-lg btn-primary" style={button}
-                                        onClick={this.addNewDirectMessage}>친구 추가
+                                        onClick={this.addNewDirectMessage}>대화 시작
                                 </button>
                                 <button className="btn btn-lg btn-default" style={button}
                                         onClick={this.props.togglePopup}>취소

@@ -1,6 +1,23 @@
 import React from "react";
+import NewDirectMessagePopup from '../popup/NewDirectMessagePopup';
 
 class DmTag extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showNewDirectMessagePopup: false
+        };
+        this.toggleNewDirectMessagePopup = this.toggleNewDirectMessagePopup.bind(this);
+    }
+
+    toggleNewDirectMessagePopup() {
+        this.setState((prevState) => {
+            return {
+                showNewDirectMessagePopup: !prevState.showNewDirectMessagePopup
+            }
+        });
+    }
+
     render() {
         var buttonStyle = {
             backgroundColor: 'Transparent',
@@ -33,7 +50,7 @@ class DmTag extends React.Component {
                     <button style={buttonStyle}><b>연락처</b></button>
                 </div>
                 <div style={innerDivStyle_2}>
-                    <button style={buttonStyle}>
+                    <button style={buttonStyle} onClick={this.toggleNewDirectMessagePopup}>
                         <svg className="i-ban" viewBox="0 0 32 32" width="14" height="14" fill="none"
                              stroke="currentcolor"
                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -41,6 +58,10 @@ class DmTag extends React.Component {
                         </svg>
                     </button>
                 </div>
+                {this.state.showNewDirectMessagePopup ?
+                    <NewDirectMessagePopup togglePopup={this.toggleNewDirectMessagePopup}/>
+                    : null
+                }
             </div>
         );
     }

@@ -46,4 +46,9 @@ public class ChannelServiceImpl implements ChannelService {
 
         return newChannel;
     }
+
+    @Override
+    public Channel getDirectChannel(Long userId, Long partnerId) {
+        return channelRepository.findDirectChannelByIds(userId, partnerId);
+    }
 }

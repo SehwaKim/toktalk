@@ -11,4 +11,6 @@ public interface ChannelService {
     public Channel getChannel(Long channelId);
 
     public Channel addChannel(Channel channel);
+
+    public Channel getDirectChannel(Long userId, Long partnerId);
 }

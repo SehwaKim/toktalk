@@ -9,7 +9,7 @@ insert into user_roles(id, role_state, user_id) VALUES (3, 'USER', 2);
 insert into user_roles(id, role_state, user_id) VALUES (4, 'USER', 3);
 insert into user_roles(id, role_state, user_id) VALUES (5, 'USER', 4);
 
-insert into channel(id, name, type, regdate) VALUES (1, 'general', 'public', now());
+insert into channel(id, name, type, regdate) VALUES (1, 'general', 'PUBLIC', now());
 
 insert into channel_user(id, user_id, channel_id, first_read_id, regdate, last_read_id) VALUES (1, 1, 1, 1, now(), 1);
 
