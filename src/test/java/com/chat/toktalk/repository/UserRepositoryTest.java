@@ -1,9 +1,7 @@
-package com.chat.toktalk;
+package com.chat.toktalk.repository;
 
 import com.chat.toktalk.domain.OauthInfo;
 import com.chat.toktalk.domain.User;
-import com.chat.toktalk.repository.UserRepository;
-import lombok.extern.log4j.Log4j2;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +11,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@Log4j2
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -39,12 +34,11 @@ public class UserRepositoryTest {
         registerUser.setEmail("아기상어@gmail.com");
         registerUser.setPassword("1234");
         registerUser.setNickname("뚜루뚜루");
-
         userRepository.save(registerUser);
 
         User result = userRepository.findUserByEmail("아기상어@gmail.com");
 
-        assertThat(result.getNickname()).isEqualTo("뚜루뚜루");
+        assertEquals(result.getNickname(),"뚜루뚜루");
     }
 
     @Test
@@ -63,8 +57,8 @@ public class UserRepositoryTest {
 
         User result = userRepository.findOauthUserByEmail("아기상어@gmail.com");
 
-        assertThat(registerUser.getOauthInfos().size()).isOne();
-        assertThat(result.getNickname()).isEqualTo("뚜루뚜루");
+        assertEquals(registerUser.getOauthInfos().size(),1);
+        assertEquals(result.getNickname(),"뚜루뚜루");
 
     }
 
