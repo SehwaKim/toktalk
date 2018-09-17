@@ -13,10 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
-@RequestMapping(value = "/api/channels", produces = "application/json; charset=utf8")
+@RequestMapping(value = "/api/channels")
 public class ChannelApiController {
+
     @Autowired
     ChannelService channelService;
 
@@ -65,6 +68,41 @@ public class ChannelApiController {
         return null;
     }
 
+    @PostMapping(value = "/direct")
+    public ResponseEntity<Channel> addDirectChannel(@RequestBody Map<String, String> params, LoginUserInfo loginUserInfo) {
+        Long userId = loginUserInfo.getId();
+        Long partnerId = getUserByEmail(params.get("partnerEmail")).getId();
+
+        Channel direct = channelService.getDirectChannel(userId, partnerId);
+
+        if (Objects.nonNull(direct)) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        ChannelUser firstChannelUser = createChannelUser(getUserByEmail(loginUserInfo.getEmail()));
+        ChannelUser secondChannelUser = createChannelUser(getUserByEmail(params.get("partnerEmail")));
+
+        Channel newDirectChannel = new Channel();
+        newDirectChannel.setType(ChannelType.DIRECT);
+        newDirectChannel.setFirstUserId(userId);
+        newDirectChannel.setSecondUserId(partnerId);
+        newDirectChannel.addChannelUser(firstChannelUser);
+        newDirectChannel.addChannelUser(secondChannelUser);
+        channelService.addChannel(newDirectChannel);
+
+        return new ResponseEntity<>(newDirectChannel, HttpStatus.CREATED);
+    }
+
+    private ChannelUser createChannelUser(User user) {
+        ChannelUser channelUser = new ChannelUser();
+        channelUser.setUser(user);
+        return channelUser;
+    }
+
+    private User getUserByEmail(String email) {
+        return userService.findUserByEmail(email);
+    }
+
     @GetMapping(value = "/{channelId}")
     public Boolean isJoiningNewChannel(LoginUserInfo loginUserInfo, @PathVariable(value = "channelId") Long channelId){
         Long userId = null;
@@ -72,7 +110,7 @@ public class ChannelApiController {
             userId = loginUserInfo.getId();
         }
 
-        ChannelUser channelUser= channelUserService.getChannelUser(channelId, userId);
+        ChannelUser channelUser = channelUserService.getChannelUser(channelId, userId);
 
         if(channelUser != null){
             return false;
