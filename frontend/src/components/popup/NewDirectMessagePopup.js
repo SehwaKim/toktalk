@@ -44,20 +44,18 @@ class NewDirectMessagePopup extends React.Component {
     }
 
     addNewDirectMessage() {
-        this.props.togglePopup();
         $.ajax({
-            url: '/api/channelUsers/direct',
+            url: '/api/channels/direct',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({partnerEmail: this.state.email})
         }).done(json => {
+            this.props.togglePopup();
             console.log(json);
-            // 웹소켓 메세지로 상대방한테도 알려야 함
-            if (json === undefined) {
-                // 이미 있는 방 - 그 방으로 이동
-            } else {
-                // 새로 방이 생성됨 - 컴포넌트 생성 후 그 방으로 이동
-            }
+
+        }).fail(xhr => { // 이미 존재하는 채널로 리다이렉트 ?
+            console.log(xhr);
+            console.log(xhr.status);
         });
     }
 
