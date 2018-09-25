@@ -1,6 +1,7 @@
 package com.chat.toktalk.service.impl;
 
 import com.chat.toktalk.domain.Channel;
+import com.chat.toktalk.domain.ChannelType;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.repository.ChannelRepository;
 import com.chat.toktalk.repository.ChannelUserRepository;
@@ -25,7 +26,8 @@ public class ChannelServiceImpl implements ChannelService {
     public List<Channel> getChannelsByUser(Long userId) {
         List<ChannelUser> channelUsers = channelUserRepository.findAllByUserId(userId);
         List<Channel> channels = new ArrayList<>(channelUsers.size());
-        channelUsers.stream().forEach(channelUser -> channels.add(channelUser.getChannel()));
+        channelUsers.stream().filter(user -> user.getChannel().getType() == ChannelType.PUBLIC)
+                .forEach(user -> channels.add(user.getChannel()));
         return channels;
     }
 
