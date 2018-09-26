@@ -47,6 +47,9 @@ public class Channel implements Serializable {
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChannelUser> channelUsers = new ArrayList<>();
 
+    @Column(name = "self_conversation")
+    private Boolean selfConversation;
+
     private Boolean freeze;
     private LocalDateTime regdate;
 

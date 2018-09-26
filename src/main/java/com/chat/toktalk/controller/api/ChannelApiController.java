@@ -106,10 +106,15 @@ public class ChannelApiController {
             return new ResponseEntity<>(direct, HttpStatus.CONFLICT);
         }
 
+        Channel newDirectChannel = new Channel();
+
+        if (userId.equals(partnerId)) {
+            newDirectChannel.setSelfConversation(true);
+        }
+
         ChannelUser firstChannelUser = createChannelUser(getUserByEmail(loginUserInfo.getEmail()));
         ChannelUser secondChannelUser = createChannelUser(getUserByEmail(params.get("partnerEmail")));
 
-        Channel newDirectChannel = new Channel();
         newDirectChannel.setType(ChannelType.DIRECT);
         newDirectChannel.setFirstUserId(userId);
         newDirectChannel.setSecondUserId(partnerId);
