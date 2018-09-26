@@ -52,6 +52,8 @@ class NewDirectMessagePopup extends React.Component {
             data: JSON.stringify({partnerEmail: this.state.email})
         }).done(json => {
             this.props.addNewChannel(json);
+        }).fail(data => {
+            this.props.addNewChannel(data);
         });
     }
 

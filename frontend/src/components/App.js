@@ -1,5 +1,6 @@
 import React from 'react';
 import {Route, HashRouter} from "react-router-dom";
+import $ from "jquery";
 
 import Profile from './sidebar/Profile';
 import GroupTag from './sidebar/GroupTag';
@@ -42,6 +43,7 @@ class App extends React.Component {
         this.printMessage = this.printMessage.bind(this);
         this.switchChannel = this.switchChannel.bind(this);
         this.markAsUnread = this.markAsUnread.bind(this);
+        this.getDirectChannel = this.getDirectChannel.bind(this);
     }
 
     setUserId(id) {
@@ -68,7 +70,12 @@ class App extends React.Component {
                 routes: prevState.routes.filter(item => item.props.cId != cId)
             }
         });
-        this.channels.removeChannel(cId);
+
+        if (this.channels.itemRefs.has(cId)) {
+            this.channels.removeChannel(cId);
+            return;
+        }
+
         this.directChannels.removeChannel(cId);
     }
 
@@ -92,23 +99,48 @@ class App extends React.Component {
     }
 
     markAsUnread(cId) {
-        if (this.directChannels.itemRefs.has(cId)) {
-            this.directChannels.itemRefs.get(cId).increaseUnread();
-        } else {
-            this.channels.itemRefs.get(cId).increaseUnread();
+        var item;
+        if ((item = this.directChannels.itemRefs.get(cId)) != null) {
+            item.increaseUnread();
+            return;
         }
+        if ((item = this.channels.itemRefs.get(cId)) != null) {
+            item.increaseUnread();
+            return;
+        }
+
+        // 나간 1:1에서 메세지오면 새 컴포넌트 생성
+        this.getDirectChannel(cId);
     }
 
-    addNewChannel(channel) {
-        if ('DIRECT' == channel.type) {
-            if (!this.directChannels.itemRefs.has(channel.id)) {
-                this.directChannels.addNewChannel(channel);
-                if (channel.name == channel.secondUserName) {
-                    this.sock.notifyInvitation(channel.id, channel.secondUserId);
-                }
+    getDirectChannel(cId) {
+        $.ajax({
+            url: '/api/channels/direct/' + cId,
+            method: 'GET'
+        }).done(json => {
+            this.directChannels.addNewChannel(json);
+        });
+    }
+
+    addNewChannel(data) {
+        var channel;
+
+        if (data.status === 409) {
+            channel = data.responseJSON;
+            this.directChannels.addNewChannel(channel);
+            return;
+        }
+
+        channel = data;
+
+        if ('DIRECT' === channel.type) {
+            this.directChannels.addNewChannel(channel);
+            if (channel.name !== channel.firstUserName) {
+                this.sock.notifyInvitation(channel.id, channel.secondUserId);
             }
         }
-        if ('PUBLIC' == channel.type) {
+
+        if ('PUBLIC' === channel.type) {
             this.channels.addNewChannel(channel);
         }
     }

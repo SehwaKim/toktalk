@@ -30,6 +30,7 @@ class DmList extends React.Component {
     }
 
     removeChannel(cId) {
+        this.itemRefs.set(cId, null);
         this.setState((prevState) => {
             return {
                 items: prevState.items.filter(item => item.props.id != cId)

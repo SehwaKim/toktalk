@@ -55,6 +55,19 @@ public class ChannelApiController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping(value = "direct/{channelId}")
+    public ResponseEntity<Channel> getDirectChannel(@PathVariable Long channelId, LoginUserInfo loginUserInfo) {
+        if (loginUserInfo != null) {
+            Channel channel = channelService.getChannel(channelId);
+            if (Objects.nonNull(channel)) {
+                channel.setName(channel.getFirstUserId().equals(loginUserInfo.getId()) ?
+                        channel.getSecondUserName() : channel.getFirstUserName());
+                return new ResponseEntity<>(channel, HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PostMapping
     public ResponseEntity<Channel> addChannel(@RequestBody ChannelForm channelForm, LoginUserInfo loginUserInfo){
         if(loginUserInfo != null){
@@ -74,7 +87,6 @@ public class ChannelApiController {
             }
 
             channel = channelService.addChannel(channel);
-//            redisService.createMessageIdCounter(channel.getId());
 
             return new ResponseEntity<>(channel, HttpStatus.OK);
         }
@@ -91,7 +103,7 @@ public class ChannelApiController {
 
         if (Objects.nonNull(direct)) {
             direct.setName(direct.getFirstUserId().equals(userId) ? direct.getSecondUserName() : direct.getFirstUserName());
-            return new ResponseEntity<>(direct, HttpStatus.OK);
+            return new ResponseEntity<>(direct, HttpStatus.CONFLICT);
         }
 
         ChannelUser firstChannelUser = createChannelUser(getUserByEmail(loginUserInfo.getEmail()));

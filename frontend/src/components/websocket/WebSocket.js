@@ -28,7 +28,7 @@ class WebSocket extends React.Component {
                 data = e.data;
             }
             const type = data.type;
-            if ('CHAT' == type) {
+            if ('CHAT' === type) {
                 if (data.notification) {
                     this.props.markAsUnread(data.channelId); // notifyUnread(data.channelId);
                     // notificationf(data.channelId); // 구글 노티
@@ -40,20 +40,20 @@ class WebSocket extends React.Component {
                 this.props.printMessage(data);
             }
 
-            if ('SYSTEM' == type) {
+            if ('SYSTEM' === type) {
                 this.props.printMessage(data);
             }
 
-            if ('TYPING' == type) {
+            if ('TYPING' === type) {
 
             }
 
-            if ('CHANNEL_MARK' == type) {
+            if ('CHANNEL_MARK' === type) {
 
             }
 
-            if ('CHANNEL_JOINED' == type) {
-                if (data.channel.type == 'DIRECT') {
+            if ('CHANNEL_JOINED' === type) {
+                if (data.channel.type === 'DIRECT') {
                     this.props.addNewChannel(data.channel);
                 }
             }
@@ -66,7 +66,7 @@ class WebSocket extends React.Component {
     }
 
     sendChatMsg(cId, cType, text) {
-        if (!(text == "") && cId != 0) {
+        if (!(text === "") && cId !== 0) {
             this.connection.send(JSON.stringify({
                 'type': 'chat',
                 'channelId': cId,
