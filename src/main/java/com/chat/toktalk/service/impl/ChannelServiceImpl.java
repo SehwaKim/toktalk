@@ -23,11 +23,12 @@ public class ChannelServiceImpl implements ChannelService {
     ChannelUserRepository channelUserRepository;
 
     @Override
-    public List<Channel> getChannelsByUser(Long userId) {
+    public List<Channel> getChannelsByUser(Long userId, ChannelType type) {
         List<ChannelUser> channelUsers = channelUserRepository.findAllByUserId(userId);
         List<Channel> channels = new ArrayList<>(channelUsers.size());
-        channelUsers.stream().filter(user -> user.getChannel().getType() == ChannelType.PUBLIC)
+        channelUsers.stream().filter(user -> user.getChannel().getType() == type)
                 .forEach(user -> channels.add(user.getChannel()));
+
         return channels;
     }
 

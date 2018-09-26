@@ -12,5 +12,5 @@ public interface MessageService {
 
     public Long countUnreadMessageByChannelUser(ChannelUser channelUser);
 
-    Long getLastIdByChannel(Long channelId);
+    Long getTotalMessageCntByChannel(Long channelId);
 }

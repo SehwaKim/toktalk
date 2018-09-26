@@ -53,11 +53,10 @@ class WebSocket extends React.Component {
             }
 
             if ('CHANNEL_JOINED' == type) {
-
+                if (data.channel.type == 'DIRECT') {
+                    this.props.addNewChannel(data.channel);
+                }
             }
-
-            // if ('UPLOAD_FILE' == type) {}
-            // if ('MESSAGES' == type) {}
 
             this.setState({
                 // messages: this.state.messages.concat([e.data])
@@ -66,11 +65,21 @@ class WebSocket extends React.Component {
         }
     }
 
-    sendChatMsg(cId, text) {
+    sendChatMsg(cId, cType, text) {
         if (!(text == "") && cId != 0) {
-            this.connection.send(JSON.stringify({'type': 'chat', 'channelId': cId, 'text': text}));
+            this.connection.send(JSON.stringify({
+                'type': 'chat',
+                'channelId': cId,
+                'channelType': cType,
+                'text': text
+            }));
         }
     }
+
+    notifyInvitation(cId, userId) {
+        this.connection.send(JSON.stringify({'type': 'invite_direct', 'channelId': cId, 'userId': userId}))
+    }
+
     render() {
         return (null);
     }

@@ -69,21 +69,22 @@ class App extends React.Component {
             }
         });
         this.channels.removeChannel(cId);
+        this.directChannels.removeChannel(cId);
     }
 
-    sendMessage(cId, text) {
-        this.sock.sendChatMsg(cId, text);
+    sendMessage(cId, cType, text) {
+        this.sock.sendChatMsg(cId, cType, text);
     }
 
-    switchChannel(cId, title) {
+    switchChannel(cId, title, cType) {
         this.setState(() => {
             return {
                 current: cId
             };
         });
-        this.input.box.switchChannel(cId);
+        this.input.box.switchChannel(cId, cType);
         this.sock.switchChannel(cId);
-        this.head.switchChannel(title);
+        this.head.switchChannel(title, cType);
     }
 
     printMessage(message) {
@@ -91,11 +92,25 @@ class App extends React.Component {
     }
 
     markAsUnread(cId) {
-        this.channels.itemRefs.get(cId).increaseUnread();
+        if (this.directChannels.itemRefs.has(cId)) {
+            this.directChannels.itemRefs.get(cId).increaseUnread();
+        } else {
+            this.channels.itemRefs.get(cId).increaseUnread();
+        }
     }
 
     addNewChannel(channel) {
-        this.channels.addNewChannel(channel);
+        if ('DIRECT' == channel.type) {
+            if (!this.directChannels.itemRefs.has(channel.id)) {
+                this.directChannels.addNewChannel(channel);
+                if (channel.name == channel.secondUserName) {
+                    this.sock.notifyInvitation(channel.id, channel.secondUserId);
+                }
+            }
+        }
+        if ('PUBLIC' == channel.type) {
+            this.channels.addNewChannel(channel);
+        }
     }
 
     render() {
@@ -108,8 +123,9 @@ class App extends React.Component {
                         <GroupTag addNewChannel={this.addNewChannel.bind(this)}/>
                         <ChannelList ref={channels => this.channels = channels} addChatArea={this.addItem}
                                      switchChannel={this.switchChannel}/>
-                        <DmTag/>
-                        <DmList {...this.props}/>
+                        <DmTag addNewChannel={this.addNewChannel.bind(this)}/>
+                        <DmList ref={directChannels => this.directChannels = directChannels} addChatArea={this.addItem}
+                                switchChannel={this.switchChannel}/>
                     </div>
                     <Header ref={head => this.head = head} userId={this.state.userId} cId={this.state.current}
                             removeItem={this.removeItem.bind(this)} switchChannel={this.switchChannel}/>
@@ -118,7 +134,7 @@ class App extends React.Component {
                     <InputArea ref={input => this.input = input} sendMessage={this.sendMessage}/>
                     <Footer/>
                     <WebSocket ref={sock => this.sock = sock} printMessage={this.printMessage}
-                               markAsUnread={this.markAsUnread}/>
+                               markAsUnread={this.markAsUnread} addNewChannel={this.addNewChannel.bind(this)}/>
                 </div>
             </HashRouter>
         );

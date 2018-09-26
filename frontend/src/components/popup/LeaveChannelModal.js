@@ -9,15 +9,21 @@ class LeaveChannelModal extends React.Component {
 
     leaveChannel() {
         this.props.togglePopup();
-        $.ajax({
-            url: '/api/channelUsers/' + this.props.userId,
-            method: 'DELETE',
-            contentType: 'application/json',
-            data: JSON.stringify({channelId: this.props.cId})
-        }).done(json => {
+        if (this.props.cType == 'PUBLIC') {
+            $.ajax({
+                url: '/api/channelUsers/' + this.props.userId,
+                method: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({channelId: this.props.cId})
+            }).done(json => {
+                this.props.removeItem(this.props.cId);
+                this.props.switchChannel(0, '');
+            });
+        }
+        if (this.props.cType == 'DIRECT') {
             this.props.removeItem(this.props.cId);
             this.props.switchChannel(0, '');
-        });
+        }
     }
 
     render() {

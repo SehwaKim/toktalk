@@ -6,16 +6,18 @@ class Header extends React.Component {
         super(props);
         this.state = {
             title: '',
+            cType: '',
             showLeaveChannelModal: false
-        }
+        };
         this.switchChannel = this.switchChannel.bind(this);
         this.toggleLeaveChannelModal = this.toggleLeaveChannelModal.bind(this);
     };
 
-    switchChannel(title) {
+    switchChannel(title, cType) {
         this.setState(() => {
             return {
-                title: title
+                title: title,
+                cType: cType
             };
         });
     }
@@ -92,7 +94,7 @@ class Header extends React.Component {
                 </div>
                 {this.state.showLeaveChannelModal ?
                     <LeaveChannelModal
-                        togglePopup={this.toggleLeaveChannelModal} cId={this.props.cId}
+                        togglePopup={this.toggleLeaveChannelModal} cId={this.props.cId} cType={this.state.cType}
                         userId={this.props.userId} removeItem={this.props.removeItem}
                         switchChannel={this.props.switchChannel}
                     />

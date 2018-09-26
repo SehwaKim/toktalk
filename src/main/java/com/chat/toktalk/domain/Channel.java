@@ -26,7 +26,7 @@ public class Channel implements Serializable {
     private Long id;
     private String name;
     private String url;
-    private String data; // 메타데이터
+    private String data;
 
     @Enumerated(value = EnumType.STRING)
     private ChannelType type;
@@ -36,6 +36,12 @@ public class Channel implements Serializable {
 
     @Column(name = "second_user_id")
     private Long secondUserId;
+
+    @Column(name = "first_user_name")
+    private String firstUserName;
+
+    @Column(name = "second_user_name")
+    private String secondUserName;
 
     @JsonBackReference
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -26,4 +26,14 @@ public class RabbitConfig {
     //Delay Q, Dead Message Q
     //Queue_NAME은 Server이름 마다 다르게 처리.
 
+    /*@Bean
+    SimpleMessageListenerContainer fanoutContainer(ConnectionFactory connectionFactory,
+                                                   MessageListenerAdapter fanoutListenerAdapter) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(new String[]{QUEUE_NAME1,QUEUE_NAME2});
+//        container.setQueueNames(QUEUE_NAME2);
+        container.setMessageListener(fanoutListenerAdapter);
+        return container;
+    }*/
 }

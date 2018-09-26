@@ -33,9 +33,23 @@ public class ChannelApiController {
     RedisService redisService;
 
     @GetMapping
-    public ResponseEntity<List<Channel>> channels(LoginUserInfo loginUserInfo) {
+    public ResponseEntity<List<Channel>> getChannels(LoginUserInfo loginUserInfo) {
         if (loginUserInfo != null) {
-            List<Channel> channels = channelService.getChannelsByUser(loginUserInfo.getId());
+            List<Channel> channels = channelService.getChannelsByUser(loginUserInfo.getId(), ChannelType.PUBLIC);
+            return new ResponseEntity<>(channels, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping(value = "direct")
+    public ResponseEntity<List<Channel>> getDirectChannels(LoginUserInfo loginUserInfo) {
+        if (loginUserInfo != null) {
+            List<Channel> channels = channelService.getChannelsByUser(loginUserInfo.getId(), ChannelType.DIRECT);
+            channels.stream().filter(channel -> channel.getFirstUserId().equals(loginUserInfo.getId()))
+                    .forEach(channel -> channel.setName(channel.getSecondUserName()));
+            channels.stream().filter(channel -> channel.getSecondUserId().equals(loginUserInfo.getId()))
+                    .forEach(channel -> channel.setName(channel.getFirstUserName()));
+
             return new ResponseEntity<>(channels, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -60,7 +74,7 @@ public class ChannelApiController {
             }
 
             channel = channelService.addChannel(channel);
-            redisService.createMessageIdCounter(channel.getId());
+//            redisService.createMessageIdCounter(channel.getId());
 
             return new ResponseEntity<>(channel, HttpStatus.OK);
         }
@@ -76,7 +90,8 @@ public class ChannelApiController {
         Channel direct = channelService.getDirectChannel(userId, partnerId);
 
         if (Objects.nonNull(direct)) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            direct.setName(direct.getFirstUserId().equals(userId) ? direct.getSecondUserName() : direct.getFirstUserName());
+            return new ResponseEntity<>(direct, HttpStatus.OK);
         }
 
         ChannelUser firstChannelUser = createChannelUser(getUserByEmail(loginUserInfo.getEmail()));
@@ -86,9 +101,12 @@ public class ChannelApiController {
         newDirectChannel.setType(ChannelType.DIRECT);
         newDirectChannel.setFirstUserId(userId);
         newDirectChannel.setSecondUserId(partnerId);
+        newDirectChannel.setFirstUserName(loginUserInfo.getNickname());
+        newDirectChannel.setSecondUserName(secondChannelUser.getUser().getNickname());
         newDirectChannel.addChannelUser(firstChannelUser);
         newDirectChannel.addChannelUser(secondChannelUser);
         channelService.addChannel(newDirectChannel);
+        newDirectChannel.setName(newDirectChannel.getSecondUserName());
 
         return new ResponseEntity<>(newDirectChannel, HttpStatus.CREATED);
     }
@@ -112,10 +130,6 @@ public class ChannelApiController {
 
         ChannelUser channelUser = channelUserService.getChannelUser(channelId, userId);
 
-        if(channelUser != null){
-            return false;
-        }
-
-        return true;
+        return Objects.isNull(channelUser);
     }
 }

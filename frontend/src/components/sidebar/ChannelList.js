@@ -47,7 +47,6 @@ class ChannelList extends React.Component {
                                            ref={(el => this.itemRefs.set(channel.id, el))}/>);
                 this.props.addChatArea(channel.id);
             }
-            ;
             this.setState({items: channels});
         });
     }
@@ -91,9 +90,9 @@ class ChannelItem extends React.Component {
         this.setState({unread: current + 1});
     }
 
-    switch(e) {
+    switch() {
         this.setState({unread: ''});
-        this.props.switchChannel(this.props.id, this.props.name);
+        this.props.switchChannel(this.props.id, this.props.name, 'PUBLIC');
     }
 
     render() {
@@ -102,7 +101,7 @@ class ChannelItem extends React.Component {
             paddingRight: '10px'
         };
         return (
-            <NavLink exact to={'/' + this.props.id} onClick={(e) => this.switch(e)}>
+            <NavLink exact to={'/' + this.props.id} onClick={() => this.switch()}>
                 <div className="row">
                     <div className="column">
                         {this.props.name}

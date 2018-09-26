@@ -159,7 +159,7 @@ public class RedisServiceImpl implements RedisService {
         return isChannelInSight;
     }
 
-    @Override
+    /*@Override
     public void createMessageIdCounter(Long channelId) {
         String key = "channel:"+channelId.toString();
         redisTemplate.opsForValue().set(key, "0");
@@ -180,5 +180,5 @@ public class RedisServiceImpl implements RedisService {
         }
 
         return null;
-    }
+    }*/
 }

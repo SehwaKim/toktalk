@@ -44,18 +44,14 @@ class NewDirectMessagePopup extends React.Component {
     }
 
     addNewDirectMessage() {
+        this.props.togglePopup();
         $.ajax({
             url: '/api/channels/direct',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({partnerEmail: this.state.email})
         }).done(json => {
-            this.props.togglePopup();
-            console.log(json);
-
-        }).fail(xhr => { // 이미 존재하는 채널로 리다이렉트 ?
-            console.log(xhr);
-            console.log(xhr.status);
+            this.props.addNewChannel(json);
         });
     }
 

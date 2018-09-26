@@ -47,7 +47,7 @@ class DmTag extends React.Component {
         return (
             <div style={divStyle}>
                 <div style={innerDivStyle_1}>
-                    <button style={buttonStyle}><b>연락처</b></button>
+                    <button style={buttonStyle}><b>1:1 대화</b></button>
                 </div>
                 <div style={innerDivStyle_2}>
                     <button style={buttonStyle} onClick={this.toggleNewDirectMessagePopup}>
@@ -59,7 +59,9 @@ class DmTag extends React.Component {
                     </button>
                 </div>
                 {this.state.showNewDirectMessagePopup ?
-                    <NewDirectMessagePopup togglePopup={this.toggleNewDirectMessagePopup}/>
+                    <NewDirectMessagePopup
+                        togglePopup={this.toggleNewDirectMessagePopup}
+                        addNewChannel={this.props.addNewChannel}/>
                     : null
                 }
             </div>
