@@ -61,14 +61,14 @@ public class MessageApiController {
         ChannelUser channelUser = channelUserService.getChannelUser(channelId, loginUserInfo.getId());
         if (channelUser != null) {
             Long unread = messageService.countUnreadMessageByChannelUser(channelUser);
-            if (unread != null) {
+            if (unread > 0) {
                 return new ResponseEntity<>(new UnreadMessageInfo(channelId, unread), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(value = "/file") //ajax에서 호출하는 부분
+    @PostMapping(value = "/file")
     @ResponseBody
     @Transactional
     public String upload(MultipartHttpServletRequest multipartRequest, LoginUserInfo loginUserInfo) { //Multipart로 받는다.

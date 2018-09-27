@@ -12,6 +12,9 @@ class WebSocket extends React.Component {
     componentDidMount() {
         var scheme = window.location.protocol;
         var path = scheme + '//' + window.location.host + "/sock";
+        if (window.location.host == 'localhost:3000') {
+            path = "http://localhost:8080/sock";
+        }
         this.connection = new SockJS(path);
         this.connection.onheartbeat = e => {
             this.connection.send(JSON.stringify({'type': 'pong'}));
@@ -25,7 +28,7 @@ class WebSocket extends React.Component {
                 data = e.data;
             }
             const type = data.type;
-            if ('CHAT' == type) {
+            if ('CHAT' === type) {
                 if (data.notification) {
                     this.props.markAsUnread(data.channelId); // notifyUnread(data.channelId);
                     // notificationf(data.channelId); // 구글 노티
@@ -37,24 +40,23 @@ class WebSocket extends React.Component {
                 this.props.printMessage(data);
             }
 
-            if ('SYSTEM' == type) {
+            if ('SYSTEM' === type) {
                 this.props.printMessage(data);
             }
 
-            if ('TYPING' == type) {
+            if ('TYPING' === type) {
 
             }
 
-            if ('CHANNEL_MARK' == type) {
+            if ('CHANNEL_MARK' === type) {
 
             }
 
-            if ('CHANNEL_JOINED' == type) {
-
+            if ('CHANNEL_JOINED' === type) {
+                if (data.channel.type === 'DIRECT') {
+                    this.props.addNewChannel(data.channel);
+                }
             }
-
-            // if ('UPLOAD_FILE' == type) {}
-            // if ('MESSAGES' == type) {}
 
             this.setState({
                 // messages: this.state.messages.concat([e.data])
@@ -63,11 +65,21 @@ class WebSocket extends React.Component {
         }
     }
 
-    sendChatMsg(cId, text) {
-        if (!(text == "")) {
-            this.connection.send(JSON.stringify({'type': 'chat', 'channelId': cId, 'text': text}));
+    sendChatMsg(cId, cType, text) {
+        if (!(text === "") && cId !== 0) {
+            this.connection.send(JSON.stringify({
+                'type': 'chat',
+                'channelId': cId,
+                'channelType': cType,
+                'text': text
+            }));
         }
     }
+
+    notifyInvitation(cId, userId) {
+        this.connection.send(JSON.stringify({'type': 'invite_direct', 'channelId': cId, 'userId': userId}))
+    }
+
     render() {
         return (null);
     }

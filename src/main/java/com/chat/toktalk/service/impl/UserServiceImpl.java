@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Log4j2
 @Service
@@ -94,5 +95,10 @@ public class UserServiceImpl implements UserService {
     public User findOauthUserByEmail(String email){
         return userRepository.findOauthUserByEmail(email);
 
+    }
+
+    @Override
+    public User findUserByNickname(String nickname) {
+        return userRepository.findUserByNickname(nickname);
     }
 }

@@ -1,6 +1,7 @@
 package com.chat.toktalk.service.impl;
 
 import com.chat.toktalk.domain.Channel;
+import com.chat.toktalk.domain.ChannelType;
 import com.chat.toktalk.domain.ChannelUser;
 import com.chat.toktalk.repository.ChannelRepository;
 import com.chat.toktalk.repository.ChannelUserRepository;
@@ -22,10 +23,12 @@ public class ChannelServiceImpl implements ChannelService {
     ChannelUserRepository channelUserRepository;
 
     @Override
-    public List<Channel> getChannelsByUser(Long userId) {
+    public List<Channel> getChannelsByUser(Long userId, ChannelType type) {
         List<ChannelUser> channelUsers = channelUserRepository.findAllByUserId(userId);
         List<Channel> channels = new ArrayList<>(channelUsers.size());
-        channelUsers.stream().forEach(channelUser -> channels.add(channelUser.getChannel()));
+        channelUsers.stream().filter(user -> user.getChannel().getType() == type)
+                .forEach(user -> channels.add(user.getChannel()));
+
         return channels;
     }
 
@@ -45,5 +48,10 @@ public class ChannelServiceImpl implements ChannelService {
         });
 
         return newChannel;
+    }
+
+    @Override
+    public Channel getDirectChannel(Long userId, Long partnerId) {
+        return channelRepository.findDirectChannelByIds(userId, partnerId);
     }
 }

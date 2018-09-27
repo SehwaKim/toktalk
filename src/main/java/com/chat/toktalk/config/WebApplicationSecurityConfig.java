@@ -49,7 +49,7 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/users/login").permitAll()
                 .antMatchers("/users/**").authenticated()
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/api/**").permitAll()
+                .antMatchers("/api/**").authenticated()
                 .anyRequest().hasAnyRole("ADMIN", "USER")
                 .and().headers().frameOptions().disable()
                 .and().formLogin()

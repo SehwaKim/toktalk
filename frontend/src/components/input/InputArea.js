@@ -14,22 +14,24 @@ class InputBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            cId: 0
+            cId: 0,
+            cType: ''
         };
         this.sendMessage = this.sendMessage.bind(this);
         this.switchChannel = this.switchChannel.bind(this);
     }
 
     sendMessage(e) {
-        this.props.sendMessage(this.state.cId, this._inputElement.value);
+        this.props.sendMessage(this.state.cId, this.state.cType, this._inputElement.value);
         this._inputElement.value = "";
         e.preventDefault();
     }
 
-    switchChannel(cId) {
+    switchChannel(cId, cType) {
         this.setState(() => {
             return {
-                cId: cId
+                cId: cId,
+                cType: cType
             };
         });
     }
@@ -41,7 +43,7 @@ class InputBox extends React.Component {
             fontSize: '15px',
             width: '80%',
             border: '0px'
-        }
+        };
         return (
             <div className="message-box">
                 <form onSubmit={this.sendMessage}>

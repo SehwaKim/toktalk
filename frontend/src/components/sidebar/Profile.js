@@ -5,7 +5,8 @@ class Profile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: ''
+            name: '',
+            id: ''
         };
     }
 
@@ -14,7 +15,8 @@ class Profile extends React.Component {
             url: '/api/users',
             method: 'GET'
         }).done(json => {
-            this.setState({name: json.nickname});
+            this.setState({name: json.nickname, id: json.id});
+            this.props.setUserId(json.id);
         });
     }
 

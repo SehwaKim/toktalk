@@ -35,8 +35,8 @@ public class ChannelUser implements Serializable {
     @Column(name = "first_read_id") // 처음으로 읽은 메세지 id
     private Long firstReadId;
 
-    @Column(name = "last_read_id") // 마지막으로 읽은 메세지 id
-    private Long lastReadId;
+    @Column(name = "last_read_cnt") // 마지막으로 읽은 메세지 갯수
+    private Long lastReadCnt;
 
     @Column(name = "is_operator")
     private Boolean isOperator;

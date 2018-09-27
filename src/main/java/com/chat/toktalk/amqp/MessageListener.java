@@ -65,7 +65,7 @@ public class MessageListener{
     private void toIndividual(SocketMessage socketMessage) {
         Set<WebSocketSession> sessions = sessionManager.getWebSocketSessionsByUser(socketMessage.getUserId());
         if(sessions != null) {
-            sessions.stream().forEach(session -> {
+            sessions.forEach(session -> {
                 try {
                     String jsonStr = new ObjectMapper().writeValueAsString(socketMessage);
                     session.sendMessage(new TextMessage(jsonStr));
