@@ -4,7 +4,6 @@ import com.chat.toktalk.argumentresolver.LoginUserInfoArgumentResolver;
 import com.chat.toktalk.interceptor.RefererSaveInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -18,7 +17,6 @@ public class ToktalkApplication implements WebMvcConfigurer {
 	public static void main(String[] args) {
 		SpringApplication.run(ToktalkApplication.class, args);
 	}
-
 	@Bean
 	public RefererSaveInterceptor loginCheckInterceptor(){
 		RefererSaveInterceptor refererSaveInterceptor = new RefererSaveInterceptor();

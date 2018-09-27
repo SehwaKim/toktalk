@@ -63,10 +63,11 @@ public class UserController {
     @PostMapping("/")
     public String processAccountForm(UserDetailsForm detailsForm, BindingResult bindingResult, RedirectAttributes attributes){
         userDetailsValidator.validate(detailsForm,bindingResult);
+        User user = userService.findUserByEmail(detailsForm.getEmail());
         if(bindingResult.hasErrors()){
             return "users/my-account";
         }
-        userService.updateNickName(detailsForm);
+        userService.updateNickName(user,detailsForm);
         attributes.addFlashAttribute("notice","닉네임 수정이 완료 되었습니다.");
         return "redirect:/users/";
     }
