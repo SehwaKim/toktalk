@@ -35,14 +35,9 @@ public class RedisServiceImpl implements RedisService {
         this.redisTemplate.setValueSerializer(redisSerializer);
     }
 
-    //    @Override
-//    public void addUser(Long id, WebSocketSession session) {
-//        redisTemplate.opsForList().rightPush(id,session.getId());
-//    }
-
     @Override
     public void addChannelUser(Long channelId, String userId) {
-        redisTemplate.opsForList().rightPush(channelId.toString(), userId.toString());
+        redisTemplate.opsForList().rightPush(channelId.toString(), userId);
     }
 
     @Override
@@ -52,7 +47,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void addUserAtSocket(String socketId, String userId) {
-        redisTemplate.opsForList().rightPush(socketId.toString(), userId.toString());
+        redisTemplate.opsForList().rightPush(socketId.toString(), userId);
     }
 
     @Override
@@ -89,7 +84,7 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void addWebSocketSessionByUser(Long userId, WebSocketSession session) {
         String key = "user:"+userId.toString();
-        redisTemplate.opsForSet().add(key, session.getId().toString());
+        redisTemplate.opsForSet().add(key, session.getId());
         Set<String> sessionIdSet = redisTemplate.opsForSet().members(key);
         logger.info("userId " + userId +"의 웹소켓세션");
         for(String id : sessionIdSet){
@@ -101,8 +96,8 @@ public class RedisServiceImpl implements RedisService {
     public void removeWebSocketSessionByUser(Long userId, WebSocketSession session) {
         String key = "user:"+userId.toString();
         Set<String> sessionIdSet = redisTemplate.opsForSet().members(key);
-        if(sessionIdSet.contains(session.getId().toString())){
-            redisTemplate.opsForSet().remove(key, session.getId().toString());
+        if (sessionIdSet.contains(session.getId())) {
+            redisTemplate.opsForSet().remove(key, session.getId());
         }
         Set<String> sessions = redisTemplate.opsForSet().members(key);
         logger.info("user " + userId +"의 웹소켓세션");
@@ -132,13 +127,13 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void removeActiveChannelInfo(WebSocketSession session) {
-        String key = "websocketsession:"+session.getId().toString();
+        String key = "websocketsession:" + session.getId();
         redisTemplate.delete(key);
     }
 
     @Override
     public Long getActiveChannelInfo(WebSocketSession session) {
-        String key = "websocketsession:"+session.getId().toString();
+        String key = "websocketsession:" + session.getId();
         String channelId = (String) redisTemplate.opsForValue().get(key);
         if (channelId != null){
             return Long.parseLong(channelId);
@@ -164,7 +159,7 @@ public class RedisServiceImpl implements RedisService {
         return isChannelInSight;
     }
 
-    @Override
+    /*@Override
     public void createMessageIdCounter(Long channelId) {
         String key = "channel:"+channelId.toString();
         redisTemplate.opsForValue().set(key, "0");
@@ -185,5 +180,5 @@ public class RedisServiceImpl implements RedisService {
         }
 
         return null;
-    }
+    }*/
 }

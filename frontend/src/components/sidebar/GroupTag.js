@@ -1,8 +1,21 @@
 import React from "react";
+import NewChannelPopup from '../popup/NewChannelPopup';
 
 class GroupTag extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            showNewChannelPopup: false
+        };
+        this.toggleNewChannelPopup = this.toggleNewChannelPopup.bind(this);
+    }
+
+    toggleNewChannelPopup() {
+        this.setState((prevState) => {
+            return {
+                showNewChannelPopup: !prevState.showNewChannelPopup
+            }
+        });
     }
 
     render() {
@@ -37,7 +50,7 @@ class GroupTag extends React.Component {
                     <button style={buttonStyle}><b>그룹 대화</b></button>
                 </div>
                 <div style={innerDivStyle_2}>
-                    <button style={buttonStyle} onClick={this.props.togglePopup}>
+                    <button style={buttonStyle} onClick={this.toggleNewChannelPopup}>
                         <svg className="i-ban" viewBox="0 0 32 32" width="14" height="14" fill="none"
                              stroke="currentcolor"
                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -45,6 +58,13 @@ class GroupTag extends React.Component {
                         </svg>
                     </button>
                 </div>
+                {this.state.showNewChannelPopup ?
+                    <NewChannelPopup
+                        togglePopup={this.toggleNewChannelPopup}
+                        addNewChannel={this.props.addNewChannel}
+                    />
+                    : null
+                }
             </div>
         );
     }

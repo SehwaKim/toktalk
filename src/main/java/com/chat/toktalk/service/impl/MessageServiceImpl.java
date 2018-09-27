@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -30,7 +31,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Message addMessage(Message message) {
         Message saved = messageRepository.save(message);
-        redisService.increaseMessageIdByChannel(message.getChannelId());
+//        redisService.increaseMessageIdByChannel(message.getChannelId());
 
         if("system".equals(message.getType())){
             ExcludedMessage excludedMessage = new ExcludedMessage();
@@ -50,35 +51,29 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Long countUnreadMessageByChannelUser(ChannelUser channelUser) {
-//        채널의 마지막 글번호 - 유저가 마지막으로 읽은 글번호 - (삭제되거나 시스템메시지 수)
-        // 근데 이 채널을 다른데서 보고있으면 무시되어야 함
+        // 채널의 마지막 글번호 - 유저가 마지막으로 읽은 글번호 - (삭제되거나 시스템메시지 수)
+        // *글번호가 아니라 글 갯수로 가져와서 계산하도록 바꿈
         Long channelId = channelUser.getChannel().getId();
         Long userId = channelUser.getUser().getId();
+        Long unread = 0L;
 
         if(!redisService.isChannelInSight(userId, channelId)){
-            Long lastMessageId = redisService.getLastMessageIdByChannel(channelId);
-            if(lastMessageId == null){
-                lastMessageId = 0L;
-            }
-            Long lastReadId = channelUser.getLastReadId();
-            if(lastReadId == null){
-                lastReadId = 0L;
-            }
-            Long excludedCnt = excludedMessageRepository.countExcludedMessageByChannelId(channelId);
-            if(excludedCnt == null){
-                excludedCnt = 0L;
-            }
-            Long result = lastMessageId - lastReadId - excludedCnt;
-            if(result > 0){
-                return result;
-            }
-        }
+            Long totMessageCnt = Optional.ofNullable(getTotalMessageCntByChannel(channelId)).orElse(0L);
+            Long lastReadCnt = Optional.ofNullable(channelUser.getLastReadCnt()).orElse(0L);//lastreadid이름 바꿔야함
+            Long excludedCnt = Optional.ofNullable(excludedMessageRepository.countExcludedMessageByChannelId(channelId))
+                    .orElse(0L);
 
-        return null;
+            System.out.println("===================================================================================");
+            System.out.println("totMessageCnt: " + totMessageCnt);
+            System.out.println("lastReadCnt: " + lastReadCnt);
+            System.out.println("excludedCnt: " + excludedCnt);
+            unread = totMessageCnt - lastReadCnt - excludedCnt;
+        }
+        return unread;
     }
 
     @Override
-    public Long getLastIdByChannel(Long channelId) {
-        return messageRepository.getLastId(channelId);
+    public Long getTotalMessageCntByChannel(Long channelId) {
+        return messageRepository.countMessageByChannel(channelId);
     }
 }

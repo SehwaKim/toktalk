@@ -1,13 +1,9 @@
 package com.chat.toktalk.config;
 
 import com.chat.toktalk.amqp.MessageSender;
-import com.chat.toktalk.domain.Channel;
-import com.chat.toktalk.domain.ChannelUser;
-import com.chat.toktalk.domain.Message;
-import com.chat.toktalk.domain.User;
+import com.chat.toktalk.domain.*;
 import com.chat.toktalk.dto.SendType;
 import com.chat.toktalk.dto.SocketMessage;
-import com.chat.toktalk.dto.UnreadMessageInfo;
 import com.chat.toktalk.service.*;
 import com.chat.toktalk.websocket.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -21,7 +17,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,24 +63,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 
         // Redis 웹소켓세션 등록
         redisService.addWebSocketSessionByUser(userId, session);
-
-        // 채널별로 읽지 않은 메세지 수 구해서 뿌려주기
-//        List<UnreadMessageInfo> unreadMessages = new ArrayList<>();
-//
-//        List<ChannelUser> channelUsers = channelUserService.getChannelUsersByUserId((Long)attributes.get("userId"));
-//
-//        for(ChannelUser channelUser : channelUsers){
-//            Long cnt = messageService.countUnreadnew UnreadMessageInfo(channelId, unread)MessageByChannelUser(channelUser);
-//            if(cnt != null){
-//                unreadMessages.add(new UnreadMessageInfo(channelUser.getChannel().getId(), cnt));
-//            }
-//        }
-//
-//        SocketMessage socketMessage = new SocketMessage(SendType.UNREAD);
-//        socketMessage.setUnreadMessages(unreadMessages);
-//        String jsonStr = objectMapper.writeValueAsString(socketMessage);
-//        logger.info(jsonStr);
-//        session.sendMessage(new TextMessage(jsonStr));
     }
 
     @Override
@@ -106,12 +83,24 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         if ("chat".equals(type)) {
             handleChatMessage(session, map);
         }
-        if ("exit_channel".equals(type)) {
-            exitChannel(session, map);
-        }
         if ("invite_member".equals(type)) {
             inviteMember(map);
         }
+        if ("invite_direct".equals(type)) {
+            notifyInvitation(map);
+        }
+    }
+
+    private void notifyInvitation(HashMap<String, Object> map) {
+        Long channelId = Long.parseLong(map.get("channelId").toString());
+        Long userId = Long.parseLong(map.get("userId").toString());
+        Channel channel = channelService.getChannel(channelId);
+
+        SocketMessage socketMessage = new SocketMessage(SendType.CHANNEL_JOINED);
+        socketMessage.setUserId(userId);
+        socketMessage.setChannel(channel);
+        channel.setName(channel.getFirstUserName());
+        messageSender.sendMessage(socketMessage);
     }
 
     private void inviteMember(HashMap<String, Object> map) {
@@ -127,13 +116,6 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         socketMessage.setUserId(invitedUserId);
         socketMessage.setChannel(channel);
         messageSender.sendMessage(socketMessage);
-    }
-
-    private void exitChannel(WebSocketSession session, HashMap<String, Object> map) {
-        Long userId = Long.parseLong(session.getAttributes().get("userId").toString());
-        Long channelId = Long.parseLong(map.get("channelId").toString());
-        channelUserService.removeChannelUser(userId, channelId);
-        redisService.removeActiveChannelInfo(session);
     }
 
     private void alertTyping(WebSocketSession session) {
@@ -158,19 +140,26 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long channelId = Long.parseLong(map.get("channelId").toString());
 
         /*
-         *   switch 하기 전 active channel 의 lastReadId 를 업데이트
+         *   switch 하기 전 active channel 의 lastReadCnt 를 업데이트
          */
         Long activeChannelId = redisService.getActiveChannelInfo(session);
         if(activeChannelId != null){
             ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, user.getId());
-//            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
-            alreadyUser.setLastReadId(messageService.getLastIdByChannel(activeChannelId));
-            channelUserService.updateChannelUser(alreadyUser);
+            if (alreadyUser != null) {
+//                alreadyUser.setLastReadCnt(redisService.getLastMessageIdByChannel(activeChannelId));
+                alreadyUser.setLastReadCnt(messageService.getTotalMessageCntByChannel(activeChannelId));
+                channelUserService.updateChannelUser(alreadyUser);
+            }
         }
 
         /*
         *   active channel 바꾸기
         */
+        if (channelId == 0) { //0번채널로 바꾸라는 요청은 그냥 지우라는 의미
+            redisService.removeActiveChannelInfo(session);
+            return;
+        }
+
         String sessionId = session.getId();
         redisService.addActiveChannelInfo(sessionId, channelId);
 
@@ -184,7 +173,7 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
             Long firstReadId = alreadyUser.getFirstReadId();
             messages = messageService.getMessagesByChannelUser(channelId, firstReadId);
             if(messages != null && messages.size() > 0){
-                alreadyUser.setLastReadId(messages.get(messages.size()-1).getId());
+                alreadyUser.setLastReadCnt(messages.get(messages.size() - 1).getId());
                 channelUserService.updateChannelUser(alreadyUser);
                 SocketMessage socketMessage = new SocketMessage(SendType.MESSAGES);
                 socketMessage.setChannelId(channelId);
@@ -233,18 +222,20 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
     private void handleChatMessage(WebSocketSession session, HashMap<String, Object> map) {
         Long channelId = new Long(map.get("channelId").toString());
         String message = (String) map.get("text");
+        String channelType = (String) map.get("channelType");
 
         Map<String, Object> attributes = session.getAttributes();
         Long userId = (Long) attributes.get("userId");
         String nickname = (String) attributes.get("nickname");
 
         // 1. 새 Message 엔티티 DB에 저장
-        Message messageNew = new Message();
-        messageNew.setUserId(userId);
-        messageNew.setNickname(nickname);
-        messageNew.setChannelId(channelId);
-        messageNew.setText(message);
-        messageService.addMessage(messageNew);
+        Message newMessage = new Message();
+        newMessage.setUserId(userId);
+        newMessage.setNickname(nickname);
+        newMessage.setChannelId(channelId);
+        newMessage.setChannelType(ChannelType.valueOf(channelType));
+        newMessage.setText(message);
+        messageService.addMessage(newMessage);
 
         // 2. 메세지큐에 내보내기
         SocketMessage socketMessage = new SocketMessage(SendType.CHAT);
@@ -263,22 +254,16 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
         Long userId = (Long) attributes.get("userId");
         sessionManager.removeWebSocketSession(userId, session);
 
-        // 마지막으로 보고 있던 채널의 lastReadId 를 업데이트
+        // 마지막으로 보고 있던 채널의 lastReadCnt 를 업데이트
         Long activeChannelId = redisService.getActiveChannelInfo(session);
         if(activeChannelId != null){
             ChannelUser alreadyUser = channelUserService.getChannelUser(activeChannelId, userId);
-//            alreadyUser.setLastReadId(redisService.getLastMessageIdByChannel(activeChannelId));
-            alreadyUser.setLastReadId(messageService.getLastIdByChannel(activeChannelId));
+            alreadyUser.setLastReadCnt(messageService.getTotalMessageCntByChannel(activeChannelId));
             channelUserService.updateChannelUser(alreadyUser);
         }
 
         // Redis 웹소켓세션 삭제
         redisService.removeWebSocketSessionByUser(userId, session);
         redisService.removeActiveChannelInfo(session);
-
-        // 레디스 정보 삭제
-        /*if(redisService.removeUser(attributes.get("userId").toString())){
-            System.out.println("삭제 성공!!!");
-        }*/
     }
 }

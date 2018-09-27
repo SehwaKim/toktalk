@@ -23,7 +23,6 @@ class ChatArea extends React.Component {
             for (let message of json) {
                 messages.push(<ChatContent key={Date.now() + message.id} {...message}/>);
             }
-            ;
             this.setState({
                 items: messages
             });
